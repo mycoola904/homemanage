@@ -1,50 +1,62 @@
-# [PROJECT_NAME] Constitution
-<!-- Example: Spec Constitution, TaskFlow Constitution, etc. -->
+<!--
+Sync Impact Report:
+- Version: 1.0.0 -> 1.0.1
+- Modified Principles: I. Spec-First Delivery; II. Deterministic Correctness
+- Added Sections: None
+- Removed Sections: None
+- Templates Updated:
+  - .specify/templates/plan-template.md ✅ (alignment verified, no edits needed)
+  - .specify/templates/spec-template.md ✅ (alignment verified, no edits needed)
+  - .specify/templates/tasks-template.md ✅ (alignment verified, no edits needed)
+- Follow-ups: None
+-->
+# HomeManage Constitution
 
 ## Core Principles
 
-### [PRINCIPLE_1_NAME]
-<!-- Example: I. Library-First -->
-[PRINCIPLE_1_DESCRIPTION]
-<!-- Example: Every feature starts as a standalone library; Libraries must be self-contained, independently testable, documented; Clear purpose required - no organizational-only libraries -->
+### I. Spec-First Delivery
+Every change traces back to an approved `/speckit.spec`, `/speckit.plan`, and `/speckit.tasks` artifact before code is written. Pull requests that skip a referenced spec, plan, or task list are rejected. If the spec drifts, halt implementation and revise the document first. Tests must be written to fail against the spec scenario prior to implementing the fix or feature.
+Clarification: Implementation can iterate as long as it stays within the documented acceptance criteria; spec drift—any change to requirements, scope, or externally observable behavior—requires updating the spec before coding resumes.
 
-### [PRINCIPLE_2_NAME]
-<!-- Example: II. CLI Interface -->
-[PRINCIPLE_2_DESCRIPTION]
-<!-- Example: Every library exposes functionality via CLI; Text in/out protocol: stdin/args → stdout, errors → stderr; Support JSON + human-readable formats -->
+### II. Deterministic Correctness
+Schema changes ship with tested migrations, repeatable data fixtures, and idempotent backfills. Every PR must demonstrate that the full automated test suite runs (tool-agnostic), migrations apply cleanly from a fresh database, and there are no uncommitted model or migration diffs. Business logic avoids unseeded randomness, clock-based behavior, or hidden global state; when such inputs are unavoidable they are explicitly seeded and logged. HTMX endpoints must behave as pure functions of request data and persisted state so swaps remain predictable. Deterministic proof first: prefer failing automated tests, but reproducible scenarios (e.g., captured template renders or HTMX exchanges) are acceptable when tests are impractical.
 
-### [PRINCIPLE_3_NAME]
-<!-- Example: III. Test-First (NON-NEGOTIABLE) -->
-[PRINCIPLE_3_DESCRIPTION]
-<!-- Example: TDD mandatory: Tests written → User approved → Tests fail → Then implement; Red-Green-Refactor cycle strictly enforced -->
+### III. Lean Dependencies & Small Surface Area
+Prefer the Python standard library, Django, and existing utilities. Adding any new dependency demands a written justification, blast-radius assessment, and removal plan inside the PR. Background workers, caches, or queues stay out until a spec proves necessity. When alternatives exist, pick the simplest reversible solution that keeps the dependency graph tiny.
 
-### [PRINCIPLE_4_NAME]
-<!-- Example: IV. Integration Testing -->
-[PRINCIPLE_4_DESCRIPTION]
-<!-- Example: Focus areas requiring integration tests: New library contract tests, Contract changes, Inter-service communication, Shared schemas -->
+### IV. Server-Driven UI & Template Safety
+All UX state originates on the server. HTMX swaps only update declared containers and must not remove the element that triggers the request. CSS or class changes are blocked until `npm run dev` (Tailwind/DaisyUI) is confirmed live in the terminal. Django templates obey single-line `{% %}` and `{# #}` rules; conditional classes are computed in the view or a single-line `{% with %}` block to avoid parser failures.
 
-### [PRINCIPLE_5_NAME]
-<!-- Example: V. Observability, VI. Versioning & Breaking Changes, VII. Simplicity -->
-[PRINCIPLE_5_DESCRIPTION]
-<!-- Example: Text I/O ensures debuggability; Structured logging required; Or: MAJOR.MINOR.BUILD format; Or: Start simple, YAGNI principles -->
+### V. AI Accountability & Guardrails
+AI contributions cite the spec paragraph implemented and link to the prompt/response that produced them. Human reviewers verify AI output against Principles I–IV before merge. AI agents may not relax template constraints, introduce dependencies, or paper over watcher issues; any uncertainty is recorded as a TODO or open question inside the relevant doc.
 
-## [SECTION_2_NAME]
-<!-- Example: Additional Constraints, Security Requirements, Performance Standards, etc. -->
+## Stack & Determinism Constraints
 
-[SECTION_2_CONTENT]
-<!-- Example: Technology stack requirements, compliance standards, deployment policies, etc. -->
+- Backend: Python 3.11+, Django, server-rendered templates, and HTMX partial responses.
+- Frontend styling: Tailwind CSS + DaisyUI compiled by the Node watcher; no SPA frameworks or client-side state stores.
+- Database: SQLite for local development; production database engine TBD but must support transactional integrity and deterministic ordering.
+- Environments must support repeatable migrations (`manage.py migrate --check`) and fixture loads. Data seeding scripts live in Django migrations or dedicated management commands.
+- Observability: structured logging via Django's logging settings; third-party APM or telemetry requires spec approval due to Principle III.
 
-## [SECTION_3_NAME]
-<!-- Example: Development Workflow, Review Process, Quality Gates, etc. -->
+## Workflow & Quality Gates
 
-[SECTION_3_CONTENT]
-<!-- Example: Code review requirements, testing gates, deployment approval process, etc. -->
+1. `/speckit.spec` -> `/speckit.plan` -> `/speckit.tasks` outputs are mandatory and must be linked from the branch description before implementation begins.
+2. The plan's Constitution Check documents coverage for spec scenarios, migration strategy, dependency impact, and watcher confirmation steps.
+3. Each HTMX endpoint defines its target IDs, failure states, and swap type inside the plan prior to coding.
+4. PR descriptions include spec links, migration summaries, deterministic test evidence, and the IDs of AI prompts used.
+5. CSS/template regressions require attaching watcher logs or screenshots proving the Tailwind watcher is running before code review.
+
+### Assumptions & Open Questions
+
+- Production database selection (likely PostgreSQL) needs confirmation before the first deployment.
+- Observability stack (e.g., OpenTelemetry vs. ELK) remains undecided; decision required before adding external services.
+- AI prompt retention location and duration must be defined to enforce Principle V record-keeping.
 
 ## Governance
-<!-- Example: Constitution supersedes all other practices; Amendments require documentation, approval, migration plan -->
 
-[GOVERNANCE_RULES]
-<!-- Example: All PRs/reviews must verify compliance; Complexity must be justified; Use [GUIDANCE_FILE] for runtime development guidance -->
+- This constitution supersedes ad-hoc preferences; when conflicts arise, default to these principles.
+- Amendments require an RFC in `docs/`, updates to this file, and validation that plan/spec/tasks templates reflect the new rules.
+- Versioning: MAJOR for removing/redefining principles, MINOR for new principles/sections or stricter requirements, PATCH for clarifications.
+- Compliance reviews occur at kickoff, pre-merge, and release retro. Missing specs, watcher evidence, or AI prompt logs block release until resolved.
 
-**Version**: [CONSTITUTION_VERSION] | **Ratified**: [RATIFICATION_DATE] | **Last Amended**: [LAST_AMENDED_DATE]
-<!-- Example: Version: 2.1.1 | Ratified: 2025-06-13 | Last Amended: 2025-07-16 -->
+**Version**: 1.0.1 | **Ratified**: 2026-02-05 | **Last Amended**: 2026-02-06

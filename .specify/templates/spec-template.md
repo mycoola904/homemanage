@@ -5,6 +5,8 @@
 **Status**: Draft  
 **Input**: User description: "$ARGUMENTS"
 
+> Per the Constitution, this spec must be reviewed and approved before any code is written. Capture determinism, dependency, and UI safety decisions here rather than deferring to implementation.
+
 ## User Scenarios & Testing *(mandatory)*
 
 <!--
@@ -100,6 +102,18 @@
 - **[Entity 1]**: [What it represents, key attributes without implementation]
 - **[Entity 2]**: [What it represents, relationships to other entities]
 
+### Server-Driven UI & Template Safety *(mandatory for UI work)*
+
+- **UI-001**: Document each HTMX endpoint, its `hx-target`, `hx-swap`, and how the triggering element remains in the DOM after the swap.
+- **UI-002**: Describe how all dynamic classes/attributes are computed server-side (views or single-line `{% with %}` blocks), avoiding inline conditional template logic.
+- **UI-003**: Note the Tailwind/DaisyUI watcher command (`npm run dev` or equivalent) and how its output will be captured before debugging styling issues.
+
+## Deterministic Data & Integrity *(mandatory)*
+
+- **Schema Changes**: [List migrations, their filenames, and rollback strategy to keep the database deterministic]
+- **Data Fixtures**: [Describe fixtures or seeding scripts, expected ordering, and idempotency guarantees]
+- **External Inputs**: [Explain how randomness, timestamps, or third-party calls are seeded/mocked to satisfy Principle II]
+
 ## Success Criteria *(mandatory)*
 
 <!--
@@ -113,3 +127,8 @@
 - **SC-002**: [Measurable metric, e.g., "System handles 1000 concurrent users without degradation"]
 - **SC-003**: [User satisfaction metric, e.g., "90% of users successfully complete primary task on first attempt"]
 - **SC-004**: [Business metric, e.g., "Reduce support tickets related to [X] by 50%"]
+
+## Assumptions & Open Questions *(mandatory)*
+
+- **Assumptions**: [Enumerate the constraints you are treating as true (e.g., "Production DB = PostgreSQL 15", "Single-tenant deployment")]
+- **Open Questions**: [List unknowns that block implementation or require stakeholder input; include owner + due date]

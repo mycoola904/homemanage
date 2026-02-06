@@ -12,6 +12,14 @@ description: "Task list template for feature implementation"
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and testing of each story.
 
+## Constitution Hooks *(do not remove)*
+
+- Every task references the spec ID and scenario it satisfies (Principle I).
+- Database tasks MUST cite the migration/fixture file and describe how determinism is enforced (Principle II).
+- Tasks that add a dependency must link to the plan’s approved justification; default assumption is “no new dependency” (Principle III).
+- UI/tasks touching templates or CSS must include a subtask to confirm the Tailwind watcher is running and to document HTMX targets (Principle IV).
+- Tasks generated or implemented with AI must store the prompt/response location noted in the task description (Principle V).
+
 ## Format: `[ID] [P?] [Story] Description`
 
 - **[P]**: Can run in parallel (different files, no dependencies)
