@@ -1,0 +1,25 @@
+<div class="flex items-center gap-2">
+  {% if user.is_authenticated %}
+    <div class="dropdown dropdown-end">
+      <label tabindex="0" class="btn btn-circle avatar placeholder">
+        <div class="bg-neutral text-neutral-content w-9 rounded-full">
+          <span>{{ user.username|default:"U"|first|upper }}</span>
+        </div>
+      </label>
+
+      <ul tabindex="0"
+          class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
+        <li><a class="opacity-60 pointer-events-none">Profile (soon)</a></li>
+        <li>
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button class="w-full text-left">Logout</button>
+          </form>
+        </li>
+      </ul>
+    </div>
+  {% else %}
+    <a class="btn btn-sm btn-outline" href="{% url 'login' %}">Login</a>
+  {% endif %}
+</div>
+

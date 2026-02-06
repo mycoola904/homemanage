@@ -1,0 +1,19 @@
+{
+  "name": "djangostarter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev:css": "npx @tailwindcss/cli -i ./static/src/input.css -o ./static/css/output.css --watch",
+    "build:css": "npx @tailwindcss/cli -i ./static/src/input.css -o ./static/css/output.css"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.18",
+    "daisyui": "^5.5.17",
+    "tailwindcss": "^4.1.18"
+  }
+}

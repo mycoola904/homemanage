@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %} 
+
+
+  <div class="p-6 space-y-4">
+  <button
+    class="btn btn-primary"
+    hx-get="{% url 'htmx_ping' %}"
+    hx-target="#htmx-result"
+    hx-swap="innerHTML"
+  >
+    HTMX Ping
+  </button>
+
+  <div id="htmx-result"></div>
+  </div>
+
+
+  <form
+  class="flex gap-2 items-center"
+  hx-post="{% url 'htmx_echo' %}"
+  hx-target="#htmx-echo-result"
+  hx-swap="innerHTML"
+>
+  {% csrf_token %}
+  <input class="input input-bordered" name="msg" placeholder="Type something" />
+  <button class="btn btn-secondary" type="submit">Send</button>
+  </form>
+
+<div id="htmx-echo-result"></div>
+
+{% endblock content %}

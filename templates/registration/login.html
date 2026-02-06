@@ -1,0 +1,16 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="p-6 max-w-md mx-auto">
+    <c-ui.card class="bg-base-300">
+      <h1 class="text-2xl font-bold mb-4">Login</h1>
+      <form method="post" class="space-y-3">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn btn-primary w-full" type="submit">Login</button>
+      </form>
+    </c-ui.card>
+  </div>
+{% endblock %}
+

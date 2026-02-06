@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="emerald">
+<head>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>{% block title %}My Django Project{% endblock title %}</title>
+
+    {% block extra_head %}
+    <!-- Additional CSS or meta tags can go here -->
+    {% endblock extra_head %}
+</head>
+
+<body>
+  <main>
+    <c-layout.app>
+      {% block content %}{% endblock content %}
+    </c-layout.app>
+  </main>
+
+  <footer class="p-4">
+    <p>&copy; 2026 My Django Project</p>
+  </footer>
+
+  {% block extra_body %}{% endblock extra_body %}
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+</body>
+</html>
+

@@ -1,0 +1,20 @@
+{# templates/components/layout/app.html #}
+{% comment %}
+Props:
+- drawer_id (optional; default is set here)
+Slots:
+- slot (page content)
+{% endcomment %}
+
+{% with drawer_id=drawer_id|default:"my-drawer-4" %}
+<div class="drawer lg:drawer-open">
+  <input id="{{ drawer_id }}" type="checkbox" class="drawer-toggle" />
+
+  <div class="drawer-content">
+    <c-layout.navbar drawer_id=drawer_id />
+    {{ slot }}
+  </div>
+
+  <c-layout.sidebar />
+</div>
+{% endwith %}
