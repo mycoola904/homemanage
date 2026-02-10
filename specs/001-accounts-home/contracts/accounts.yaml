@@ -1,0 +1,167 @@
+openapi: 3.1.0
+info:
+  title: Accounts Feature (Server-Rendered)
+  version: 0.1.0
+  description: >-
+    HTML-only endpoints for the Accounts Home feature. All routes require
+    authentication and scope data to the requesting user. Responses return
+    fully-rendered templates or HTMX fragments (never JSON).
+servers:
+  - url: https://app.example.com
+paths:
+  /accounts/:
+    get:
+      summary: Accounts index
+      description: >-
+        Renders the accounts table using django-cotton components. Includes
+        an empty preview panel (`#account-preview-panel`) and wires HTMX
+        attributes on action buttons.
+      responses:
+        '200':
+          description: HTML page with layout chrome
+          content:
+            text/html:
+              examples:
+                success:
+                  summary: Accounts table + preview container
+  /accounts/new/:
+    get:
+      summary: Account create form
+      responses:
+        '200':
+          description: Full-page create form using base layout.
+    post:
+      summary: Create account
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AccountForm'
+      responses:
+        '302':
+          description: Redirect to /accounts/ with flash success message.
+        '422':
+          description: Form re-rendered with validation errors (HTML).
+  /accounts/{accountId}/preview/:
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+    get:
+      summary: HTMX preview fragment
+      description: Returns html fragment swapped into `#account-preview-panel`.
+      responses:
+        '200':
+          description: Preview panel html fragment
+          content:
+            text/html: {}
+        '404':
+          description: Not found fragment describing missing account.
+  /accounts/{accountId}/edit/:
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+    get:
+      summary: HTMX edit form fragment
+      responses:
+        '200':
+          description: Form fragment rendered in preview panel.
+    post:
+      summary: Update account via HTMX
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AccountForm'
+      responses:
+        '200':
+          description: Updated preview fragment (successful save).
+        '422':
+          description: Form fragment with validation errors.
+        '404':
+          description: Not found fragment for deleted/unowned account.
+  /accounts/{accountId}/:
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+    get:
+      summary: Canonical account detail page
+      responses:
+        '200':
+          description: Full layout page containing account header and placeholder transactions section.
+        '404':
+          description: Full-page 404 template.
+  /accounts/{accountId}/delete/confirm/:
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+    get:
+      summary: HTMX delete confirmation partial
+      description: >-
+        Returns a row-scoped fragment that nests inside a `<td>` placeholder.
+        Buttons are wired with `hx-request="queue:last"` and `hx-disabled-elt="this"` to block duplicate submissions.
+      responses:
+        '200':
+          description: Confirmation fragment (HTML).
+        '404':
+          description: Fragment instructing client to refresh index.
+  /accounts/{accountId}/delete/:
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+    post:
+      summary: Hard delete via HTMX
+      responses:
+        '200':
+          description: HTML snippet with instructions for removing the table row and clearing preview panel if needed.
+        '404':
+          description: Fragment signaling the record is already gone.
+
+components:
+  parameters:
+    AccountId:
+      name: accountId
+      in: path
+      required: true
+      description: UUID primary key of the account
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    AccountForm:
+      type: object
+      required:
+        - name
+        - account_type
+        - status
+        - current_balance
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        institution:
+          type: string
+          maxLength: 255
+        account_type:
+          type: string
+          enum: [checking, savings, credit_card, loan, other]
+        number_last4:
+          type: string
+          pattern: "^[0-9]{0,4}$"
+        status:
+          type: string
+          enum: [active, closed, pending]
+        current_balance:
+          type: string
+          pattern: "^-?[0-9]+(\.[0-9]{2})?$"
+        credit_limit_or_principal:
+          type: string
+          nullable: true
+        statement_close_date:
+          type: string
+          format: date
+          nullable: true
+        payment_due_day:
+          type: integer
+          minimum: 1
+          maximum: 31
+          nullable: true
+        notes:
+          type: string
+          nullable: true
