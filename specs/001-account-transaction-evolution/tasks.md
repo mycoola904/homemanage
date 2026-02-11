@@ -32,6 +32,7 @@ description: "Task list for account and transaction evolution"
 - [ ] T003 Update financial/models.py with Account fields (`account_number`, `routing_number`, `interest_rate`), Category model, Transaction `transaction_type`, and case-insensitive category uniqueness (Spec FR-001, FR-007)
 - [ ] T004 Create migration financial/migrations/0003_account_transaction_evolution.py to add fields, create Category, backfill `transaction_type`, and drop `direction`/`number_last4` with idempotent logic (Spec FR-011, Migration Strategy)
 - [ ] T005 [P] Add migration backfill tests in financial/tests/test_migrations_backfill.py covering `direction` → `transaction_type` mapping (Spec SC-002)
+- [ ] T024 [P] Validate SQLite-default test settings in core/settings_test.py and document `manage.py migrate --check` usage for tests (Spec FR-012)
 
 **Checkpoint**: Foundation ready - user story implementation can begin
 
@@ -75,6 +76,8 @@ description: "Task list for account and transaction evolution"
 - [ ] T014 [US2] Update account_transactions_new in financial/views.py to save signed amounts and return correct HTMX fragments (Spec UI-002)
 - [ ] T015 [US2] Update financial/services/transactions.py to format signed amounts from `transaction_type` (Spec SC-001)
 - [ ] T016 [US2] Update financial/templates/financial/accounts/transactions/_form.html to expose `transaction_type` choices and absolute amount input; confirm Tailwind watcher in task notes (Spec UI-004)
+- [ ] T025 [P] [US2] Add transaction edit HTMX tests in financial/tests/test_transaction_edit.py (Spec UI-002, FR-005)
+- [ ] T026 [US2] Add transaction edit endpoint in financial/urls.py and financial/views.py plus template updates in financial/templates/financial/accounts/transactions/_form.html (Spec UI-002)
 
 **Checkpoint**: User Story 2 works independently
 
@@ -105,6 +108,7 @@ description: "Task list for account and transaction evolution"
 ## Phase 6: Polish & Cross-Cutting Concerns
 
 - [ ] T023 [P] Update specs/001-account-transaction-evolution/quickstart.md with final verification steps and test command (Spec SC-002)
+- [ ] T027 [P] Verify HTMX responses preserve triggering elements for account preview/edit/delete, transaction add/edit, and inline category add (Spec FR-010, UI-001, UI-002)
 
 ---
 

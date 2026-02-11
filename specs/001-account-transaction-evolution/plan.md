@@ -47,6 +47,7 @@ specs/001-account-transaction-evolution/
 ├── quickstart.md        # Phase 1 output (/speckit.plan)
 ├── contracts/           # Phase 1 output (/speckit.plan)
 └── tasks.md             # Phase 2 output (/speckit.tasks)
+```
 
 ### Source Code (repository root)
 
@@ -72,6 +73,7 @@ financial/
 │   ├── detail.html
 │   └── transactions/
 │       ├── _body.html
+│       ├── _category_form.html
 │       ├── _form.html
 │       └── _missing.html
 ├── migrations/
@@ -88,6 +90,18 @@ templates/
 ```
 
 **Structure Decision**: Single Django project with the `financial` app owning account/transaction logic and templates, and shared components in `templates/components` per django-cotton configuration.
+
+## HTMX Endpoint Contracts
+
+All form endpoints preserve the triggering element in the DOM and use the documented targets/swaps.
+
+- **Account preview**: `hx-target="#account-preview-panel"`, `hx-swap="innerHTML"`, root element `<section>`.
+- **Account edit (GET/POST)**: `hx-target="#account-preview-panel"`, `hx-swap="innerHTML"`, root element `<form>`.
+- **Account delete confirm**: `hx-target="#account-preview-panel"`, `hx-swap="innerHTML"`, root element `<form>`.
+- **Transactions body**: `hx-target="#account-transactions-body"`, `hx-swap="innerHTML"`, root element `<div>`.
+- **Transactions new (GET/POST)**: `hx-target="#account-transactions-body"`, `hx-swap="innerHTML"`, root element `<form>`.
+- **Transactions edit (GET/POST)**: `hx-target="#account-transactions-body"`, `hx-swap="innerHTML"`, root element `<form>`.
+- **Inline category add (POST)**: `hx-target="#account-transactions-body"`, `hx-swap="innerHTML"`, root element `<form>` on errors and `<div>` on success.
 
 ## Pre-Implementation Commitments
 
