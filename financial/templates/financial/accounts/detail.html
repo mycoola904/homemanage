@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }}{% endblock title %}
+
+{% block content %}
+<div class="p-6 space-y-6">
+    <a href="{% url 'financial:accounts-index' %}" class="link link-hover text-sm">&larr; Back to Accounts</a>
+
+    <div class="grid gap-6 lg:grid-cols-3">
+        <div class="lg:col-span-2 space-y-4">
+            <c-ui.card>
+                <div class="space-y-3">
+                    <h1 class="text-3xl font-bold">{{ account.name }}</h1>
+                    {% if account.institution %}
+                        <p class="text-base-content/70">{{ account.institution }}</p>
+                    {% endif %}
+                    <div class="badge badge-outline">{{ account.get_account_type_display }}</div>
+                </div>
+            </c-ui.card>
+
+            <c-ui.card>
+                {% include "financial/accounts/_preview.html" with preview=preview %}
+            </c-ui.card>
+        </div>
+
+        <div>
+            <c-ui.card>
+                <h2 class="text-xl font-semibold mb-2">Status</h2>
+                <span class="{{ preview.status_badge_class }}">{{ preview.status_label }}</span>
+            </c-ui.card>
+        </div>
+    </div>
+
+    <c-ui.card>
+        <h2 class="text-xl font-semibold mb-2">Transactions (Coming Soon)</h2>
+        <p class="text-base-content/70">Detailed transaction history will appear here once the Transactions feature ships.</p>
+    </c-ui.card>
+</div>
+{% endblock content %}

@@ -1,0 +1,7 @@
+<!-- HTMX targets for US2/US3 will swap innerHTML here via hx-target="#account-preview-panel" -->
+<section id="{{ panel_id|default:"account-preview-panel" }}"
+         class="rounded-2xl border border-dashed border-base-300 bg-base-100 p-6 min-h-64"
+         data-component="financial.account_preview_panel"
+         {% if swap_oob %}hx-swap-oob="true"{% endif %}>
+    <p class="text-base-content/70">Select Preview on any account to load inline details.</p>
+</section>

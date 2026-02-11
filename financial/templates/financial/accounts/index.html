@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Accounts{% endblock title %}
+
+{% block content %}
+<div class="p-6 space-y-6">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-bold">Accounts</h1>
+            <p class="text-base-content/70">Review every household account without leaving this page.</p>
+        </div>
+        <a href="{{ add_account_url }}" class="btn btn-primary">
+            Add Account
+        </a>
+    </div>
+
+    {% if messages %}
+        <div class="space-y-2">
+            {% for message in messages %}
+                <div class="alert alert-success">{{ message }}</div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="grid gap-6 lg:grid-cols-2">
+        <c-financial.accounts_table
+            rows=account_rows
+            has_accounts=has_accounts
+            empty_state_title=empty_state_title
+            empty_state_body=empty_state_body
+            add_account_url=add_account_url
+        />
+
+        <c-financial.account_preview_panel panel_id=preview_panel_id />
+    </div>
+</div>
+{% endblock content %}

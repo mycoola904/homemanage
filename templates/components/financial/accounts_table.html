@@ -1,0 +1,37 @@
+{% comment %}
+Context:
+- rows: iterable[AccountSummaryRow]
+- has_accounts: bool
+- add_account_url: str
+- empty_state_title / empty_state_body: copy strings
+{% endcomment %}
+
+<section class="space-y-4" data-component="financial.accounts_table">
+    {% if has_accounts %}
+        <div class="overflow-x-auto rounded-2xl border border-base-200 bg-base-100 shadow-sm">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Institution</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th class="text-right">Balance</th>
+                        <th class="text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                        <c-financial.account_row row=row />
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="rounded-2xl border border-dashed border-base-300 bg-base-100 p-8 text-center">
+            <p class="text-xl font-semibold">{{ empty_state_title }}</p>
+            <p class="text-base-content/70">{{ empty_state_body }}</p>
+            <a href="{{ add_account_url }}" class="btn btn-primary mt-4">Add Account</a>
+        </div>
+    {% endif %}
+</section>

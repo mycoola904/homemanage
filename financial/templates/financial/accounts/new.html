@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Add Account{% endblock title %}
+
+{% block content %}
+<div class="p-6 mx-auto w-full max-w-3xl space-y-6">
+    <a href="{{ cancel_url }}" class="link link-hover text-sm">&larr; Back to Accounts</a>
+
+    <c-ui.card>
+        <div class="space-y-4">
+            <div>
+                <h1 class="text-3xl font-bold">{{ page_title }}</h1>
+                <p class="text-base-content/70">Provide the metadata we need to render deterministic rows.</p>
+            </div>
+
+            {% include "financial/accounts/_form.html" with form=form submit_label=submit_label cancel_url=cancel_url %}
+        </div>
+    </c-ui.card>
+</div>
+{% endblock content %}

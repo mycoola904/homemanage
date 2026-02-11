@@ -1,0 +1,68 @@
+{% comment %}
+Context:
+- row: AccountSummaryRow (see financial/services/accounts.py)
+- Future tasks will replace placeholder URLs with live HTMX endpoints.
+{% endcomment %}
+
+<tr data-component="financial.account_row"
+    data-account-id="{{ row.id }}"
+    id="account-row-{{ row.id }}"
+    {% if swap_oob %}hx-swap-oob="true"{% endif %}>
+    <td>
+        <div class="font-semibold">{{ row.name }}</div>
+        <p class="text-sm text-base-content/70">{{ row.account_type_label }}</p>
+    </td>
+    <td>{{ row.institution|default:"—" }}</td>
+    <td>
+        <span class="badge badge-outline">{{ row.account_type_label }}</span>
+    </td>
+    <td>
+        <span class="{{ row.status_badge_class }}">{{ row.status_label }}</span>
+    </td>
+    <td class="text-right font-mono">
+        {{ row.current_balance_display }}
+    </td>
+    <td class="text-right">
+        <div class="join join-horizontal justify-end gap-2">
+            <button
+                type="button"
+                class="btn btn-xs join-item"
+                hx-get="{{ row.preview_url }}"
+                hx-target="#account-preview-panel"
+                hx-swap="innerHTML"
+                hx-request="queue:last"
+                hx-disabled-elt="this"
+                aria-label="Preview account"
+            >
+                Preview
+            </button>
+            <a class="btn btn-xs join-item btn-ghost" href="{{ row.open_url }}" aria-label="Open account detail">
+                Open
+            </a>
+            <button
+                type="button"
+                class="btn btn-xs join-item btn-ghost"
+                hx-get="{{ row.edit_url }}"
+                hx-target="#account-preview-panel"
+                hx-swap="innerHTML"
+                hx-request="queue:last"
+                hx-disabled-elt="this"
+                aria-label="Edit account"
+            >
+                Edit
+            </button>
+            <button
+                type="button"
+                class="btn btn-xs join-item btn-error"
+                hx-get="{{ row.delete_url }}"
+                hx-target="#account-preview-panel"
+                hx-swap="innerHTML"
+                hx-request="queue:last"
+                hx-disabled-elt="this"
+                aria-label="Delete account"
+            >
+                Delete
+            </button>
+        </div>
+    </td>
+</tr>

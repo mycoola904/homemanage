@@ -5,11 +5,13 @@ __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
+*.egg-info/
 
 *.sqlite3
 db.sqlite3
 
 .env
+.env.*
 .venv/
 venv/
 ENV/
@@ -26,6 +28,9 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+dist/
+build/
+coverage/
 
 # Tailwind build output (generated)
 static/css/output.css
@@ -35,6 +40,9 @@ static/css/output.css
 # =========================
 .DS_Store
 Thumbs.db
+.idea/
+*.tmp
+*.swp
 
 # VS Code (keep settings optional)
 .vscode/*

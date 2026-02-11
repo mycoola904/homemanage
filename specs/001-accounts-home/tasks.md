@@ -24,8 +24,8 @@ description: "Task list for Accounts Home + Preview Panel"
 
 **Purpose**: Verify local environment, dependencies, and tooling before touching feature code.
 
-- [ ] T001 Install backend requirements via `requirements.txt` and Node dev dependencies via `package.json` to align with quickstart.md before starting the Accounts feature.
-- [ ] T002 Configure `.env` for PostgreSQL (per quickstart.md) and start `npm run dev:css`, capturing watcher logs so later template tasks satisfy Spec Server-Driven UI constraints.
+- [x] T001 Install backend requirements via `requirements.txt` and Node dev dependencies via `package.json` to align with quickstart.md before starting the Accounts feature.
+- [x] T002 Configure `.env` for PostgreSQL (per quickstart.md) and start `npm run dev:css`, capturing watcher logs so later template tasks satisfy Spec Server-Driven UI constraints.
 
 ---
 
@@ -33,14 +33,14 @@ description: "Task list for Accounts Home + Preview Panel"
 
 **Purpose**: Core infrastructure needed before any user story work begins.
 
-- [ ] T003 Create the `financial` Django app (`python manage.py startapp financial`), add it to `core/settings.py:INSTALLED_APPS`, and scaffold `models.py`, `views.py`, `forms.py`, `urls.py`, `tests/`, `templates/financial/accounts/`, and `fixtures/` as outlined in plan.md.
-- [ ] T004 Wire `financial.urls` under `/accounts/` in [core/urls.py](core/urls.py) with `login_required` to satisfy spec FR-002 before implementing story routes.
-- [ ] T005 Define `Account` enums, manager, and model fields in [financial/models.py](financial/models.py) per data-model.md (spec FR-001, US1 requirements) including `Meta.ordering = ("account_type", "name", "created_at")` and FK to `settings.AUTH_USER_MODEL`.
-- [ ] T006 Create migration [financial/migrations/0001_initial.py](financial/migrations/0001_initial.py) with UUID PKs, decimal precision, and `(user_id, Lower(name))` uniqueness; document deterministic rollback steps per spec Data & Integrity.
-- [ ] T007 Build deterministic fixture [financial/fixtures/accounts_minimal.json](financial/fixtures/accounts_minimal.json) containing checking, credit_card, and loan examples as described in spec Data & Integrity, ensuring UUIDs are stable for repeatable tests.
-- [ ] T008 Add scoped queryset helpers (`AccountQuerySet`, `UserAccountQuerysetMixin`) plus USD formatting utility in [financial/models.py](financial/models.py) and `financial/services/formatters.py` to enforce ownership + deterministic display (research.md clarifications).
-- [ ] T009 Create global django-cotton component directory `templates/components/financial/` with stub files (`accounts_table.html`, `account_row.html`, `account_preview_panel.html`) and note `COTTON_DIR="components"`; confirm `npm run dev:css` is running before touching these templates (plan component rule).
-- [ ] T010 Add `docs/ai/001-accounts-home-log.md` with instructions for recording AI prompt/response IDs so future tasks can reference it (plan Constitution Check AI Accountability).
+- [x] T003 Create the `financial` Django app (`python manage.py startapp financial`), add it to `core/settings.py:INSTALLED_APPS`, and scaffold `models.py`, `views.py`, `forms.py`, `urls.py`, `tests/`, `templates/financial/accounts/`, and `fixtures/` as outlined in plan.md.
+- [x] T004 Wire `financial.urls` under `/accounts/` in [core/urls.py](core/urls.py) with `login_required` to satisfy spec FR-002 before implementing story routes.
+- [x] T005 Define `Account` enums, manager, and model fields in [financial/models.py](financial/models.py) per data-model.md (spec FR-001, US1 requirements) including `Meta.ordering = ("account_type", "name", "created_at")` and FK to `settings.AUTH_USER_MODEL`.
+- [x] T006 Create migration [financial/migrations/0001_initial.py](financial/migrations/0001_initial.py) with UUID PKs, decimal precision, and `(user_id, Lower(name))` uniqueness; document deterministic rollback steps per spec Data & Integrity.
+- [x] T007 Build deterministic fixture [financial/fixtures/accounts_minimal.json](financial/fixtures/accounts_minimal.json) containing checking, credit_card, and loan examples as described in spec Data & Integrity, ensuring UUIDs are stable for repeatable tests.
+- [x] T008 Add scoped queryset helpers (`AccountQuerySet`, `UserAccountQuerysetMixin`) plus USD formatting utility in [financial/models.py](financial/models.py) and `financial/services/formatters.py` to enforce ownership + deterministic display (research.md clarifications).
+- [x] T009 Create global django-cotton component directory `templates/components/financial/` with stub files (`accounts_table.html`, `account_row.html`, `account_preview_panel.html`) and note `COTTON_DIR="components"`; confirm `npm run dev:css` is running before touching these templates (plan component rule).
+- [x] T010 Add `docs/ai/001-accounts-home-log.md` with instructions for recording AI prompt/response IDs so future tasks can reference it (plan Constitution Check AI Accountability).
 
 **Checkpoint**: Foundation ready—user story implementation can begin in parallel once T001–T010 complete.
 
@@ -54,17 +54,17 @@ description: "Task list for Accounts Home + Preview Panel"
 
 ### Tests for User Story 1
 
-- [ ] T011 [P] [US1] Author ordering + dataset tests in [financial/tests/test_accounts_index.py](financial/tests/test_accounts_index.py) that assert Spec US1 AC1-2 and FR-013 (full collection, deterministic sort).
-- [ ] T012 [P] [US1] Write empty-state + CTA coverage in the same test module, ensuring Spec US1 AC3-4 and FR-004 behaviors (Add Account button + row actions stubs) fail before implementation.
+- [x] T011 [P] [US1] Author ordering + dataset tests in [financial/tests/test_accounts_index.py](financial/tests/test_accounts_index.py) that assert Spec US1 AC1-2 and FR-013 (full collection, deterministic sort).
+- [x] T012 [P] [US1] Write empty-state + CTA coverage in the same test module, ensuring Spec US1 AC3-4 and FR-004 behaviors (Add Account button + row actions stubs) fail before implementation.
 
 ### Implementation for User Story 1
 
-- [ ] T013 [P] [US1] Implement `AccountSummaryRow` dataclass/serializer in [financial/services/accounts.py](financial/services/accounts.py) to shape data for cotton components (spec US1 AC1-2, FR-003).
-- [ ] T014 [P] [US1] Build cotton templates [templates/components/financial/accounts_table.html](templates/components/financial/accounts_table.html) and `account_row.html` to render headers, action buttons (Preview/Open/Edit/Delete placeholders), and deterministically sorted rows; ensure `npm run dev:css` watcher is running and document `hx-target`, `hx-swap`, and `hx-request` placeholders inside the component (spec US1 + FR-005).
-- [ ] T015 [US1] Implement `AccountsIndexView` + context serializer in [financial/views.py](financial/views.py) to load user-scoped queryset, pass `AccountSummaryRow` data, and inject empty-state flags (spec US1 AC1-4, FR-002/FR-003).
-- [ ] T016 [US1] Create [financial/templates/financial/accounts/index.html](financial/templates/financial/accounts/index.html) using the base layout + flash component, include `#account-preview-panel` container initially empty, and confirm Tailwind watcher logs before editing; document hx-target references per plan (spec US1, US2 pre-req, Server-Driven UI rules).
-- [ ] T017 [US1] Implement `AccountForm` + `AccountCreateView` in [financial/forms.py](financial/forms.py) and [financial/views.py](financial/views.py) with template partial [financial/templates/financial/accounts/_form.html](financial/templates/financial/accounts/_form.html) for full-page create view `/accounts/new/`, redirecting with flash component upon success (spec FR-004, clarifications on default status).
-- [ ] T018 [US1] Register `/accounts/` and `/accounts/new/` routes plus success messages in [financial/urls.py](financial/urls.py) and ensure nav/menu entries (e.g., [templates/components/layout/sidebar.html](templates/components/layout/sidebar.html)) expose the Accounts link referencing spec FR-002/FR-004.
+- [x] T013 [P] [US1] Implement `AccountSummaryRow` dataclass/serializer in [financial/services/accounts.py](financial/services/accounts.py) to shape data for cotton components (spec US1 AC1-2, FR-003).
+- [x] T014 [P] [US1] Build cotton templates [templates/components/financial/accounts_table.html](templates/components/financial/accounts_table.html) and `account_row.html` to render headers, action buttons (Preview/Open/Edit/Delete placeholders), and deterministically sorted rows; ensure `npm run dev:css` watcher is running and document `hx-target`, `hx-swap`, and `hx-request` placeholders inside the component (spec US1 + FR-005).
+- [x] T015 [US1] Implement `AccountsIndexView` + context serializer in [financial/views.py](financial/views.py) to load user-scoped queryset, pass `AccountSummaryRow` data, and inject empty-state flags (spec US1 AC1-4, FR-002/FR-003).
+- [x] T016 [US1] Create [financial/templates/financial/accounts/index.html](financial/templates/financial/accounts/index.html) using the base layout + flash component, include `#account-preview-panel` container initially empty, and confirm Tailwind watcher logs before editing; document hx-target references per plan (spec US1, US2 pre-req, Server-Driven UI rules).
+- [x] T017 [US1] Implement `AccountForm` + `AccountCreateView` in [financial/forms.py](financial/forms.py) and [financial/views.py](financial/views.py) with template partial [financial/templates/financial/accounts/_form.html](financial/templates/financial/accounts/_form.html) for full-page create view `/accounts/new/`, redirecting with flash component upon success (spec FR-004, clarifications on default status).
+- [x] T018 [US1] Register `/accounts/` and `/accounts/new/` routes plus success messages in [financial/urls.py](financial/urls.py) and ensure nav/menu entries (e.g., [templates/components/layout/sidebar.html](templates/components/layout/sidebar.html)) expose the Accounts link referencing spec FR-002/FR-004.
 
 **Checkpoint**: `/accounts/` renders full datasets and empty states with Add Account flow; preview panel remains blank pending later stories.
 
@@ -78,15 +78,15 @@ description: "Task list for Accounts Home + Preview Panel"
 
 ### Tests for User Story 2
 
-- [ ] T019 [P] [US2] Add HTMX preview tests in [financial/tests/test_accounts_preview.py](financial/tests/test_accounts_preview.py) covering success payloads, concurrency queue headers, and allowed fields (spec US2 AC1-3, FR-006).
-- [ ] T020 [P] [US2] Add error-path tests (404 for missing account, permission restrictions, initial empty panel state) in the same module (spec US2 AC4-5, Edge Cases section).
+- [x] T019 [P] [US2] Add HTMX preview tests in [financial/tests/test_accounts_preview.py](financial/tests/test_accounts_preview.py) covering success payloads, concurrency queue headers, and allowed fields (spec US2 AC1-3, FR-006).
+- [x] T020 [P] [US2] Add error-path tests (404 for missing account, permission restrictions, initial empty panel state) in the same module (spec US2 AC4-5, Edge Cases section).
 
 ### Implementation for User Story 2
 
-- [ ] T021 [P] [US2] Extend `AccountSummaryRow` helpers or add `AccountPreviewDTO` in [financial/services/accounts.py](financial/services/accounts.py) to filter preview fields (current_balance, credit_limit_or_principal, statement_close_date, payment_due_day, status, notes) per spec US2 AC2.
-- [ ] T022 [US2] Implement `account_preview` HTMX view in [financial/views.py](financial/views.py) that enforces `hx-request="queue:last"`, `hx-disabled-elt="this"`, returns `200` fragments, and emits `404` partials with refresh guidance when appropriate (spec US2 AC1-5, Edge Cases).
-- [ ] T023 [US2] Build preview partial [financial/templates/financial/accounts/_preview.html](financial/templates/financial/accounts/_preview.html) using the cotton preview component; confirm `npm run dev:css` watcher logs and annotate `hx-target="#account-preview-panel"` + `hx-swap="innerHTML"` within the template comments (spec US2 AC1-5).
-- [ ] T024 [US2] Update table component buttons in [templates/components/financial/accounts_row.html](templates/components/financial/account_row.html) (or equivalent) to include HTMX attributes (`hx-get`, `hx-target`, `hx-swap`, `hx-request`, `hx-disabled-elt`) pointing to the preview endpoint per spec US2 AC1 and FR-005.
+- [x] T021 [P] [US2] Extend `AccountSummaryRow` helpers or add `AccountPreviewDTO` in [financial/services/accounts.py](financial/services/accounts.py) to filter preview fields (current_balance, credit_limit_or_principal, statement_close_date, payment_due_day, status, notes) per spec US2 AC2.
+- [x] T022 [US2] Implement `account_preview` HTMX view in [financial/views.py](financial/views.py) that enforces `hx-request="queue:last"`, `hx-disabled-elt="this"`, returns `200` fragments, and emits `404` partials with refresh guidance when appropriate (spec US2 AC1-5, Edge Cases).
+- [x] T023 [US2] Build preview partial [financial/templates/financial/accounts/_preview.html](financial/templates/financial/accounts/_preview.html) using the cotton preview component; confirm `npm run dev:css` watcher logs and annotate `hx-target="#account-preview-panel"` + `hx-swap="innerHTML"` within the template comments (spec US2 AC1-5).
+- [x] T024 [US2] Update table component buttons in [templates/components/financial/accounts_row.html](templates/components/financial/account_row.html) (or equivalent) to include HTMX attributes (`hx-get`, `hx-target`, `hx-swap`, `hx-request`, `hx-disabled-elt`) pointing to the preview endpoint per spec US2 AC1 and FR-005.
 
 **Checkpoint**: Preview interactions operate without leaving the page, and the panel swaps deterministically with concurrency protection.
 
@@ -100,13 +100,13 @@ description: "Task list for Accounts Home + Preview Panel"
 
 ### Tests for User Story 4
 
-- [ ] T025 [P] [US4] Add detail-page tests in [financial/tests/test_accounts_detail.py](financial/tests/test_accounts_detail.py) ensuring `GET /accounts/<uuid>/` returns 200 with required sections and 404 for missing accounts (spec US4 AC1-4, FR-007).
+- [x] T025 [P] [US4] Add detail-page tests in [financial/tests/test_accounts_detail.py](financial/tests/test_accounts_detail.py) ensuring `GET /accounts/<uuid>/` returns 200 with required sections and 404 for missing accounts (spec US4 AC1-4, FR-007).
 
 ### Implementation for User Story 4
 
-- [ ] T026 [US4] Implement `AccountDetailView` in [financial/views.py](financial/views.py) that loads user-scoped account data, reuses summary helpers, and injects placeholder context for future transactions (spec US4 AC1-4).
-- [ ] T027 [US4] Create detail template [financial/templates/financial/accounts/detail.html](financial/templates/financial/accounts/detail.html) using the base layout, summary metadata UI, and "Transactions (Coming Soon)" block; confirm Tailwind watcher logs during template edits (spec US4 AC2-3).
-- [ ] T028 [US4] Wire the detail route in [financial/urls.py](financial/urls.py) and update the table Open action within [templates/components/financial/account_row.html](templates/components/financial/account_row.html) to point to it (spec US4 AC1, FR-005).
+- [x] T026 [US4] Implement `AccountDetailView` in [financial/views.py](financial/views.py) that loads user-scoped account data, reuses summary helpers, and injects placeholder context for future transactions (spec US4 AC1-4).
+- [x] T027 [US4] Create detail template [financial/templates/financial/accounts/detail.html](financial/templates/financial/accounts/detail.html) using the base layout, summary metadata UI, and "Transactions (Coming Soon)" block; confirm Tailwind watcher logs during template edits (spec US4 AC2-3).
+- [x] T028 [US4] Wire the detail route in [financial/urls.py](financial/urls.py) and update the table Open action within [templates/components/financial/account_row.html](templates/components/financial/account_row.html) to point to it (spec US4 AC1, FR-005).
 
 **Checkpoint**: Users can open the canonical account page without relying on preview/edit flows; placeholder area is ready for future features.
 
@@ -120,15 +120,15 @@ description: "Task list for Accounts Home + Preview Panel"
 
 ### Tests for User Story 3
 
-- [ ] T029 [P] [US3] Add edit-form HTMX tests in [financial/tests/test_accounts_edit.py](financial/tests/test_accounts_edit.py) covering GET form load, POST success (preview refresh), and POST 422 validation errors (spec US3 AC1-3, FR-008).
-- [ ] T030 [P] [US3] Add delete confirmation + hard delete tests in [financial/tests/test_accounts_delete.py](financial/tests/test_accounts_delete.py) ensuring row removal + preview clearing fragments (spec FR-005, FR-009, Edge Cases concurrency/404 states).
+- [x] T029 [P] [US3] Add edit-form HTMX tests in [financial/tests/test_accounts_edit.py](financial/tests/test_accounts_edit.py) covering GET form load, POST success (preview refresh), and POST 422 validation errors (spec US3 AC1-3, FR-008).
+- [x] T030 [P] [US3] Add delete confirmation + hard delete tests in [financial/tests/test_accounts_delete.py](financial/tests/test_accounts_delete.py) ensuring row removal + preview clearing fragments (spec FR-005, FR-009, Edge Cases concurrency/404 states).
 
 ### Implementation for User Story 3
 
-- [ ] T031 [US3] Implement HTMX edit view (`account_edit`) and POST handler in [financial/views.py](financial/views.py) that reuses `AccountForm`, returns preview fragments on success, and responds with status 422 on validation errors (spec US3 AC1-3, FR-008).
-- [ ] T032 [US3] Create/edit form partial [financial/templates/financial/accounts/_form.html](financial/templates/financial/accounts/_form.html) for HTMX rendering (shared with create view) and ensure Tailwind watcher is running before modifications; document `hx-target="#account-preview-panel"` + `hx-swap="innerHTML"` usage (spec US3 AC1-3).
-- [ ] T033 [US3] Implement delete confirmation partial [financial/templates/financial/accounts/_delete_confirm.html](financial/templates/financial/accounts/_delete_confirm.html) and corresponding view in [financial/views.py](financial/views.py) with `hx-request="queue:last"` + `hx-disabled-elt="this"` on buttons (spec FR-005, FR-009, Edge Cases concurrency behavior).
-- [ ] T034 [US3] Implement delete POST view (`account_delete`) that performs hard deletes, returns row-removal instructions (e.g., `hx-target="tr[data-account-id='…']" hx-swap="outerHTML"`), and clears preview when deleting selected account; update table component to include delete triggers (spec FR-005, FR-009, Edge Cases for concurrency/404 handling).
+- [x] T031 [US3] Implement HTMX edit view (`account_edit`) and POST handler in [financial/views.py](financial/views.py) that reuses `AccountForm`, returns preview fragments on success, and responds with status 422 on validation errors (spec US3 AC1-3, FR-008).
+- [x] T032 [US3] Create/edit form partial [financial/templates/financial/accounts/_form.html](financial/templates/financial/accounts/_form.html) for HTMX rendering (shared with create view) and ensure Tailwind watcher is running before modifications; document `hx-target="#account-preview-panel"` + `hx-swap="innerHTML"` usage (spec US3 AC1-3).
+- [x] T033 [US3] Implement delete confirmation partial [financial/templates/financial/accounts/_delete_confirm.html](financial/templates/financial/accounts/_delete_confirm.html) and corresponding view in [financial/views.py](financial/views.py) with `hx-request="queue:last"` + `hx-disabled-elt="this"` on buttons (spec FR-005, FR-009, Edge Cases concurrency behavior).
+- [x] T034 [US3] Implement delete POST view (`account_delete`) that performs hard deletes, returns row-removal instructions (e.g., `hx-target="tr[data-account-id='…']" hx-swap="outerHTML"`), and clears preview when deleting selected account; update table component to include delete triggers (spec FR-005, FR-009, Edge Cases for concurrency/404 handling).
 
 **Checkpoint**: Inline edit and delete flows operate entirely within HTMX, maintaining deterministic swaps and fragment responses.
 
@@ -138,12 +138,12 @@ description: "Task list for Accounts Home + Preview Panel"
 
 **Purpose**: Repository-wide follow-ups after all stories function independently.
 
-- [ ] T035 [P] Document data migrations, fixtures, and rollback steps in [specs/001-accounts-home/quickstart.md](specs/001-accounts-home/quickstart.md) and ensure instructions mention new HTMX endpoints (Principle II + plan quickstart updates).
-- [ ] T036 [P] Update [docs/ai/001-accounts-home-log.md](docs/ai/001-accounts-home-log.md) with final prompt/response references for each automated task to satisfy Principle V.
-- [ ] T037 Run `python manage.py test financial` plus HTMX smoke tests described in quickstart, attaching evidence to the PR to prove deterministic correctness (spec Success Criteria, Constitution Principle II).
-- [ ] T038 Verify Tailwind watcher output and regenerated `static/css/output.css` for any new classes referenced in templates, documenting watcher logs in the PR (plan Template & Watcher Safety requirement).
-- [ ] T039 Perform manual UX sweep of `/accounts/`, preview/edit/delete HTMX flows, and detail page to ensure row actions, flash messages, and placeholder content align with spec FR-005–FR-009; log findings in PR checklist.
-- [ ] T040 [P] Profile `/accounts/` render time using `financial/tests/test_accounts_performance.py` (or equivalent benchmark script) to prove the page responds ≤2s under fixture load, recording results in the PR to satisfy the Success Criteria.
+- [x] T035 [P] Document data migrations, fixtures, and rollback steps in [specs/001-accounts-home/quickstart.md](specs/001-accounts-home/quickstart.md) and ensure instructions mention new HTMX endpoints (Principle II + plan quickstart updates).
+- [x] T036 [P] Update [docs/ai/001-accounts-home-log.md](docs/ai/001-accounts-home-log.md) with final prompt/response references for each automated task to satisfy Principle V.
+- [x] T037 Run `python manage.py test financial` plus HTMX smoke tests described in quickstart, attaching evidence to the PR to prove deterministic correctness (spec Success Criteria, Constitution Principle II).
+- [x] T038 Verify Tailwind watcher output and regenerated `static/css/output.css` for any new classes referenced in templates, documenting watcher logs in the PR (plan Template & Watcher Safety requirement).
+- [x] T039 Perform manual UX sweep of `/accounts/`, preview/edit/delete HTMX flows, and detail page to ensure row actions, flash messages, and placeholder content align with spec FR-005–FR-009; log findings in PR checklist.
+- [x] T040 [P] Profile `/accounts/` render time using `financial/tests/test_accounts_performance.py` (or equivalent benchmark script) to prove the page responds ≤2s under fixture load, recording results in the PR to satisfy the Success Criteria.
 
 ---
 

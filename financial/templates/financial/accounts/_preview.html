@@ -1,0 +1,44 @@
+{# HTMX swaps this fragment into #account-preview-panel via hx-target="#account-preview-panel" hx-swap="innerHTML" #}
+<section class="space-y-4" aria-live="polite">
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="text-2xl font-bold">{{ preview.name }}</h2>
+            {% if preview.institution %}
+                <p class="text-base-content/70">{{ preview.institution }}</p>
+            {% endif %}
+        </div>
+        <span class="{{ preview.status_badge_class }}">{{ preview.status_label }}</span>
+    </div>
+
+    <div class="grid gap-4 rounded-2xl border border-base-200 bg-base-100 p-4 md:grid-cols-2">
+        <div>
+            <p class="text-sm text-base-content/70">Current balance</p>
+            <p class="text-xl font-semibold">{{ preview.current_balance_display }}</p>
+        </div>
+        {% if preview.has_credit_limit %}
+            <div>
+                <p class="text-sm text-base-content/70">Credit limit / principal</p>
+                <p class="text-xl font-semibold">{{ preview.credit_limit_display }}</p>
+            </div>
+        {% endif %}
+        {% if preview.statement_close_date_display %}
+            <div>
+                <p class="text-sm text-base-content/70">Statement close date</p>
+                <p class="font-medium">{{ preview.statement_close_date_display }}</p>
+            </div>
+        {% endif %}
+        {% if preview.payment_due_day %}
+            <div>
+                <p class="text-sm text-base-content/70">Payment due day</p>
+                <p class="font-medium">Day {{ preview.payment_due_day }}</p>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if preview.notes %}
+        <div class="rounded-2xl border border-base-200 bg-base-100 p-4">
+            <p class="text-sm text-base-content/70">Notes</p>
+            <p class="whitespace-pre-line">{{ preview.notes }}</p>
+        </div>
+    {% endif %}
+</section>

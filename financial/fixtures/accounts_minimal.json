@@ -1,0 +1,59 @@
+[
+  {
+    "model": "financial.account",
+    "pk": "11111111-1111-1111-1111-111111111111",
+    "fields": {
+      "user": 1,
+      "name": "Household Checking",
+      "institution": "Civic Bank",
+      "account_type": "checking",
+      "number_last4": "1234",
+      "status": "active",
+      "current_balance": "2450.75",
+      "credit_limit_or_principal": null,
+      "statement_close_date": null,
+      "payment_due_day": null,
+      "notes": "Primary operating account",
+      "created_at": "2026-02-01T12:00:00Z",
+      "updated_at": "2026-02-01T12:00:00Z"
+    }
+  },
+  {
+    "model": "financial.account",
+    "pk": "22222222-2222-2222-2222-222222222222",
+    "fields": {
+      "user": 1,
+      "name": "Everyday Credit",
+      "institution": "CloudCard",
+      "account_type": "credit_card",
+      "number_last4": "9876",
+      "status": "active",
+      "current_balance": "-815.34",
+      "credit_limit_or_principal": "5000.00",
+      "statement_close_date": "2026-02-15",
+      "payment_due_day": 5,
+      "notes": "Used for groceries",
+      "created_at": "2026-02-02T12:00:00Z",
+      "updated_at": "2026-02-02T12:00:00Z"
+    }
+  },
+  {
+    "model": "financial.account",
+    "pk": "33333333-3333-3333-3333-333333333333",
+    "fields": {
+      "user": 1,
+      "name": "Hybrid Auto Loan",
+      "institution": "Metro Finance",
+      "account_type": "loan",
+      "number_last4": "4567",
+      "status": "active",
+      "current_balance": "14500.00",
+      "credit_limit_or_principal": "22000.00",
+      "statement_close_date": null,
+      "payment_due_day": 18,
+      "notes": "2019 crossover",
+      "created_at": "2026-02-03T12:00:00Z",
+      "updated_at": "2026-02-03T12:00:00Z"
+    }
+  }
+]
