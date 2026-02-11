@@ -1,0 +1,183 @@
+openapi: 3.1.0
+info:
+  title: Account Transaction Evolution (Server-Rendered)
+  version: 0.1.0
+  description: >-
+    HTML-only endpoints for account editing, transaction creation, and inline
+    category creation. All routes require authentication and return full pages
+    or HTMX fragments (never JSON).
+servers:
+  - url: https://app.example.com
+paths:
+  /accounts/{accountId}/edit/:
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+    get:
+      summary: HTMX account edit form
+      responses:
+        '200':
+          description: Account edit form fragment for #account-preview-panel.
+          content:
+            text/html: {}
+    post:
+      summary: Update account details
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AccountForm'
+      responses:
+        '200':
+          description: Updated preview fragment.
+        '422':
+          description: Form fragment with validation errors.
+        '404':
+          description: Not found fragment.
+  /accounts/{accountId}/transactions/:
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+    get:
+      summary: Transaction body fragment
+      description: Renders the transactions table body for #account-transactions-body.
+      responses:
+        '200':
+          description: Transactions body fragment (HTML).
+          content:
+            text/html: {}
+  /accounts/{accountId}/transactions/new/:
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+    get:
+      summary: New transaction form fragment
+      responses:
+        '200':
+          description: Transaction form fragment for #account-transactions-body.
+          content:
+            text/html: {}
+    post:
+      summary: Create transaction
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransactionForm'
+      responses:
+        '200':
+          description: Updated transactions body fragment.
+        '422':
+          description: Form fragment with validation errors.
+        '404':
+          description: Missing account fragment.
+  /accounts/{accountId}/transactions/categories/new/:
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+    post:
+      summary: Inline category creation
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CategoryForm'
+      responses:
+        '200':
+          description: Fragment updating the category dropdown and preserving the form.
+        '400':
+          description: Category form fragment with validation errors.
+        '404':
+          description: Missing account fragment.
+components:
+  parameters:
+    AccountId:
+      name: accountId
+      in: path
+      required: true
+      description: UUID primary key of the account
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    AccountForm:
+      type: object
+      required:
+        - name
+        - account_type
+        - status
+        - current_balance
+      properties:
+        name:
+          type: string
+          maxLength: 255
+        institution:
+          type: string
+          maxLength: 255
+        account_type:
+          type: string
+          enum: [checking, savings, credit_card, loan, other]
+        account_number:
+          type: string
+          nullable: true
+        routing_number:
+          type: string
+          nullable: true
+        interest_rate:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [active, closed, pending]
+        current_balance:
+          type: string
+          pattern: "^-?[0-9]+(\.[0-9]{2})?$"
+        credit_limit_or_principal:
+          type: string
+          nullable: true
+        statement_close_date:
+          type: string
+          format: date
+          nullable: true
+        payment_due_day:
+          type: integer
+          minimum: 1
+          maximum: 31
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+    TransactionForm:
+      type: object
+      required:
+        - posted_on
+        - description
+        - transaction_type
+        - amount
+      properties:
+        posted_on:
+          type: string
+          format: date
+        description:
+          type: string
+          maxLength: 255
+        transaction_type:
+          type: string
+          enum: [deposit, expense, transfer, adjustment, payment, charge]
+        amount:
+          type: string
+          pattern: "^[0-9]+(\.[0-9]{2})?$"
+        category_id:
+          type: string
+          format: uuid
+          nullable: true
+        notes:
+          type: string
+          nullable: true
+    CategoryForm:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          maxLength: 255
