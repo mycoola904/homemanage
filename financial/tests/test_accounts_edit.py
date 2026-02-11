@@ -47,6 +47,8 @@ class AccountEditTests(TestCase):
         body = response.content.decode()
         self.assertIn("Household Checking", body)
         self.assertIn("$3,000.00", body)
+        self.assertIn('id="accounts-table"', body)
+        self.assertIn('hx-swap-oob="true"', body)
 
     def test_invalid_data_returns_422(self):
         self.client.force_login(self.user)

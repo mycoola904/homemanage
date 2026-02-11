@@ -41,7 +41,14 @@ def _accounts_table_component_context(request) -> dict:
 	}
 
 
-def _render_preview_response(request, account: Account, *, include_row_oob: bool = False, status: int = 200) -> HttpResponse:
+def _render_preview_response(
+	request,
+	account: Account,
+	*,
+	include_row_oob: bool = False,
+	include_table_oob: bool = False,
+	status: int = 200,
+) -> HttpResponse:
 	preview_html = render_to_string(
 		"financial/accounts/_preview.html",
 		{
@@ -57,6 +64,16 @@ def _render_preview_response(request, account: Account, *, include_row_oob: bool
 			request=request,
 		)
 		preview_html += row_html
+	if include_table_oob:
+		table_html = render_to_string(
+			"components/financial/accounts_table.html",
+			{
+				**_accounts_table_component_context(request),
+				"swap_oob": True,
+			},
+			request=request,
+		)
+		preview_html += table_html
 	return HttpResponse(preview_html, status=status)
 
 
@@ -174,7 +191,7 @@ def account_edit(request, pk):
 	form = AccountForm(request.POST, instance=account, user=request.user)
 	if form.is_valid():
 		account = form.save()
-		return _render_preview_response(request, account, include_row_oob=True)
+		return _render_preview_response(request, account, include_table_oob=True)
 
 	return render(
 		request,
