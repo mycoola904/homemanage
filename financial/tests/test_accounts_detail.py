@@ -26,7 +26,9 @@ class AccountDetailTests(TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Hybrid Auto Loan")
-        self.assertContains(response, "Transactions (Coming Soon)")
+        self.assertContains(response, "Transactions")
+        self.assertContains(response, "Add Transaction")
+        self.assertContains(response, "account-transactions")
 
     def test_other_users_receive_404(self):
         other = User.objects.create_user("jamie", "jamie@example.com", "pass-9876")

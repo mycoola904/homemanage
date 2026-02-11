@@ -1,0 +1,10 @@
+<div data-component="financial.account_transactions_body">
+    {% if has_transactions %}
+        <c-financial.account_transactions_table rows=transaction_rows />
+    {% else %}
+        <div class="rounded-2xl border border-dashed border-base-300 bg-base-100 p-6 text-center">
+            <p class="text-lg font-semibold">No transactions yet</p>
+            <p class="text-base-content/70">Add your first transaction to this account to start tracking activity.</p>
+        </div>
+    {% endif %}
+</div>

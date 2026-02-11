@@ -5,16 +5,18 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
+from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from django.views.generic import CreateView, DetailView, ListView
 
-from financial.forms import AccountForm
-from financial.models import Account, UserAccountQuerysetMixin
+from financial.forms import AccountForm, TransactionForm
+from financial.models import Account, Transaction, UserAccountQuerysetMixin
 from financial.services.accounts import (
 	AccountSummaryRow,
 	build_account_preview,
 	serialize_account_rows,
 )
+from financial.services.transactions import serialize_transaction_rows
 
 
 def _get_account_or_404(user, pk) -> Account:
@@ -85,6 +87,38 @@ def _render_accounts_table_fragment(request) -> str:
 	)
 
 
+def _transactions_body_context(account: Account) -> dict:
+	transactions = Transaction.objects.for_account(account).ordered()
+	rows = serialize_transaction_rows(transactions)
+	return {
+		"transaction_rows": rows,
+		"has_transactions": bool(rows),
+	}
+
+
+def _render_transactions_body(request, account: Account, *, status: int = 200) -> HttpResponse:
+	context = _transactions_body_context(account)
+	return render(
+		request,
+		"financial/accounts/transactions/_body.html",
+		context,
+		status=status,
+	)
+
+
+def _render_transactions_missing(request, account_id) -> HttpResponse:
+	return render(
+		request,
+		"financial/accounts/transactions/_missing.html",
+		{"account_id": account_id},
+		status=200,
+	)
+
+
+def _get_account_for_transactions(request, pk) -> Account | None:
+	return Account.objects.filter(pk=pk, user=request.user).first()
+
+
 class AccountsIndexView(LoginRequiredMixin, UserAccountQuerysetMixin, ListView):
 	"""Render the server-driven accounts table with deterministic ordering."""
 
@@ -143,9 +177,13 @@ class AccountDetailView(LoginRequiredMixin, UserAccountQuerysetMixin, DetailView
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
+		transactions_context = _transactions_body_context(self.object)
 		context.update(
 			page_title=self.object.name,
 			preview=build_account_preview(self.object),
+			transactions_new_url=reverse("financial:account-transactions-new", args=[self.object.id]),
+			transactions_body_url=reverse("financial:account-transactions-body", args=[self.object.id]),
+			**transactions_context,
 		)
 		return context
 
@@ -249,3 +287,52 @@ def account_delete(request, pk):
 		request=request,
 	)
 	return HttpResponse(table_html + preview_reset)
+
+
+@login_required
+@require_http_methods(["GET"])
+def account_transactions_body(request, pk):
+	account = _get_account_for_transactions(request, pk)
+	if account is None:
+		return _render_transactions_missing(request, pk)
+	return _render_transactions_body(request, account)
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def account_transactions_new(request, pk):
+	account = _get_account_for_transactions(request, pk)
+	if account is None:
+		return _render_transactions_missing(request, pk)
+
+	post_hx_url = reverse("financial:account-transactions-new", args=[account.id])
+	cancel_hx_url = reverse("financial:account-transactions-body", args=[account.id])
+	if request.method == "GET":
+		form = TransactionForm(initial={"posted_on": timezone.localdate()})
+		return render(
+			request,
+			"financial/accounts/transactions/_form.html",
+			{
+				"form": form,
+				"post_hx_url": post_hx_url,
+				"cancel_hx_url": cancel_hx_url,
+			},
+		)
+
+	form = TransactionForm(request.POST)
+	if form.is_valid():
+		transaction = form.save(commit=False)
+		transaction.account = account
+		transaction.save()
+		return _render_transactions_body(request, account)
+
+	return render(
+		request,
+		"financial/accounts/transactions/_form.html",
+		{
+			"form": form,
+			"post_hx_url": post_hx_url,
+			"cancel_hx_url": cancel_hx_url,
+		},
+		status=422,
+	)

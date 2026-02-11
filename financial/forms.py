@@ -1,6 +1,8 @@
+from decimal import Decimal
+
 from django import forms
 
-from financial.models import Account
+from financial.models import Account, Transaction, TransactionDirection
 
 
 class AccountForm(forms.ModelForm):
@@ -43,3 +45,36 @@ class AccountForm(forms.ModelForm):
         if conflict_qs.exists():
             raise forms.ValidationError("You already have an account with this name.")
         return name
+
+
+class TransactionForm(forms.ModelForm):
+    """Model-backed form for inline transaction creation."""
+
+    class Meta:
+        model = Transaction
+        fields = [
+            "posted_on",
+            "description",
+            "direction",
+            "amount",
+            "notes",
+        ]
+        widgets = {
+            "posted_on": forms.DateInput(attrs={"type": "date"}),
+            "direction": forms.RadioSelect(choices=TransactionDirection.choices),
+            "notes": forms.Textarea(attrs={"rows": 3}),
+        }
+
+    def clean_description(self):
+        description = (self.cleaned_data.get("description") or "").strip()
+        if not description:
+            raise forms.ValidationError("Enter a description.")
+        return description
+
+    def clean_amount(self):
+        amount = self.cleaned_data.get("amount")
+        if amount is None:
+            return amount
+        if amount <= Decimal("0"):
+            raise forms.ValidationError("Amount must be greater than 0.")
+        return amount

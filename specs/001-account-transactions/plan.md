@@ -11,12 +11,6 @@ Add a first-class `Transaction` model scoped to an `Account`, render an Account 
 
 ## Technical Context
 
-<!--
-  ACTION REQUIRED: Replace the content in this section with the technical details
-  for the project. The structure here is presented in advisory capacity to guide
-  the iteration process.
--->
-
 **Language/Version**: Python (project assumes 3.11+ per constitution)  
 **Primary Dependencies**: Django 6.0.2, django-htmx 1.27.0, django-cotton 2.6.1  
 **Storage**: SQLite for local/dev/tests (`db.sqlite3` in repo); production DB may vary (out of scope)  
@@ -81,13 +75,6 @@ specs/001-account-transactions/
 ```
 
 ### Source Code (repository root)
-<!--
-  ACTION REQUIRED: Replace the placeholder tree below with the concrete layout
-  for this feature. Delete unused options and expand the chosen structure with
-  real paths (e.g., apps/admin, packages/something). The delivered plan must
-  not include Option labels.
--->
-
 ```text
 core/
 ├── settings.py

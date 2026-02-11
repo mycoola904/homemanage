@@ -1,0 +1,48 @@
+<form method="post"
+      action="{{ post_hx_url }}"
+      class="space-y-4"
+      data-component="financial.transaction_form"
+      hx-post="{{ post_hx_url }}"
+      hx-target="#account-transactions-body"
+      hx-swap="innerHTML">
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div class="alert alert-error">
+            {% for error in form.non_field_errors %}
+                <span>{{ error }}</span>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {% for field in form %}
+        <div class="form-control gap-2">
+            <label class="label" for="{{ field.id_for_label }}">
+                <span class="label-text font-semibold">{{ field.label }}</span>
+                {% if field.field.required %}
+                    <span class="text-error" aria-hidden="true">*</span>
+                {% endif %}
+            </label>
+            {{ field }}
+            {% if field.help_text %}
+                <p class="text-sm text-base-content/70">{{ field.help_text }}</p>
+            {% endif %}
+            {% for error in field.errors %}
+                <p class="text-sm text-error">{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endfor %}
+
+    <div class="flex flex-wrap gap-2">
+        <button type="submit" class="btn btn-primary" hx-disabled-elt="this">Save transaction</button>
+        <button type="button"
+                class="btn btn-ghost"
+                hx-get="{{ cancel_hx_url }}"
+                hx-target="#account-transactions-body"
+                hx-swap="innerHTML"
+                hx-request="queue:last"
+                hx-disabled-elt="this">
+            Cancel
+        </button>
+    </div>
+</form>

@@ -45,14 +45,14 @@ These endpoints MUST enforce the same auth + ownership rules as accounts: transa
 
 If the account does not exist or is not owned by the authenticated user, these endpoints MUST return a `200` response containing an inline “not found” message fragment within the Transactions panel body (and MUST NOT reveal any transaction data).
 
-- `GET /accounts/<uuid:account_id>/transactions/`
+- `GET /accounts/<uuid:pk>/transactions/`
   - Returns a fragment containing the Transactions panel body (table OR empty state).
   - Used for initial rendering and for “Cancel” to restore the table.
 
-- `GET /accounts/<uuid:account_id>/transactions/new/`
+- `GET /accounts/<uuid:pk>/transactions/new/`
   - Returns a fragment containing the Add Transaction form.
 
-- `POST /accounts/<uuid:account_id>/transactions/new/`
+- `POST /accounts/<uuid:pk>/transactions/new/`
   - On success: creates the transaction and returns the Transactions panel body fragment.
   - On validation failure: returns the Add Transaction form fragment with field errors and status `422`.
 
@@ -161,7 +161,7 @@ The Add Transaction form MUST include a `direction` control implemented as radio
 
 - **UI-004 (Template safety)**: Templates MUST NOT split `{% ... %}` tags across multiple lines and MUST NOT use multi-line Django template comments.
 
-- **UI-005 (Watcher workflow)**: If styling issues arise during implementation, the first check MUST be that the Tailwind watcher is running (e.g., `npm run dev`) and rebuilding assets.
+- **UI-005 (Watcher workflow)**: If styling issues arise during implementation, the first check MUST be that the Tailwind watcher is running (e.g., `npm run dev:css`) and rebuilding assets.
 
 ## Deterministic Data & Integrity *(mandatory)*
 

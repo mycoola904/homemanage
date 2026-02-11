@@ -14,17 +14,17 @@
 
 ## Phase 1: Setup (Shared Infrastructure)
 
-- [ ] T001 Confirm Tailwind watcher command and record terminal output in docs/ai/002-account-transactions-log.md (Principle IV)
-- [ ] T002 Run baseline test command and record results in docs/ai/002-account-transactions-log.md (Principle II)
+- [X] T001 Confirm Tailwind watcher command (`npm run dev:css`) and record terminal output in docs/ai/002-account-transactions-log.md (Spec UI-005, Principle IV)
+- [X] T002 Run baseline test command and record results in docs/ai/002-account-transactions-log.md (Spec SC-003 baseline, Principle II)
 
 ---
 
 ## Phase 2: Foundational (Blocking Prerequisites)
 
-- [ ] T003 Add `Transaction` model + `TransactionDirection` TextChoices + deterministic queryset helper in financial/models.py (Spec FR-001, FR-004)
-- [ ] T004 [P] Create migration financial/migrations/0002_transaction.py adding the Transaction table + composite index `(account_id, posted_on, created_at, id)` with clean rollback (Spec Deterministic Data & Integrity)
-- [ ] T005 [P] Add `TransactionForm` (ModelForm) with widgets + positive amount validation in financial/forms.py (Spec FR-003)
-- [ ] T006 [P] Implement transaction row serializer + signed amount display helper in financial/services/transactions.py (Spec Display rules + FR-004)
+- [X] T003 Add `Transaction` model + `TransactionDirection` TextChoices + deterministic queryset helper in financial/models.py (Spec FR-001, FR-004)
+- [X] T004 [P] Create migration financial/migrations/0002_transaction.py adding the Transaction table + composite index `(account_id, posted_on, created_at, id)` with clean rollback (Spec Deterministic Data & Integrity)
+- [X] T005 [P] Add `TransactionForm` (ModelForm) with widgets + positive amount validation in financial/forms.py (Spec FR-003)
+- [X] T006 [P] Implement transaction row serializer + signed amount display helper in financial/services/transactions.py (Spec Display rules + FR-004)
 
 **Checkpoint**: Migration applies cleanly and core model/form/service compile.
 
@@ -38,18 +38,18 @@
 
 ### Tests (write first; ensure they fail before implementation)
 
-- [ ] T007 [US1] Update financial/tests/test_accounts_detail.py to assert the new Transactions panel renders (remove “Transactions (Coming Soon)” expectation) (US1 scenario 1/2)
-- [ ] T008 [US1] Add view/render tests for empty and non-empty transactions panel in financial/tests/test_account_transactions_panel.py (US1 scenarios 1/2, FR-004)
+- [X] T007 [US1] Update financial/tests/test_accounts_detail.py to assert the new Transactions panel renders (remove “Transactions (Coming Soon)” expectation) (US1 scenario 1/2)
+- [X] T008 [US1] Add view/render tests for empty and non-empty transactions panel in financial/tests/test_account_transactions_panel.py (US1 scenarios 1/2, FR-004)
 
 ### Implementation
 
-- [ ] T009 [P] [US1] Create reusable transactions table component in templates/components/financial/account_transactions_table.html (Spec FR-008)
-- [ ] T010 [P] [US1] Create transactions body fragment template financial/templates/financial/accounts/transactions/_body.html using stable swap target `#account-transactions-body` (Spec UI-001)
-- [ ] T011 [P] [US1] Create inline “not found” fragment template financial/templates/financial/accounts/transactions/_missing.html (US3 scenario 1 groundwork)
-- [ ] T012 [US1] Implement GET fragment view for `/accounts/<uuid>/transactions/` in financial/views.py (auth + ownership; deterministic ordering; returns `_missing.html` with HTTP 200 on missing/unowned) (FR-002, FR-004)
-- [ ] T013 [US1] Add URL route for transactions body in financial/urls.py (`<uuid:pk>/transactions/`) (FR-005)
-- [ ] T014 [US1] Replace the placeholder card with a stable Transactions panel container in financial/templates/financial/accounts/detail.html (`#account-transactions` + `#account-transactions-body`) (UI-001, UI-003)
-- [ ] T015 [US1] Extend AccountDetailView context in financial/views.py to render initial Transactions body server-side (no HTMX required for first paint) (US1 scenarios 1/2)
+- [X] T009 [P] [US1] Create reusable transactions table component in templates/components/financial/account_transactions_table.html (Spec FR-008)
+- [X] T010 [P] [US1] Create transactions body fragment template financial/templates/financial/accounts/transactions/_body.html using stable swap target `#account-transactions-body` (Spec UI-001)
+- [X] T011 [P] [US1] Create inline “not found” fragment template financial/templates/financial/accounts/transactions/_missing.html (US3 scenario 1 groundwork)
+- [X] T012 [US1] Implement GET fragment view for `/accounts/<uuid:pk>/transactions/` in financial/views.py (auth + ownership; deterministic ordering; returns `_missing.html` with HTTP 200 on missing/unowned) (FR-002, FR-004)
+- [X] T013 [US1] Add URL route for transactions body in financial/urls.py (`<uuid:pk>/transactions/`) (FR-005)
+- [X] T014 [US1] Replace the placeholder card with a stable Transactions panel container in financial/templates/financial/accounts/detail.html (`#account-transactions` + `#account-transactions-body`) (UI-001, UI-003)
+- [X] T015 [US1] Extend AccountDetailView context in financial/views.py to render initial Transactions body server-side (no HTMX required for first paint) (US1 scenarios 1/2)
 
 **Checkpoint**: US1 works without US2 endpoints.
 
@@ -63,15 +63,15 @@
 
 ### Tests (write first; ensure they fail before implementation)
 
-- [ ] T016 [US2] Add HTMX add-flow tests in financial/tests/test_account_transactions_add.py for GET new form, POST valid, POST invalid (422), and Cancel path (US2 scenarios 1–4, FR-007)
+- [X] T016 [US2] Add HTMX add-flow tests in financial/tests/test_account_transactions_add.py for GET new form, POST valid, POST invalid (422), and Cancel path (US2 scenarios 1–4, FR-007)
 
 ### Implementation
 
-- [ ] T017 [P] [US2] Create add form fragment financial/templates/financial/accounts/transactions/_form.html with `direction` radios + `posted_on` date input default and `hx-post`/Cancel wiring per spec (UI-002)
-- [ ] T018 [US2] Implement GET `/accounts/<uuid>/transactions/new/` in financial/views.py returning `_form.html` or `_missing.html` (US2 scenario 1)
-- [ ] T019 [US2] Implement POST `/accounts/<uuid>/transactions/new/` in financial/views.py: on valid save return `_body.html`; on invalid return `_form.html` with HTTP 422 (US2 scenarios 3/4, FR-006, FR-007)
-- [ ] T020 [US2] Add URL routes for transactions new GET/POST in financial/urls.py (`<uuid:pk>/transactions/new/`) (FR-005)
-- [ ] T021 [US2] Add stable panel header button wiring in financial/templates/financial/accounts/detail.html: Add button `hx-get` targets `#account-transactions-body` and uses `hx-request="queue:last"` + `hx-disabled-elt="this"` (UI-002, UI-003)
+- [X] T017 [P] [US2] Create add form fragment financial/templates/financial/accounts/transactions/_form.html with `direction` radios + `posted_on` date input default and `hx-post`/Cancel wiring per spec (UI-002)
+- [X] T018 [US2] Implement GET `/accounts/<uuid:pk>/transactions/new/` in financial/views.py returning `_form.html` or `_missing.html` (US2 scenario 1)
+- [X] T019 [US2] Implement POST `/accounts/<uuid:pk>/transactions/new/` in financial/views.py: on valid save return `_body.html`; on invalid return `_form.html` with HTTP 422 (US2 scenarios 3/4, FR-006, FR-007)
+- [X] T020 [US2] Add URL routes for transactions new GET/POST in financial/urls.py (`<uuid:pk>/transactions/new/`) (FR-005)
+- [X] T021 [US2] Add stable panel header button wiring in financial/templates/financial/accounts/detail.html: Add button `hx-get` targets `#account-transactions-body` and uses `hx-request="queue:last"` + `hx-disabled-elt="this"` (UI-002, UI-003)
 
 **Checkpoint**: US2 works end-to-end and does not remove the Add button from the DOM.
 
@@ -85,11 +85,11 @@
 
 ### Tests (write first; ensure they fail before implementation)
 
-- [ ] T022 [US3] Add missing/unowned endpoint tests in financial/tests/test_account_transactions_missing.py for `/transactions/` and `/transactions/new/` GET/POST (US3 scenario 1)
+- [X] T022 [US3] Add missing/unowned endpoint tests in financial/tests/test_account_transactions_missing.py for `/transactions/` and `/transactions/new/` GET/POST (US3 scenario 1)
 
 ### Implementation
 
-- [ ] T023 [US3] Ensure all transactions endpoints share a single missing/unowned handling path in financial/views.py that returns `_missing.html` with HTTP 200 and no data (Spec Endpoints + US3 scenario 1)
+- [X] T023 [US3] Ensure all transactions endpoints share a single missing/unowned handling path in financial/views.py that returns `_missing.html` with HTTP 200 and no data (Spec Endpoints + US3 scenario 1)
 
 **Checkpoint**: US3 behavior is consistent across all fragments.
 
@@ -97,11 +97,12 @@
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T024 [P] Reconcile implemented URL param naming and behavior notes in specs/001-account-transactions/contracts/transactions.yaml (ensure it matches Django routes and status codes)
-- [ ] T025 Update specs/001-account-transactions/quickstart.md if any command or URL differs from implementation
-- [ ] T026 [P] Add a performance sanity test for rendering ~200 transactions in financial/tests/test_account_transactions_performance.py (Spec SC-004)
-- [ ] T027 Record full test run output in docs/ai/002-account-transactions-log.md (Principle II)
-- [ ] T028 Record migration check output (e.g., `python manage.py makemigrations --check`) in docs/ai/002-account-transactions-log.md (Principle II)
+- [X] T024 [P] Reconcile implemented URL param naming and behavior notes in specs/001-account-transactions/contracts/transactions.yaml (ensure it matches Django routes and status codes)
+- [X] T025 Update specs/001-account-transactions/quickstart.md if any command or URL differs from implementation
+- [X] T026 [P] Add a performance sanity test for rendering ~200 transactions in financial/tests/test_account_transactions_performance.py (Spec SC-004)
+- [X] T027 Record full test run output in docs/ai/002-account-transactions-log.md (Spec SC-003, SC-004, Principle II)
+- [X] T028 Record migration check output (e.g., `python manage.py makemigrations --check`) in docs/ai/002-account-transactions-log.md (Spec Schema Changes, Principle II)
+- [X] T029 Verify success criteria evidence and record in docs/ai/002-account-transactions-log.md: SC-001 (manual timed add flow) and SC-002 (422 + inline errors without leaving account detail) (Spec SC-001, SC-002, US2 scenarios 3/4)
 
 ---
 
@@ -167,6 +168,7 @@ graph TD
 - Add US2 (T016–T021), validate add flow
 - Add US3 (T022–T023), validate safe failure
 - Finish polish (T024–T028)
+- Finish polish (T024–T029)
 
 ---
 

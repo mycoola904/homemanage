@@ -31,9 +31,28 @@
         </div>
     </div>
 
-    <c-ui.card>
-        <h2 class="text-xl font-semibold mb-2">Transactions (Coming Soon)</h2>
-        <p class="text-base-content/70">Detailed transaction history will appear here once the Transactions feature ships.</p>
-    </c-ui.card>
+    <section id="account-transactions">
+        <c-ui.card>
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                    <h2 class="text-xl font-semibold">Transactions</h2>
+                    <p class="text-base-content/70">Review recent activity for this account.</p>
+                </div>
+                <button type="button"
+                        class="btn btn-sm btn-primary"
+                        hx-get="{{ transactions_new_url }}"
+                        hx-target="#account-transactions-body"
+                        hx-swap="innerHTML"
+                        hx-request="queue:last"
+                        hx-disabled-elt="this">
+                    Add Transaction
+                </button>
+            </div>
+
+            <div id="account-transactions-body" class="mt-4">
+                {% include "financial/accounts/transactions/_body.html" with transaction_rows=transaction_rows has_transactions=has_transactions %}
+            </div>
+        </c-ui.card>
+    </section>
 </div>
 {% endblock content %}

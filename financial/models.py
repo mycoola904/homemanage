@@ -30,6 +30,11 @@ class AccountStatus(models.TextChoices):
 	PENDING = "pending", "Pending"
 
 
+class TransactionDirection(models.TextChoices):
+	DEBIT = "debit", "Debit"
+	CREDIT = "credit", "Credit"
+
+
 class AccountQuerySet(models.QuerySet):
 	"""Reusable queryset helpers for deterministic ordering and scoping."""
 
@@ -125,3 +130,44 @@ class Account(models.Model):
 
 	def __str__(self):
 		return f"{self.name} ({self.get_account_type_display()})"
+
+
+class TransactionQuerySet(models.QuerySet):
+	"""Reusable queryset helpers for deterministic transaction ordering."""
+
+	def ordered(self) -> "TransactionQuerySet":
+		return self.order_by("-posted_on", "-created_at", "-id")
+
+	def for_account(self, account) -> "TransactionQuerySet":
+		if account is None:
+			return self.none()
+		return self.filter(account=account)
+
+
+TransactionManager = models.Manager.from_queryset(TransactionQuerySet)
+
+
+class Transaction(models.Model):
+	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+	account = models.ForeignKey(
+		Account,
+		related_name="transactions",
+		on_delete=models.CASCADE,
+	)
+	posted_on = models.DateField()
+	description = models.CharField(max_length=255)
+	direction = models.CharField(max_length=10, choices=TransactionDirection.choices)
+	amount = models.DecimalField(max_digits=10, decimal_places=2)
+	notes = models.TextField(blank=True)
+	created_at = models.DateTimeField(auto_now_add=True)
+
+	objects = TransactionManager()
+
+	class Meta:
+		ordering = ("-posted_on", "-created_at", "-id")
+		indexes = [
+			models.Index(
+				fields=["account", "posted_on", "created_at", "id"],
+				name="fin_txn_acct_posted_created_id",
+			),
+		]

@@ -11,5 +11,15 @@ urlpatterns = [
     path("<uuid:pk>/edit/", views.account_edit, name="accounts-edit"),
     path("<uuid:pk>/delete/confirm/", views.account_delete_confirm, name="accounts-delete-confirm"),
     path("<uuid:pk>/delete/", views.account_delete, name="accounts-delete"),
+    path(
+        "<uuid:pk>/transactions/",
+        views.account_transactions_body,
+        name="account-transactions-body",
+    ),
+    path(
+        "<uuid:pk>/transactions/new/",
+        views.account_transactions_new,
+        name="account-transactions-new",
+    ),
     path("<uuid:pk>/", views.AccountDetailView.as_view(), name="accounts-detail"),
 ]

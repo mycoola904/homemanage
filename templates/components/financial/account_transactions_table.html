@@ -1,0 +1,26 @@
+{% comment %}
+Context:
+- rows: iterable[TransactionRow]
+{% endcomment %}
+
+<section class="overflow-x-auto rounded-2xl border border-base-200 bg-base-100 shadow-sm"
+         data-component="financial.account_transactions_table">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Posted On</th>
+                <th>Description</th>
+                <th class="text-right">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+                <tr data-transaction-id="{{ row.id }}">
+                    <td class="whitespace-nowrap">{{ row.posted_on_display }}</td>
+                    <td>{{ row.description }}</td>
+                    <td class="text-right font-mono">{{ row.amount_display }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</section>
