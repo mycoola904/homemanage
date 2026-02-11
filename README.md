@@ -1,112 +1,182 @@
-# Django Golden Starter
+# homemanage
 
-A clean, opinionated Django starter project with HTMX, Tailwind CSS, DaisyUI, and AI-agent guardrails baked in.
-Designed for rapid development without rediscovering known pitfalls.
-***
-## Why this repo exists
-This starter exists to:
-- Avoid repeating known Django + frontend mistakes  
-- Encode hard-won lessons (template parsing, HTMX swaps, watcher issues)  
-- Provide a stable base for small to medium Django projects  
-- Enable productive use of VS Code AI Agents with enforced constraints
+A structured household finance and account management application built with Django, PostgreSQL, HTMX, TailwindCSS, and DaisyUI.
 
-This is not a tutorial repo.<br>
-It is a working baseline.
+This project is intended to be a long-term, extensible financial management system for personal use. It emphasizes clarity, correctness, and disciplined development practices over rapid feature sprawl.
 
-## Stack
-- Backend: Django
-- Frontend: HTMX
-- Styling: Tailwind CSS + DaisyUI
-- Tooling: Node.js (for Tailwind), Python venv
-- Editor: VS Code (recommended)
-- AI: VS Code Copilot Agents (repo-aware)
+---
 
-## Project Structure
+## Purpose
 
-    ├─ agents.md      # Hard constraints & learned pitfalls for AI agents <br>
-    ├─ manage.py<br>
-    ├─ core/                     # Django project settings<br>
-    ├─ apps/                     # Django apps live here<br>
-    ├─ templates/<br>
-    ├─ static/<br>
-    ├─ .github/<br>
-    │  └─ agents/                # VS Code custom agents (repo-scoped)<br>
-    ├─ README.md<br>
+`homemanage` is designed to:
 
-## AI Agent Usage (Important)
+- Track financial accounts (Checking, Savings, Credit Cards, Loans, etc.)
+- Record and manage transactions
+- Provide clean UI interactions using HTMX
+- Support structured financial analysis and future forecasting
+- Serve as a disciplined, spec-driven development environment
 
-This repository is designed to be used with VS Code’s built-in Agents feature.
+This repository is **not** a starter template. It is a concrete application built from a starter foundation.
 
-### Key files
-- agents.md <br>
-Defines non-negotiable rules, diagnostic order, and known pitfalls
-(e.g., Django template parsing rules, “check the watcher first”).
+---
 
-- .github/agents/*
-Custom VS Code agents configured to read and obey agents.md.
+## Tech Stack
 
-### Rule
-> Any AI agent working in this repo must read and follow agents.md
-MUST / MUST NOT rules are hard constraints.
+- **Python 3.x**
+- **Django 5.x**
+- **PostgreSQL**
+- **HTMX** (dynamic partial rendering)
+- **TailwindCSS**
+- **DaisyUI**
+- **Git + GitHub Issues** for structured feature tracking
 
-This prevents the AI from:
-- reintroducing known bugs
-- “prettifying” code in unsafe ways
-- skipping basic diagnostics
+---
 
-## Development Setup
-### 1. Python environment
+## Architecture Overview
 
-````bash
+### Backend
+
+- Django project structure
+- PostgreSQL database
+- Model-driven forms
+- Explicit uniqueness constraints at the database level
+- Clean separation between feature apps
+
+### Frontend
+
+- TailwindCSS for utility-based styling
+- DaisyUI for component styling
+- HTMX for partial swaps and dynamic UX
+- Reusable global components stored under:
+
+```
+templates/components/
+```
+
+All shared components are globally defined to maintain UI consistency.
+
+---
+
+## Current Features
+
+### Accounts
+
+- Account list view
+- Create account
+- Edit account
+- Delete account
+- HTMX-powered detail panel swapping
+- Database-enforced uniqueness for account names
+- Manual test-verified CRUD behavior
+
+---
+
+## Development Workflow
+
+This project follows a disciplined feature-branch workflow:
+
+1. Each feature is developed in its own branch.
+2. Features are manually tested before merge.
+3. Small defects are fixed immediately.
+4. Larger issues are logged via GitHub Issues.
+5. `main` must remain stable.
+6. Feature branches are deleted after successful merge.
+
+### Definition of Done (General)
+
+A feature is ready to merge when:
+
+- All CRUD paths function correctly
+- No unhandled errors occur
+- HTMX interactions behave predictably
+- Database constraints hold
+- No known blocking issues remain
+
+---
+
+## Setup Instructions
+
+### 1. Clone the repository
+
+```bash
+git clone <repo-url>
+cd homemanage
+```
+
+### 2. Create virtual environment
+
+```bash
 python -m venv .venv
-source .venv/bin/activate   # Windows: .venv\Scripts\activate
+source .venv/bin/activate  # macOS/Linux
+# OR
+.venv\Scripts\activate    # Windows
+```
+
+### 3. Install dependencies
+
+```bash
 pip install -r requirements.txt
-````
-### 2. Node & Tailwind
-````bash
-npm install
-npm run dev   # or npm run watch
-````
-⚠️ **Important:**
-If styles are not updating, confirm the watcher is running before debugging CSS.
+```
 
-## Django Templates: Known Constraints
-This repo intentionally enforces the following:
+### 4. Configure environment variables
 
-- {% ... %} template tags must be single-line
-- {# ... #} Django comments must be single-line
-- Multi-line comments should use HTML comments
-- Complex logic belongs in views, not templates<br>
+Create a `.env` file at the project root.
 
-These rules exist because Django’s template parser is line-sensitive and can fail silently.
+Include database configuration and Django secret key.
 
-## HTMX Guidelines
+### 5. Apply migrations
 
-- Prefer targeted swaps (hx-target)
-- Avoid swapping out containers you need later
-- Return partial templates for HTMX requests
-- Avoid location.reload() as a workaround
+```bash
+python manage.py migrate
+```
+
+### 6. Run development server
+
+```bash
+python manage.py runserver
+```
+
+### 7. Run Tailwind watcher (if applicable)
+
+```bash
+npx tailwindcss -i ./static/src/input.css -o ./static/dist/output.css --watch
+```
+
+---
+
+## Roadmap
+
+Planned future enhancements:
+
+- Category model refactor (move from free-form to relational model)
+- Budget modeling system
+- Financial risk index tracking
+- Reporting dashboards
+- CSV transaction import
+- Forecasting / projection modules
+- Advanced filtering and analytics
+
+---
 
 ## Philosophy
 
-- Prefer correctness over cleverness
-- Prefer small, reversible changes
-- Prefer explicit logic over magic
-- Encode experience in files, not memory
-- This repo is meant to feel boring in the best possible way.
+This project prioritizes:
 
-## When to use this starter
+- Stability over novelty
+- Clarity over cleverness
+- Explicit database integrity
+- Spec-driven iteration
+- Clean Git discipline
 
-Use this repo if you want:
-- A personal Django baseline
-- A consistent starting point for new projects
-- An AI-assisted workflow with guardrails
-- Fewer “why is this broken?” moments
-- Do not use this repo if you want:
-- experimental framework churn
-- heavy abstraction layers
-- tutorial-style scaffolding
+It is intended to grow incrementally with confidence.
+
+---
 
 ## License
-Personal / internal use.<br>
-Adapt freely for your own projects.
+
+Personal project. Not intended for public distribution at this time.
+
+---
+
+*homemanage — structured household financial clarity.*
+
