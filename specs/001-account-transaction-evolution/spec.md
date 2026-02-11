@@ -7,6 +7,16 @@
 
 > Per the Constitution, this spec must be reviewed and approved before any code is written. Capture determinism, dependency, and UI safety decisions here rather than deferring to implementation.
 
+## Clarifications
+
+### Session 2026-02-11
+
+- Q: How should existing `number_last4` be handled when introducing `account_number`? → A: Leave `account_number` null for existing rows; drop `number_last4`.
+- Q: How should category casing and uniqueness be handled? → A: Preserve original casing; enforce uniqueness on lowercased value; reject duplicates.
+- Q: How should inline category add validation errors be returned? → A: Return the category form fragment with validation errors and a 400; keep the transaction form visible.
+- Q: Should Category include a created timestamp? → A: Add `created_at` as auto timestamp.
+- Q: How should zero or negative transaction amounts be handled? → A: Reject zero/negative inputs; require positive absolute amounts.
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Maintain accurate account details (Priority: P1)
@@ -70,7 +80,9 @@ Account owners choose an existing category or add a new category inline while cr
 - **FR-004**: Account validation MUST be deterministic and enforced in model-level validation.
 - **FR-005**: The system MUST replace `direction` with `transaction_type` and enforce the deterministic sign matrix for stored amounts.
 - **FR-006**: The system MUST restrict transaction type choices based on account type (e.g., checking: deposit, expense, transfer; credit card: payment, charge).
+- **FR-006a**: Transaction amount inputs MUST be positive and non-zero; zero or negative values MUST be rejected.
 - **FR-007**: The system MUST introduce a Category entity with a user-owned name that is unique per user in a case-insensitive manner.
+- **FR-007a**: Category names MUST preserve user-entered casing while enforcing case-insensitive uniqueness.
 - **FR-008**: The transaction form MUST allow selecting an existing category or adding a new category inline without a full page reload.
 - **FR-009**: All account and transaction form GET and POST requests MUST bind to the correct model instance.
 - **FR-010**: HTMX endpoints MUST preserve existing swap targets and not remove the triggering element from the DOM.
@@ -82,7 +94,7 @@ Account owners choose an existing category or add a new category inline while cr
 
 - **Account**: User-owned financial account with account type, account number, routing number (conditional), and interest rate (conditional).
 - **Transaction**: Entry linked to an account with transaction type, amount, date, description, optional notes, and category.
-- **Category**: User-owned label with a unique (case-insensitive) name and created timestamp.
+- **Category**: User-owned label with a unique (case-insensitive) name and auto `created_at` timestamp.
 
 ### Server-Driven UI & Template Safety *(mandatory for UI work)*
 
@@ -122,8 +134,9 @@ Rules:
 2. Add Category table and nullable category reference on transactions.
 3. Add transaction_type field while retaining direction temporarily for backfill.
 4. Backfill transaction_type from direction using deterministic mapping rules by account type.
-5. Enforce model validation and constraints after backfill completes.
-6. Remove direction and number_last4 once data has been migrated.
+5. Do not backfill account_number from number_last4; existing account_number remains null until user update.
+6. Enforce model validation and constraints after backfill completes.
+7. Remove direction and number_last4 once data has been migrated.
 
 Backfill mapping rules:
 
@@ -142,6 +155,7 @@ Data integrity rules:
 - **Account edit form POST**: POST returns the preview fragment on success or the same form fragment with errors on failure, both swapped into `#account-preview-panel` with `hx-swap="innerHTML"`.
 - **Account transactions body**: GET add-transaction form and POST submission target `#account-transactions-body` with `hx-swap="innerHTML"` and return a single root `<div>` or `<form>` compatible with innerHTML replacement.
 - **Inline category add**: HTMX partial for category creation returns a fragment that updates the category dropdown options and preserves the transaction form state without full page reload.
+- **Inline category add errors**: On validation failure, return the category form fragment with errors and a 400 status; the transaction form remains visible.
 
 ## Success Criteria *(mandatory)*
 
