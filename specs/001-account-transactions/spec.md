@@ -7,6 +7,16 @@
 
 > Per the Constitution, this spec must be reviewed and approved before any code is written. This feature MUST remain server-rendered and deterministic, use HTMX fragments (HTML-only), add no new runtime dependencies, and follow Django template safety rules.
 
+## Clarifications
+
+### Session 2026-02-11
+
+- Q: Money amount storage (DB precision)? → A: DecimalField(max_digits=10, decimal_places=2)
+- Q: Transactions table columns? → A: Posted On, Description, Amount (signed)
+- Q: Missing/unowned account fragments HTTP status? → A: 200 with inline “not found” message fragment
+- Q: Add Transaction form default `posted_on`? → A: Default to today (server-side)
+- Q: Add Transaction form `direction` control? → A: Radio buttons (Debit/Credit)
+
 ## Goals
 
 - Users can view a Transactions panel on an Account detail page.
@@ -32,6 +42,8 @@
 ### Endpoints (HTML only)
 
 These endpoints MUST enforce the same auth + ownership rules as accounts: transactions are accessed only through an account owned by the authenticated user.
+
+If the account does not exist or is not owned by the authenticated user, these endpoints MUST return a `200` response containing an inline “not found” message fragment within the Transactions panel body (and MUST NOT reveal any transaction data).
 
 - `GET /accounts/<uuid:account_id>/transactions/`
   - Returns a fragment containing the Transactions panel body (table OR empty state).
@@ -119,15 +131,16 @@ The minimal model is designed to support a useful table and a correct create flo
 | Field | Required | Meaning | Rationale |
 | --- | ---: | --- | --- |
 | `account` | yes | Owning account | Enables scoping and display on account detail page. |
-| `posted_on` | yes | Date of the transaction | User-facing “when”; avoids timezone complexity for MVP. |
+| `posted_on` | yes | Date of the transaction | User-facing “when”; defaults to server-side “today” for the add form. |
 | `description` | yes | Payee/merchant/memo | Primary identifier in a table; supports real-world entries. |
 | `direction` | yes | `debit` or `credit` | Avoids ambiguity of negative amounts across account types. |
-| `amount` | yes | Positive money value | Simple validation; sign is derived from `direction`. |
+| `amount` | yes | Positive money value (USD, 2dp) | Stored as `DecimalField(max_digits=10, decimal_places=2)`; sign is derived from `direction`. |
 | `notes` | no | Optional free text | Captures extra detail without categories/tags. |
 | `created_at` | yes | Creation timestamp | Deterministic tie-breaker and audit trail. |
 
 **Display rules (UI)**:
 
+- Transactions table columns: Posted On, Description, Amount (signed).
 - Amount is displayed as `-$amount` for `debit` and `+$amount` for `credit`.
 - Amount uses consistent currency formatting with the existing Accounts feature (USD, en-US) until multi-currency is specified.
 
@@ -141,6 +154,8 @@ The minimal model is designed to support a useful table and a correct create flo
   - Add button: `hx-get` → `/accounts/<account_id>/transactions/new/`, `hx-target="#account-transactions-body"`, `hx-swap="innerHTML"`, `hx-request="queue:last"`, `hx-disabled-elt="this"`
   - Cancel: `hx-get` → `/accounts/<account_id>/transactions/`, same target + swap
   - Save: form `hx-post` → `/accounts/<account_id>/transactions/new/`, same target + swap
+
+The Add Transaction form MUST include a `direction` control implemented as radio buttons: Debit / Credit.
 
 - **UI-003 (Trigger remains in DOM)**: The Add Transaction button MUST remain usable after any swap (no `outerHTML` swaps of the panel container).
 
@@ -159,7 +174,7 @@ The minimal model is designed to support a useful table and a correct create flo
 
 - **External Inputs**:
   - No third-party calls.
-  - Default values (e.g., initial `posted_on`) must not rely on non-deterministic client behavior.
+  - Default values (e.g., initial `posted_on`) must not rely on non-deterministic client behavior; the add form defaults `posted_on` server-side to the server's current local date.
 
 ## Success Criteria *(mandatory)*
 
@@ -182,6 +197,4 @@ The minimal model is designed to support a useful table and a correct create flo
 
 ### Open Questions
 
-- Should the Add Transaction form default `posted_on` to “today”?
-- Should “direction” be presented as a dropdown (debit/credit) or inferred from account type in a future feature?
 - Do we need a “status” (pending/cleared) now, or explicitly defer to a later reconciliation feature?

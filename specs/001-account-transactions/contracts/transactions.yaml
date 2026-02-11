@@ -1,0 +1,105 @@
+openapi: 3.1.0
+info:
+  title: Account Transactions Feature (Server-Rendered)
+  version: 0.1.0
+  description: >-
+    HTML-only endpoints for Account Transactions. Routes require authentication
+    and scope transactions to accounts owned by the requesting user. Responses
+    return HTMX fragments only (never JSON).
+servers:
+  - url: https://app.example.com
+paths:
+  /accounts/{accountId}/transactions/:
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+    get:
+      summary: Transactions panel body fragment
+      description: >-
+        Returns the transactions panel body HTML fragment (table or empty state)
+        swapped into `#account-transactions-body`.
+
+        If the account is missing or unowned, returns HTTP 200 with an inline
+        "not found" message fragment and no transaction data.
+      responses:
+        '200':
+          description: Transactions body fragment (HTML)
+          content:
+            text/html: {}
+
+  /accounts/{accountId}/transactions/new/:
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+    get:
+      summary: Add Transaction form fragment
+      description: >-
+        Returns the Add Transaction form HTML fragment swapped into
+        `#account-transactions-body`.
+
+        If the account is missing or unowned, returns HTTP 200 with an inline
+        "not found" message fragment and no transaction data.
+      responses:
+        '200':
+          description: Add Transaction form fragment (HTML)
+          content:
+            text/html: {}
+
+    post:
+      summary: Create transaction (HTMX)
+      description: >-
+        Creates a new transaction for the account and returns the updated
+        transactions body fragment (table/empty state). On validation failure,
+        returns the form fragment with HTTP 422.
+
+        If the account is missing or unowned, returns HTTP 200 with an inline
+        "not found" message fragment and no transaction data.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransactionForm'
+      responses:
+        '200':
+          description: Updated transactions body fragment (HTML)
+          content:
+            text/html: {}
+        '422':
+          description: Form fragment with validation errors (HTML)
+          content:
+            text/html: {}
+
+components:
+  parameters:
+    AccountId:
+      name: accountId
+      in: path
+      required: true
+      description: UUID primary key of the account
+      schema:
+        type: string
+        format: uuid
+
+  schemas:
+    TransactionForm:
+      type: object
+      required:
+        - posted_on
+        - description
+        - direction
+        - amount
+      properties:
+        posted_on:
+          type: string
+          format: date
+        description:
+          type: string
+          maxLength: 255
+        direction:
+          type: string
+          enum: [debit, credit]
+        amount:
+          type: string
+          pattern: '^[0-9]+(\.[0-9]{2})?$'
+        notes:
+          type: string
+          nullable: true
