@@ -83,9 +83,9 @@ paths:
               $ref: '#/components/schemas/CategoryForm'
       responses:
         '200':
-          description: Fragment updating the category dropdown and preserving the form.
+          description: Fragment for #account-transactions-body that updates the category dropdown and preserves the form.
         '400':
-          description: Category form fragment with validation errors.
+          description: Category form fragment for #account-transactions-body with validation errors.
         '404':
           description: Missing account fragment.
 components:

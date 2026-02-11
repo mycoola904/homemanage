@@ -21,5 +21,15 @@ urlpatterns = [
         views.account_transactions_new,
         name="account-transactions-new",
     ),
+        path(
+            "<uuid:pk>/transactions/<uuid:transaction_id>/edit/",
+            views.account_transactions_edit,
+            name="account-transactions-edit",
+        ),
+    path(
+        "<uuid:pk>/transactions/categories/new/",
+        views.account_transactions_category_new,
+        name="account-transactions-category-new",
+    ),
     path("<uuid:pk>/", views.AccountDetailView.as_view(), name="accounts-detail"),
 ]

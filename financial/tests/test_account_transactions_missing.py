@@ -23,6 +23,10 @@ class AccountTransactionsMissingTests(TestCase):
         )
         self.body_url = reverse("financial:account-transactions-body", args=[self.account.id])
         self.new_url = reverse("financial:account-transactions-new", args=[self.account.id])
+        self.edit_url = reverse(
+            "financial:account-transactions-edit",
+            args=[self.account.id, uuid.uuid4()],
+        )
 
     def test_unowned_account_returns_missing_fragment(self):
         self.client.force_login(self.other_user)
@@ -38,11 +42,19 @@ class AccountTransactionsMissingTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("not found", response.content.decode().lower())
 
+        response = self.client.get(self.edit_url, HTTP_HX_REQUEST="true")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("not found", response.content.decode().lower())
+
     def test_missing_account_returns_missing_fragment(self):
         self.client.force_login(self.user)
         missing_id = uuid.uuid4()
         body_url = reverse("financial:account-transactions-body", args=[missing_id])
         new_url = reverse("financial:account-transactions-new", args=[missing_id])
+        edit_url = reverse(
+            "financial:account-transactions-edit",
+            args=[missing_id, uuid.uuid4()],
+        )
 
         response = self.client.get(body_url, HTTP_HX_REQUEST="true")
         self.assertEqual(response.status_code, 200)
@@ -53,5 +65,9 @@ class AccountTransactionsMissingTests(TestCase):
         self.assertIn("not found", response.content.decode().lower())
 
         response = self.client.post(new_url, {"description": "Test"}, HTTP_HX_REQUEST="true")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("not found", response.content.decode().lower())
+
+        response = self.client.get(edit_url, HTTP_HX_REQUEST="true")
         self.assertEqual(response.status_code, 200)
         self.assertIn("not found", response.content.decode().lower())

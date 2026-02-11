@@ -15,21 +15,23 @@
     {% endif %}
 
     {% for field in form %}
-        <div class="form-control gap-2">
-            <label class="label" for="{{ field.id_for_label }}">
-                <span class="label-text font-semibold">{{ field.label }}</span>
-                {% if field.field.required %}
-                    <span class="text-error" aria-hidden="true">*</span>
+        {% if field.name not in hidden_field_names %}
+            <div class="form-control gap-2">
+                <label class="label" for="{{ field.id_for_label }}">
+                    <span class="label-text font-semibold">{{ field.label }}</span>
+                    {% if field.field.required %}
+                        <span class="text-error" aria-hidden="true">*</span>
+                    {% endif %}
+                </label>
+                {{ field }}
+                {% if field.help_text %}
+                    <p class="text-sm text-base-content/70">{{ field.help_text }}</p>
                 {% endif %}
-            </label>
-            {{ field }}
-            {% if field.help_text %}
-                <p class="text-sm text-base-content/70">{{ field.help_text }}</p>
-            {% endif %}
-            {% for error in field.errors %}
-                <p class="text-sm text-error">{{ error }}</p>
-            {% endfor %}
-        </div>
+                {% for error in field.errors %}
+                    <p class="text-sm text-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
     {% endfor %}
 
     <div class="flex flex-wrap gap-2">

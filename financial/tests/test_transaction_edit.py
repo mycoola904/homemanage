@@ -9,7 +9,7 @@ from financial.models import Account, AccountStatus, AccountType, Transaction, T
 User = get_user_model()
 
 
-class AccountTransactionsAddTests(TestCase):
+class TransactionEditTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user("alex", "alex@example.com", "pass-1234")
         self.account = Account.objects.create(
@@ -20,34 +20,47 @@ class AccountTransactionsAddTests(TestCase):
             status=AccountStatus.ACTIVE,
             current_balance=1000,
         )
-        self.new_url = reverse("financial:account-transactions-new", args=[self.account.id])
+        self.transaction = Transaction.objects.create(
+            account=self.account,
+            posted_on=date(2026, 2, 10),
+            description="Groceries",
+            transaction_type=TransactionType.EXPENSE,
+            amount="12.50",
+        )
+        self.edit_url = reverse(
+            "financial:account-transactions-edit",
+            args=[self.account.id, self.transaction.id],
+        )
         self.body_url = reverse("financial:account-transactions-body", args=[self.account.id])
 
-    def test_get_new_form_fragment(self):
+    def test_get_edit_form_fragment(self):
         self.client.force_login(self.user)
-        response = self.client.get(self.new_url, HTTP_HX_REQUEST="true")
+        response = self.client.get(self.edit_url, HTTP_HX_REQUEST="true")
 
         self.assertEqual(response.status_code, 200)
-        self.assertIn("transaction_form", response.content.decode())
-        self.assertIn("posted_on", response.content.decode())
-        self.assertIn(self.body_url, response.content.decode())
+        body = response.content.decode()
+        self.assertIn("transaction_form", body)
+        self.assertIn("Groceries", body)
+        self.assertIn(self.body_url, body)
 
-    def test_post_valid_creates_transaction_and_returns_body(self):
+    def test_post_valid_updates_transaction_and_returns_body(self):
         self.client.force_login(self.user)
         payload = {
-            "posted_on": date(2026, 2, 11),
-            "description": "Grocery Run",
-            "transaction_type": TransactionType.EXPENSE,
-            "amount": "32.50",
+            "posted_on": date(2026, 2, 12),
+            "description": "Paycheck",
+            "transaction_type": TransactionType.DEPOSIT,
+            "amount": "250.00",
             "notes": "",
         }
-        response = self.client.post(self.new_url, payload, HTTP_HX_REQUEST="true")
+        response = self.client.post(self.edit_url, payload, HTTP_HX_REQUEST="true")
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(Transaction.objects.filter(account=self.account).count(), 1)
+        self.transaction.refresh_from_db()
+        self.assertEqual(self.transaction.description, "Paycheck")
+        self.assertEqual(self.transaction.transaction_type, TransactionType.DEPOSIT)
         body = response.content.decode()
-        self.assertIn("Grocery Run", body)
-        self.assertIn("-$32.50", body)
+        self.assertIn("Paycheck", body)
+        self.assertIn("+$250.00", body)
         self.assertNotIn("transaction_form", body)
 
     def test_post_invalid_returns_422_and_form(self):
@@ -59,16 +72,9 @@ class AccountTransactionsAddTests(TestCase):
             "amount": "",
             "notes": "",
         }
-        response = self.client.post(self.new_url, payload, HTTP_HX_REQUEST="true")
+        response = self.client.post(self.edit_url, payload, HTTP_HX_REQUEST="true")
 
         self.assertEqual(response.status_code, 422)
         body = response.content.decode()
         self.assertIn("transaction_form", body)
         self.assertIn("This field is required", body)
-
-    def test_cancel_path_returns_body_fragment(self):
-        self.client.force_login(self.user)
-        response = self.client.get(self.body_url, HTTP_HX_REQUEST="true")
-
-        self.assertEqual(response.status_code, 200)
-        self.assertIn("account_transactions_body", response.content.decode())

@@ -1,0 +1,35 @@
+# Node artifacts
+node_modules/
+dist/
+build/
+coverage/
+*.log
+
+# Env files
+.env*
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.pyd
+*.pyo
+*.egg-info/
+.venv/
+venv/
+ENV/
+env/
+*.sqlite3
+db.sqlite3
+
+# Django generated
+staticfiles/
+media/
+static/css/output.css
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.tmp
+*.swp

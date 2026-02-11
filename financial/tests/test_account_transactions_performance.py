@@ -6,13 +6,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from financial.models import (
-    Account,
-    AccountStatus,
-    AccountType,
-    Transaction,
-    TransactionDirection,
-)
+from financial.models import Account, AccountStatus, AccountType, Transaction, TransactionType
 
 User = get_user_model()
 
@@ -39,7 +33,7 @@ class AccountTransactionsPerformanceTests(TestCase):
                     account=self.account,
                     posted_on=start_date + timedelta(days=idx % 14),
                     description=f"Load Test {idx:03d}",
-                    direction=TransactionDirection.DEBIT if idx % 2 == 0 else TransactionDirection.CREDIT,
+                    transaction_type=TransactionType.EXPENSE if idx % 2 == 0 else TransactionType.DEPOSIT,
                     amount=Decimal("5.00") + Decimal(idx),
                 )
             )

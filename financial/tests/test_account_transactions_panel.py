@@ -4,13 +4,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from financial.models import (
-    Account,
-    AccountStatus,
-    AccountType,
-    Transaction,
-    TransactionDirection,
-)
+from financial.models import Account, AccountStatus, AccountType, Transaction, TransactionType
 
 User = get_user_model()
 
@@ -42,14 +36,14 @@ class AccountTransactionsPanelTests(TestCase):
             account=self.account,
             posted_on=date(2026, 2, 10),
             description="Grocery Run",
-            direction=TransactionDirection.DEBIT,
+            transaction_type=TransactionType.EXPENSE,
             amount="45.55",
         )
         Transaction.objects.create(
             account=self.account,
             posted_on=date(2026, 2, 11),
             description="Paycheck",
-            direction=TransactionDirection.CREDIT,
+            transaction_type=TransactionType.DEPOSIT,
             amount="1250.00",
         )
 

@@ -9,7 +9,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from django.views.generic import CreateView, DetailView, ListView
 
-from financial.forms import AccountForm, TransactionForm
+from financial.forms import AccountForm, CategoryForm, TransactionForm
 from financial.models import Account, Transaction, UserAccountQuerysetMixin
 from financial.services.accounts import (
 	AccountSummaryRow,
@@ -115,8 +115,31 @@ def _render_transactions_missing(request, account_id) -> HttpResponse:
 	)
 
 
+def _transaction_form_context(
+	*,
+	form: TransactionForm,
+	category_form: CategoryForm,
+	post_hx_url: str,
+	cancel_hx_url: str,
+	category_post_url: str,
+	transaction_id: str | None = None,
+) -> dict:
+	return {
+		"form": form,
+		"category_form": category_form,
+		"post_hx_url": post_hx_url,
+		"cancel_hx_url": cancel_hx_url,
+		"category_post_url": category_post_url,
+		"transaction_id": transaction_id,
+	}
+
+
 def _get_account_for_transactions(request, pk) -> Account | None:
 	return Account.objects.filter(pk=pk, user=request.user).first()
+
+
+def _get_transaction_for_account(account: Account, transaction_id) -> Transaction | None:
+	return Transaction.objects.filter(account=account, pk=transaction_id).first()
 
 
 class AccountsIndexView(LoginRequiredMixin, UserAccountQuerysetMixin, ListView):
@@ -162,10 +185,12 @@ class AccountCreateView(LoginRequiredMixin, CreateView):
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
+		form = context.get("form")
 		context.update(
 			page_title="Add Account",
 			submit_label="Create account",
 			cancel_url=reverse("financial:accounts-index"),
+			hidden_field_names=getattr(form, "hidden_field_names", []),
 		)
 		return context
 
@@ -223,6 +248,7 @@ def account_edit(request, pk):
 				"submit_label": "Save changes",
 				"post_hx_url": post_hx_url,
 				"cancel_hx_url": reverse("financial:accounts-preview", args=[account.id]),
+				"hidden_field_names": getattr(form, "hidden_field_names", []),
 			},
 		)
 
@@ -239,6 +265,7 @@ def account_edit(request, pk):
 			"submit_label": "Save changes",
 			"post_hx_url": post_hx_url,
 			"cancel_hx_url": reverse("financial:accounts-preview", args=[account.id]),
+			"hidden_field_names": getattr(form, "hidden_field_names", []),
 		},
 		status=422,
 	)
@@ -307,32 +334,168 @@ def account_transactions_new(request, pk):
 
 	post_hx_url = reverse("financial:account-transactions-new", args=[account.id])
 	cancel_hx_url = reverse("financial:account-transactions-body", args=[account.id])
+	category_post_url = reverse("financial:account-transactions-category-new", args=[account.id])
 	if request.method == "GET":
-		form = TransactionForm(initial={"posted_on": timezone.localdate()})
+		form = TransactionForm(
+			initial={"posted_on": timezone.localdate()},
+			account=account,
+			user=request.user,
+		)
+		category_form = CategoryForm(user=request.user)
 		return render(
 			request,
 			"financial/accounts/transactions/_form.html",
-			{
-				"form": form,
-				"post_hx_url": post_hx_url,
-				"cancel_hx_url": cancel_hx_url,
-			},
+			_transaction_form_context(
+				form=form,
+				category_form=category_form,
+				post_hx_url=post_hx_url,
+				cancel_hx_url=cancel_hx_url,
+				category_post_url=category_post_url,
+				transaction_id=str(transaction.id),
+			),
 		)
 
-	form = TransactionForm(request.POST)
+	form = TransactionForm(request.POST, account=account, user=request.user)
 	if form.is_valid():
 		transaction = form.save(commit=False)
 		transaction.account = account
 		transaction.save()
 		return _render_transactions_body(request, account)
 
+	category_form = CategoryForm(user=request.user)
+
 	return render(
 		request,
 		"financial/accounts/transactions/_form.html",
-		{
-			"form": form,
-			"post_hx_url": post_hx_url,
-			"cancel_hx_url": cancel_hx_url,
-		},
+		_transaction_form_context(
+			form=form,
+			category_form=category_form,
+			post_hx_url=post_hx_url,
+			cancel_hx_url=cancel_hx_url,
+			category_post_url=category_post_url,
+			transaction_id=str(transaction.id),
+		),
 		status=422,
+	)
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def account_transactions_edit(request, pk, transaction_id):
+	account = _get_account_for_transactions(request, pk)
+	if account is None:
+		return _render_transactions_missing(request, pk)
+
+	transaction = _get_transaction_for_account(account, transaction_id)
+	if transaction is None:
+		return _render_transactions_body(request, account, status=404)
+
+	post_hx_url = reverse("financial:account-transactions-edit", args=[account.id, transaction.id])
+	cancel_hx_url = reverse("financial:account-transactions-body", args=[account.id])
+	category_post_url = reverse("financial:account-transactions-category-new", args=[account.id])
+
+	if request.method == "GET":
+		form = TransactionForm(instance=transaction, account=account, user=request.user)
+		category_form = CategoryForm(user=request.user)
+		return render(
+			request,
+			"financial/accounts/transactions/_form.html",
+			_transaction_form_context(
+				form=form,
+				category_form=category_form,
+				post_hx_url=post_hx_url,
+				cancel_hx_url=cancel_hx_url,
+				category_post_url=category_post_url,
+			),
+		)
+
+	form = TransactionForm(request.POST, instance=transaction, account=account, user=request.user)
+	if form.is_valid():
+		form.save()
+		return _render_transactions_body(request, account)
+
+	category_form = CategoryForm(user=request.user)
+	return render(
+		request,
+		"financial/accounts/transactions/_form.html",
+		_transaction_form_context(
+			form=form,
+			category_form=category_form,
+			post_hx_url=post_hx_url,
+			cancel_hx_url=cancel_hx_url,
+			category_post_url=category_post_url,
+		),
+		status=422,
+	)
+
+
+@login_required
+@require_http_methods(["POST"])
+def account_transactions_category_new(request, pk):
+	account = _get_account_for_transactions(request, pk)
+	if account is None:
+		return _render_transactions_missing(request, pk)
+
+	transaction_id = request.POST.get("transaction_id")
+	transaction = None
+	if transaction_id:
+		transaction = _get_transaction_for_account(account, transaction_id)
+		if transaction is None:
+			return _render_transactions_body(request, account, status=404)
+
+	if transaction is None:
+		post_hx_url = reverse("financial:account-transactions-new", args=[account.id])
+	else:
+		post_hx_url = reverse(
+			"financial:account-transactions-edit",
+			args=[account.id, transaction.id],
+		)
+	cancel_hx_url = reverse("financial:account-transactions-body", args=[account.id])
+	category_post_url = reverse("financial:account-transactions-category-new", args=[account.id])
+
+	category_form = CategoryForm(request.POST, user=request.user)
+	data = request.POST.copy()
+	if category_form.is_valid():
+		category = category_form.save(commit=False)
+		category.user = request.user
+		category.save()
+		data["category"] = str(category.id)
+		transaction_form = TransactionForm(
+			data,
+			instance=transaction,
+			account=account,
+			user=request.user,
+		)
+		category_form = CategoryForm(user=request.user)
+		return render(
+			request,
+			"financial/accounts/transactions/_form.html",
+			_transaction_form_context(
+				form=transaction_form,
+				category_form=category_form,
+				post_hx_url=post_hx_url,
+				cancel_hx_url=cancel_hx_url,
+				category_post_url=category_post_url,
+				transaction_id=str(transaction.id) if transaction else None,
+			),
+		)
+
+	transaction_form = TransactionForm(
+		data,
+		instance=transaction,
+		account=account,
+		user=request.user,
+	)
+	return render(
+		request,
+		"financial/accounts/transactions/_form.html",
+		_transaction_form_context(
+			form=transaction_form,
+			category_form=category_form,
+			post_hx_url=post_hx_url,
+			cancel_hx_url=cancel_hx_url,
+			category_post_url=category_post_url,
+			transaction_id=str(transaction.id) if transaction else None,
+		),
+		status=400,
 	)
