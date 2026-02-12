@@ -129,7 +129,7 @@ As a user with multiple household memberships, I can switch active household and
 - **UI-003**: Any dynamic classes/attributes in templates MUST be precomputed in views/context or single-line template constructs; multiline template tags/comments are prohibited.
 - **UI-004**: For each HTMX endpoint touched by this feature, implementation planning MUST document endpoint route, `hx-target`, `hx-swap`, returned partial root element, and replaced container ID.
 - **UI-005**: HTMX endpoints MUST preserve their triggering element unless explicitly justified in planning.
-- **UI-006**: Before any styling/layout debugging, implementation must confirm Tailwind/DaisyUI watcher is running (`npm run dev`) and capture rebuild output evidence.
+- **UI-006**: Before any styling/layout debugging, implementation must confirm Tailwind/DaisyUI watcher is running (`npm run dev:css`) and capture rebuild output evidence.
 
 ## Deterministic Data & Integrity *(mandatory)*
 

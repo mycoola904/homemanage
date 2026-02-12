@@ -15,7 +15,7 @@ Introduce first-class `Household` and `HouseholdMember` tenancy primitives, moun
 **Testing**: Django test runner (`python manage.py test --settings=core.settings_test`) with targeted financial + household tests and migration checks  
 **Target Platform**: Server-rendered web app on Linux/Windows dev environments  
 **Project Type**: Django monolith with app modules (`core`, `financial`, `pages`)  
-**Performance Goals**: Preserve current finance UX responsiveness while adding household scoping; no additional query fanout for account/transaction list/detail beyond household filter  
+**Performance Goals**: Preserve current finance UX responsiveness while adding household scoping; household-scoped finance list/detail endpoints must not add more than +1 SQL query over the pre-household-filter baseline in SQLite test instrumentation, with query-count assertions captured in automated tests  
 **Constraints**: Deterministic model-form updates with `instance=`; all financial queries scoped to `current_household`; no cross-household leakage; no module navigation via HTMX swaps; no new runtime services/deps  
 **Scale/Scope**: MVP supports multiple households per user, single active household per session, Finance module only under household launcher
 
@@ -26,7 +26,7 @@ Introduce first-class `Household` and `HouseholdMember` tenancy primitives, moun
 - [x] **Spec Traceability**: Coverage maps directly to [User Stories 1–4](specs/001-add-household-container/spec.md#L20-L84), [Edge Cases](specs/001-add-household-container/spec.md#L86-L94), and [FR-001..FR-016](specs/001-add-household-container/spec.md#L100-L137). Tests expected to fail pre-implementation include login household selection, household switch behavior, household-scoped account/transaction access guards, and transaction household derivation.
 - [x] **Deterministic Data Plan**: New migrations add `Household` and `HouseholdMember`, then add `household` FK to `Account` and `Transaction`. Path A reset/re-seed command creates two canonical households plus deterministic sample data. Rollback for local dev is deterministic: reset DB + rerun migrations + rerun seed command.
 - [x] **Dependency Discipline**: No new dependencies, services, background jobs, or client-side frameworks. All work uses existing Django/HTMX/Tailwind stack.
-- [x] **Template & Watcher Safety**: Watcher command documented as `npm run dev:css` (project equivalent of `npm run dev`) and must be active before any CSS/template debugging. Conditional classes remain precomputed in views/services or single-line template constructs.
+- [x] **Template & Watcher Safety**: Watcher command documented as `npm run dev:css` and must be active before any CSS/template debugging. Conditional classes remain precomputed in views/services or single-line template constructs.
 - [x] **HTMX Failure Handling**: All HTMX form endpoints in financial module keep stable targets, return fragment roots matching target containers, and preserve triggering elements unless explicitly justified (none required here).
 - [x] **AI Accountability**: Prompt/response log for this plan and implementation will be recorded in `docs/ai/003-household-top-level-container-log.md` and referenced in PR description with spec/plan/tasks links.
 

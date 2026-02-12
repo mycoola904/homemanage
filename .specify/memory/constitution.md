@@ -28,7 +28,7 @@ For every HTMX **form** endpoint, the implementation plan must explicitly docume
 - the `hx-swap` strategy
 - the expected returned partial root element (what HTML node the response starts with)
 
-HTMX swaps only update declared containers and must not remove the element that triggers the request unless the implementation plan explicitly specifies and justifies the removal. CSS or class changes are blocked until `npm run dev` (Tailwind/DaisyUI) is confirmed live in the terminal. Django templates obey single-line `{% %}` and `{# #}` rules; conditional classes are computed in the view or a single-line `{% with %}` block to avoid parser failures.
+HTMX swaps only update declared containers and must not remove the element that triggers the request unless the implementation plan explicitly specifies and justifies the removal. CSS or class changes are blocked until `npm run dev:css` (Tailwind/DaisyUI) is confirmed live in the terminal. Django templates obey single-line `{% %}` and `{# #}` rules; conditional classes are computed in the view or a single-line `{% with %}` block to avoid parser failures.
 
 ### **V. AI Accountability & Guardrails**
 

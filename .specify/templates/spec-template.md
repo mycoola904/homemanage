@@ -106,7 +106,7 @@
 
 - **UI-001**: Document each HTMX endpoint, its `hx-target`, `hx-swap`, and how the triggering element remains in the DOM after the swap.
 - **UI-002**: Describe how all dynamic classes/attributes are computed server-side (views or single-line `{% with %}` blocks), avoiding inline conditional template logic.
-- **UI-003**: Note the Tailwind/DaisyUI watcher command (`npm run dev` or equivalent) and how its output will be captured before debugging styling issues.
+- **UI-003**: Note the Tailwind/DaisyUI watcher command (`npm run dev:css`) and how its output will be captured before debugging styling issues.
 
 ## Deterministic Data & Integrity *(mandatory)*
 

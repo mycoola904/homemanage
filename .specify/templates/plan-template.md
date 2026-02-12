@@ -34,7 +34,7 @@
 - [ ] **Spec Traceability**: Link to the `/speckit.spec` section covering this work and enumerate the scenarios/tests that will fail before implementation (Principle I).
 - [ ] **Deterministic Data Plan**: List migrations, fixtures, and rollback steps proving the database change is idempotent and reproducible (Principle II).
 - [ ] **Dependency Discipline**: Declare any new dependency (expected: NONE). If unavoidable, attach justification, blast-radius analysis, and removal plan; otherwise block the work (Principle III).
-- [ ] **Template & Watcher Safety**: Confirm `npm run dev` (Tailwind/DaisyUI) is running, outline how conditional classes are precomputed, and note the required HTMX `hx-target`/`hx-swap` containers (Principle IV).
+- [ ] **Template & Watcher Safety**: Confirm `npm run dev:css` (Tailwind/DaisyUI) is running, outline how conditional classes are precomputed, and note the required HTMX `hx-target`/`hx-swap` containers (Principle IV).
 - [ ] **HTMX Failure Handling**: Describe server-driven error states, swap types, and how the triggering element stays intact across responses (Principle IV).
 - [ ] **AI Accountability**: Specify where prompt/response logs for this work will be stored and how they will be referenced in the PR description (Principle V).
 
