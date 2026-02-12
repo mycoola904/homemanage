@@ -33,7 +33,7 @@ class AccountDeleteTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertFalse(Account.objects.filter(pk=self.account.pk).exists())
         body = response.content.decode()
-        self.assertIn("account-preview-panel", body)
+        self.assertIn("Select Preview", body)
         self.assertNotIn("Loan Refi", body)
 
     def test_non_owner_gets_404(self):

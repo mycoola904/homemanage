@@ -1,4 +1,4 @@
 @import "tailwindcss";
 @plugin "daisyui"{
-  themes: light, dark, dracula,  forest, emerald;
+  themes: light, dark, dracula,  forest, emerald, cupcake, garden;
 };

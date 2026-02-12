@@ -3,10 +3,10 @@ from decimal import Decimal
 
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
-from django.test import TestCase
+from django.test import TransactionTestCase
 
 
-class TransactionTypeBackfillTests(TestCase):
+class TransactionTypeBackfillTests(TransactionTestCase):
     migrate_from = [("financial", "0002_transaction")]
     migrate_to = [("financial", "0003_account_transaction_evolution")]
 
@@ -68,6 +68,7 @@ class TransactionTypeBackfillTests(TestCase):
             ).id,
         }
 
+        self.executor = MigrationExecutor(connection)
         self.executor.migrate(self.migrate_to)
         self.apps = self.executor.loader.project_state(self.migrate_to).apps
 

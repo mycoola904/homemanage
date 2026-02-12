@@ -78,12 +78,20 @@ class AccountForm(forms.ModelForm):
                     "routing_number",
                     "Routing numbers are only for checking or savings accounts.",
                 )
+                self.add_error(
+                    None,
+                    "Routing numbers are only for checking or savings accounts.",
+                )
             cleaned_data["routing_number"] = None
 
         if account_type not in {"credit_card", "loan", "other"}:
             if interest_rate is not None:
                 self.add_error(
                     "interest_rate",
+                    "Interest rates are only for credit or loan accounts.",
+                )
+                self.add_error(
+                    None,
                     "Interest rates are only for credit or loan accounts.",
                 )
             cleaned_data["interest_rate"] = None
@@ -116,6 +124,9 @@ class TransactionForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if self._account is not None:
+            self.instance.account = self._account
+
+        if self._account is not None:
             self.fields["transaction_type"].choices = TransactionType.allowed_for_account(
                 self._account.account_type,
             )
@@ -142,6 +153,7 @@ class CategoryForm(forms.ModelForm):
     def __init__(self, *args, user=None, **kwargs):
         self._user = user
         super().__init__(*args, **kwargs)
+        self.fields["name"].error_messages["required"] = "Enter a category name."
 
     class Meta:
         model = Category

@@ -307,13 +307,19 @@ def account_delete(request, pk):
 		)
 
 	account.delete()
-	table_html = _render_accounts_table_fragment(request)
-	preview_reset = render_to_string(
-		"components/financial/account_preview_panel.html",
-		{"panel_id": "account-preview-panel", "swap_oob": True},
+	table_html = render_to_string(
+		"components/financial/accounts_table.html",
+		{
+			**_accounts_table_component_context(request),
+			"swap_oob": True,
+		},
 		request=request,
 	)
-	return HttpResponse(table_html + preview_reset)
+	preview_reset = render_to_string(
+		"financial/accounts/_preview_empty.html",
+		request=request,
+	)
+	return HttpResponse(preview_reset + table_html)
 
 
 @login_required
@@ -351,7 +357,6 @@ def account_transactions_new(request, pk):
 				post_hx_url=post_hx_url,
 				cancel_hx_url=cancel_hx_url,
 				category_post_url=category_post_url,
-				transaction_id=str(transaction.id),
 			),
 		)
 
@@ -373,7 +378,6 @@ def account_transactions_new(request, pk):
 			post_hx_url=post_hx_url,
 			cancel_hx_url=cancel_hx_url,
 			category_post_url=category_post_url,
-			transaction_id=str(transaction.id),
 		),
 		status=422,
 	)

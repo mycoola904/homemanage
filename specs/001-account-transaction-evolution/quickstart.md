@@ -20,8 +20,12 @@
 1. **Account edit validation**: Open account edit form for checking and credit card accounts.
    - Observe: routing number is visible only for checking/savings; interest rate only for credit card/loan/other debt.
 2. **Transaction sign matrix**: Add transactions for each account type and verify stored amounts follow the deterministic sign matrix.
-3. **Inline category add**: Create a new category inline while adding a transaction.
+3. **Transaction add/edit HTMX**: Add a transaction, then edit it from the table.
+   - Observe: `#account-transactions-body` swaps without a full page reload; the Add Transaction button remains visible.
+4. **Inline category add**: Create a new category inline while adding a transaction.
    - Observe: dropdown updates without full page reload; duplicates (case-only) are rejected with errors.
+5. **Account preview/edit/delete HTMX**: Use Preview, Edit, and Delete from the accounts table.
+   - Observe: `#account-preview-panel` swaps without full page reload; delete updates the table and resets the preview panel.
 
 ## Testing
 - Run suite with SQLite: `python manage.py test financial --settings=core.settings_test`

@@ -107,8 +107,8 @@ description: "Task list for account and transaction evolution"
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T023 [P] Update specs/001-account-transaction-evolution/quickstart.md with final verification steps and test command (Spec SC-002)
-- [ ] T027 [P] Verify HTMX responses preserve triggering elements for account preview/edit/delete, transaction add/edit, and inline category add (Spec FR-010, UI-001, UI-002)
+- [x] T023 [P] Update specs/001-account-transaction-evolution/quickstart.md with final verification steps and test command (Spec SC-002)
+- [x] T027 [P] Verify HTMX responses preserve triggering elements for account preview/edit/delete, transaction add/edit, and inline category add (Spec FR-010, UI-001, UI-002)
 
 ---
 

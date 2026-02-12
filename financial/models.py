@@ -271,7 +271,8 @@ class Transaction(models.Model):
 
 		if self.amount is None:
 			return
-		if self.amount <= Decimal("0"):
+		signed_once = getattr(self, "_signed_amount", False)
+		if self.amount <= Decimal("0") and not signed_once:
 			raise ValidationError({"amount": "Amount must be greater than 0."})
 
 		sign_map = {
@@ -305,6 +306,7 @@ class Transaction(models.Model):
 		}
 		sign = sign_map[self.account.account_type][self.transaction_type]
 		self.amount = abs(self.amount) * sign
+		self._signed_amount = True
 
 	def save(self, *args, **kwargs):
 		self.full_clean()

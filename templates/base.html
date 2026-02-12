@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="forest">
+<html lang="en" data-theme="garden">
 <head>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/output.css' %}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{% block title %}My Django Project{% endblock title %}</title>
+    <title>{% block title %}Home Management{% endblock title %}</title>
 
     {% block extra_head %}
     <!-- Additional CSS or meta tags can go here -->
@@ -14,6 +14,7 @@
 </head>
 
 <body>
+  
   <main>
     <c-layout.app>
       {% block content %}{% endblock content %}
@@ -21,7 +22,7 @@
   </main>
 
   <footer class="p-4">
-    <p>&copy; 2026 My Django Project</p>
+    <p>&copy; 2026 Home Management</p>
   </footer>
 
   {% block extra_body %}{% endblock extra_body %}

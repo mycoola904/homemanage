@@ -1,26 +1,28 @@
-<section class="space-y-4" aria-live="polite">
+<form method="post"
+      action="{% url 'financial:accounts-delete' account.id %}"
+      class="space-y-4"
+      aria-live="polite"
+      hx-post="{% url 'financial:accounts-delete' account.id %}"
+      hx-target="#account-preview-panel"
+      hx-swap="innerHTML"
+      hx-request="queue:last">
+    {% csrf_token %}
+
     <div class="space-y-2">
         <h2 class="text-2xl font-bold">Delete account?</h2>
         <p class="text-base-content/70">Once deleted, <strong>{{ account.name }}</strong> is removed immediately.</p>
     </div>
 
-        <form method="post"
-            hx-post="{% url 'financial:accounts-delete' account.id %}"
-            hx-target="[data-component='financial.accounts_table']"
-            hx-swap="outerHTML"
-            hx-request="queue:last">
-        {% csrf_token %}
-        <div class="flex flex-wrap gap-3">
-            <button type="submit" class="btn btn-error" hx-disabled-elt="this">Delete account</button>
-            <button type="button"
-                    class="btn btn-ghost"
-                    hx-get="{% url 'financial:accounts-preview' account.id %}"
-                    hx-target="#account-preview-panel"
-                    hx-swap="innerHTML"
-                    hx-request="queue:last"
-                    hx-disabled-elt="this">
-                Cancel
-            </button>
-        </div>
-    </form>
-</section>
+    <div class="flex flex-wrap gap-3">
+        <button type="submit" class="btn btn-error" hx-disabled-elt="this">Delete account</button>
+        <button type="button"
+                class="btn btn-ghost"
+                hx-get="{% url 'financial:accounts-preview' account.id %}"
+                hx-target="#account-preview-panel"
+                hx-swap="innerHTML"
+                hx-request="queue:last"
+                hx-disabled-elt="this">
+            Cancel
+        </button>
+    </div>
+</form>
