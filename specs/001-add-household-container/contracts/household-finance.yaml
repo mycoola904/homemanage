@@ -1,0 +1,218 @@
+openapi: 3.1.0
+info:
+  title: Household + Finance Module Contract (Server-Rendered)
+  version: 0.1.0
+  description: >-
+    HTML-first endpoints for household-scoped navigation and finance interactions.
+    All routes require authentication and enforce current household scoping.
+servers:
+  - url: https://app.example.com
+paths:
+  /household/:
+    get:
+      summary: Household home (module launcher)
+      responses:
+        '200':
+          description: Full HTML page with household-scoped launcher and nav.
+        '403':
+          description: No-household-access page when user has no eligible households.
+  /household/switch/:
+    post:
+      summary: Switch active household in session
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              required: [household_id]
+              properties:
+                household_id:
+                  type: string
+                  format: uuid
+      responses:
+        '302':
+          description: Redirect to /household/ with updated session household.
+        '403':
+          description: Attempted switch to non-member or ineligible household.
+  /household/finance/:
+    get:
+      summary: Finance module root under household scope
+      responses:
+        '200':
+          description: Full HTML page (dashboard/accounts entry) scoped to current household.
+        '403':
+          description: No eligible active household in session.
+  /household/finance/{accountId}/preview/:
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+    get:
+      summary: HTMX account preview fragment
+      responses:
+        '200':
+          description: Fragment swapped into #account-preview-panel.
+          content:
+            text/html: {}
+        '404':
+          description: Account missing or outside current household scope.
+  /household/finance/{accountId}/edit/:
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+    get:
+      summary: HTMX account edit form fragment
+      responses:
+        '200':
+          description: Edit form fragment for preview panel.
+        '404':
+          description: Account missing or outside scope.
+    post:
+      summary: Update account under household scope
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AccountForm'
+      responses:
+        '200':
+          description: Updated preview fragment and/or out-of-band table update.
+        '422':
+          description: Form fragment with validation errors.
+        '404':
+          description: Account missing or outside scope.
+  /household/finance/{accountId}/delete/confirm/:
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+    get:
+      summary: HTMX delete confirmation fragment
+      responses:
+        '200':
+          description: Confirmation fragment swapped into preview panel.
+        '404':
+          description: Account missing or outside scope.
+  /household/finance/{accountId}/delete/:
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+    post:
+      summary: Hard-delete account under household scope
+      responses:
+        '200':
+          description: Preview reset fragment + OOB table refresh fragment.
+        '404':
+          description: Account missing or already deleted/outside scope.
+  /household/finance/{accountId}/transactions/new/:
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+    get:
+      summary: HTMX new transaction form
+      responses:
+        '200':
+          description: Transaction form fragment for #account-transactions-body.
+        '404':
+          description: Account missing or outside scope.
+    post:
+      summary: Create transaction in account's household
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransactionForm'
+      responses:
+        '200':
+          description: Transactions body fragment refreshed.
+        '422':
+          description: Transaction form fragment with validation errors.
+        '404':
+          description: Account missing or outside scope.
+  /household/finance/{accountId}/transactions/{transactionId}/edit/:
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+      - $ref: '#/components/parameters/TransactionId'
+    get:
+      summary: HTMX edit transaction form
+      responses:
+        '200':
+          description: Transaction edit fragment for #account-transactions-body.
+        '404':
+          description: Transaction/account missing or outside scope.
+    post:
+      summary: Update transaction with household invariant enforcement
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/TransactionForm'
+      responses:
+        '200':
+          description: Transactions body fragment refreshed.
+        '422':
+          description: Transaction form fragment with validation errors.
+        '404':
+          description: Transaction/account missing or outside scope.
+  /household/finance/{accountId}/transactions/categories/new/:
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+    post:
+      summary: HTMX inline category create while editing transaction
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CategoryForm'
+      responses:
+        '200':
+          description: Transaction form fragment with new category selected.
+        '400':
+          description: Category form validation failure fragment.
+        '404':
+          description: Account or transaction missing/outside scope.
+
+components:
+  parameters:
+    AccountId:
+      name: accountId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    TransactionId:
+      name: transactionId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    AccountForm:
+      type: object
+      required: [name, account_type, status, current_balance]
+      properties:
+        name: { type: string }
+        institution: { type: string }
+        account_type:
+          type: string
+          enum: [checking, savings, credit_card, loan, other]
+        status:
+          type: string
+          enum: [active, closed, pending]
+        current_balance:
+          type: string
+    TransactionForm:
+      type: object
+      required: [posted_on, description, amount, account]
+      properties:
+        posted_on: { type: string, format: date }
+        description: { type: string }
+        amount: { type: string }
+        account:
+          type: string
+          format: uuid
+    CategoryForm:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string }
