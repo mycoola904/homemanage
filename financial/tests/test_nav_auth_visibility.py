@@ -44,6 +44,17 @@ class NavAuthVisibilityTests(TestCase):
         self.assertNotContains(response, "Login")
         self.assertNotContains(response, "Settings")
 
+    def test_authenticated_user_without_household_hides_finance(self):
+        no_household_user = User.objects.create_user("no-household", "no-household@example.com", "pass-1234")
+        self.client.force_login(no_household_user)
+
+        response = self.client.get(reverse("home"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, "Finance")
+        self.assertNotContains(response, "Settings")
+        self.assertNotContains(response, "Login")
+
     def test_authenticated_admin_nav_shows_settings(self):
         self.client.force_login(self.admin)
 
