@@ -32,7 +32,7 @@
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
 - [ ] T004 Add `online_access_url` field to Account model in financial/models.py for FR-017 entity update
-- [ ] T005 Create migration for `online_access_url` in financial/migrations/00xx_add_account_online_access_url.py with deterministic forward/backward behavior
+- [ ] T005 Create migration for `online_access_url` in financial/migrations/NNNN_account_online_access_url.py (next sequential number) with deterministic forward/backward behavior
 - [ ] T006 [P] Add import form class shell (file upload + basic field wiring) in financial/forms.py for FR-003/FR-004
 - [ ] T007 [P] Create import service module skeleton for CSV parsing pipeline in financial/services/account_import.py for FR-005/FR-006
 - [ ] T008 Add import URL route placeholders in financial/urls.py for /financial/import/, /financial/import/panel/, /financial/import/template/
@@ -63,6 +63,8 @@
 - [ ] T017 [US1] Implement atomic account creation transaction and success summary builder in financial/services/account_import.py (FR-006/FR-010)
 - [ ] T018 [US1] Implement POST import view in financial/views.py with `hx-target="#account-import-panel"` and `hx-swap="innerHTML"` success path (UI-001/UI-002, contract POST 200)
 - [ ] T019 [US1] Wire import views to named routes in financial/urls.py and update any finance navigation links as needed (FR-001/FR-002)
+- [ ] T039 [P] [US1] Add test in financial/tests/test_account_import.py verifying selected filename is shown before submit (FR-003)
+- [ ] T040 [US1] Implement selected filename display behavior in financial/templates/financial/accounts/_import_panel.html and supporting view/form wiring (FR-003)
 
 **Checkpoint**: US1 is independently functional and testable.
 
@@ -119,10 +121,12 @@
 
 **Purpose**: Final consistency, traceability, and verification across stories.
 
-- [ ] T035 [P] Remove duplicate `Account Import Row` bullet and align final wording in specs/001-account-import/spec.md for spec hygiene
+- [ ] T035 [P] Verify final schema-change wording and FR-to-contract header parity between specs/001-account-import/spec.md and specs/001-account-import/contracts/account-import.openapi.yaml
 - [ ] T036 Document HTMX target/swap decisions in inline template/view context where applicable in financial/views.py and financial/templates/financial/accounts/_import_panel.html (UI-001/UI-002 evidence)
 - [ ] T037 [P] Update AI prompt/response traceability notes in specs/001-account-import/quickstart.md and PR checklist section for Principle V evidence
 - [ ] T038 Run feature-targeted and financial test suites via core.settings_test and record outcomes in specs/001-account-import/quickstart.md validation notes
+- [ ] T041 [P] Add performance validation task for 1,000-row import under 10s and record evidence in quickstart.md (SC-002)
+- [ ] T042 [P] Add SC-003 validation protocol task: run and record at least 10 first-time template-based import trials with >=90% successful completion evidence in specs/001-account-import/quickstart.md
 
 ---
 

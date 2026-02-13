@@ -83,7 +83,7 @@ As a household member, I can access a template CSV so I can prepare import files
 - **FR-003**: The import form MUST allow the user to choose a local file and display the selected file path or filename before submission.
 - **FR-004**: The system MUST accept account import files in CSV format only.
 - **FR-005**: The system MUST validate file type, required columns, and row-level data before persisting any imported account records.
-- **FR-005a**: The CSV MUST include this near-full account header set: `name`, `institution`, `account_type`, `account_number`, `routing_number`, `interest_rate`, `status`, `current_balance`, `credit_limit_or_principal`, `statement_close_date`, `payment_due_day`, `online_access_url`, `notes`.
+- **FR-005a**: The CSV MUST include this required exact account header set: `name`, `institution`, `account_type`, `account_number`, `routing_number`, `interest_rate`, `status`, `current_balance`, `credit_limit_or_principal`, `statement_close_date`, `payment_due_day`, `online_access_url`, `notes`.
 - **FR-005b**: Columns listed in FR-005a are required as headers in every import file; individual cell values may be empty only when the corresponding Account field allows blank or null values.
 - **FR-006**: The system MUST treat each upload as an atomic operation: if any validation error exists, no accounts from that upload are created.
 - **FR-007**: The system MUST create imported accounts only in the household context active for the logged-in user at submission time.
@@ -101,7 +101,6 @@ As a household member, I can access a template CSV so I can prepare import files
 ### Key Entities *(include if feature involves data)*
 
 - **Account Import File**: A user-provided CSV document containing rows intended to create account records.
-- **Account Import Row**: One logical account entry from the file, including the full required header set and row values mapped to Account fields.
 - **Account Import Row**: One logical account entry from the file, including the full required header set and row values mapped to Account fields, including optional `online_access_url`.
 - **Import Result Summary**: Outcome data for one upload attempt, including counts and row-level validation messages.
 - **Household Context**: The active household selected by the logged-in user that determines ownership of imported records.
@@ -115,7 +114,7 @@ As a household member, I can access a template CSV so I can prepare import files
 
 ## Deterministic Data & Integrity *(mandatory)*
 
-- **Schema Changes**: No schema change is required; account records are created using existing Account model fields and constraints.
+- **Schema Changes**: Add one Account schema change for online access URL with a reversible migration (add field + rollback path). Migration filename is created in financial/migrations and validated in tests.
 - **Data Fixtures**: Provide a deterministic template CSV with stable header ordering using the FR-005a header set and representative sample rows; repeated use of the same valid import file must produce the same resulting account set when starting from the same database state.
 - **External Inputs**: Import behavior must not depend on randomness; parsing and validation outcomes must be deterministic for the same file content and household context.
 

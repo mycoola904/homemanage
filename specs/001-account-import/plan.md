@@ -54,7 +54,7 @@ financial/
 ├── urls.py
 ├── views.py
 ├── migrations/
-│   └── 00xx_add_account_online_access_url.py
+│   └── NNNN_account_online_access_url.py (next sequential migration number)
 ├── templates/financial/accounts/
 │   ├── import.html
 │   └── _import_panel.html
