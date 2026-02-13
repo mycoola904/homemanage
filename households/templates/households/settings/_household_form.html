@@ -1,0 +1,27 @@
+<form
+  class="mt-4 space-y-3"
+  method="post"
+  action="{% url 'household:settings-households-create' %}"
+  hx-post="{% url 'household:settings-households-create' %}"
+  hx-target="#settings-household-panel"
+  hx-swap="innerHTML"
+>
+  {% csrf_token %}
+  {% if household_form.non_field_errors %}
+    <div class="alert alert-error py-2">
+      <ul>
+        {% for err in household_form.non_field_errors %}
+          <li>{{ err }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+  <div>
+    <label class="label" for="household-name">Household name</label>
+    <input id="household-name" name="name" class="input input-bordered w-full" type="text" value="{{ household_form.name.value|default:'' }}" required>
+    {% if household_form.name.errors %}
+      <p class="mt-1 text-sm text-error">{{ household_form.name.errors.0 }}</p>
+    {% endif %}
+  </div>
+  <button class="btn btn-primary" type="submit">Create Household</button>
+</form>

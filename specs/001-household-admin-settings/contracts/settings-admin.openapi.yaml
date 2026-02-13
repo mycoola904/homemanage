@@ -47,9 +47,7 @@ paths:
         '200':
           description: User and memberships created; returns updated users/memberships partial
         '400':
-          description: Validation error partial (duplicate identity, weak password, missing membership)
-        '409':
-          description: Conflict if concurrent duplicate identity attempt
+          description: Validation error partial (duplicate identity, weak password, missing membership, or no-households precondition)
         '403':
           description: Forbidden
   /settings/households/{householdId}/memberships/:
@@ -79,6 +77,8 @@ paths:
       responses:
         '200':
           description: Membership removed (or already absent) and updated list partial returned
+        '400':
+          description: Validation error partial (household/user missing, or owner protection violation)
         '403':
           description: Forbidden
 components:

@@ -25,6 +25,8 @@ class HouseholdHomeView(LoginRequiredMixin, TemplateView):
     template_name = "pages/household_home.html"
 
     def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return self.handle_no_permission()
         context = resolve_current_household(request)
         if context.redirect is not None:
             return context.redirect

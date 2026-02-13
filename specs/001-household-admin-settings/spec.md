@@ -109,7 +109,7 @@ As an Administrator, I can add and remove members for a selected household so th
 
 - **FR-001**: System MUST support a global "Administrator" authorization concept that grants access to household administration features.
 - **FR-002**: For MVP, Django superusers MUST be treated as global Administrators for this feature and receive access automatically.
-- **FR-003**: The authorization check MUST be implemented so a future explicit permission/group can be added without changing user-facing behavior.
+- **FR-003**: Administrator authorization logic MUST be centralized in a single server-side policy function/service used by both Settings endpoint guards and navigation visibility decisions.
 - **FR-004**: System MUST display a "Settings" sidebar navigation item only to Administrators.
 - **FR-005**: System MUST deny non-Administrators from accessing Settings screens even if they navigate directly to the URL.
 - **FR-006**: System MUST show a Login button in navbar/header navigation only when the user is not authenticated.
@@ -161,13 +161,13 @@ Functional requirements are considered accepted when the corresponding User Stor
 ### Measurable Outcomes
 
 - **SC-001**: An Administrator can create a new household in under 60 seconds (from opening Settings to seeing the new household listed).
-- **SC-002**: An Administrator can create a user login account (including password set) in under 90 seconds.
 - **SC-002**: An Administrator can create a user login account (including password set and at least one household membership) in under 90 seconds.
-- **SC-003**: An Administrator can add an existing user as a household member in under 60 seconds.
-- **SC-004**: Non-Administrators are unable to access Settings and are unable to create households, create user accounts, or change memberships (0 successful unauthorized attempts in acceptance testing).
-- **SC-005**: Validation errors for duplicate household names, duplicate usernames/emails, weak passwords, and duplicate memberships are displayed clearly and prevent unintended data creation (100% of tested cases).
-- **SC-006**: In acceptance testing, unauthenticated users see Login navigation and do not see module navigation (including Finance) in 100% of tested views.
-- **SC-007**: In acceptance testing, when no households exist, user creation is blocked and administrators are directed to household creation in 100% of tested cases.
+- **SC-003**: An Administrator can create a user login account with multiple household memberships in under 90 seconds.
+- **SC-004**: An Administrator can add an existing user as a household member in under 60 seconds.
+- **SC-005**: Non-Administrators are unable to access Settings and are unable to create households, create user accounts, or change memberships (0 successful unauthorized attempts in acceptance testing).
+- **SC-006**: Validation errors for duplicate household names, duplicate usernames/emails, weak passwords, and duplicate memberships are displayed clearly and prevent unintended data creation (100% of tested cases).
+- **SC-007**: In acceptance testing, unauthenticated users see Login navigation and do not see module navigation (including Finance) in 100% of tested views.
+- **SC-008**: In acceptance testing, when no households exist, user creation is blocked and administrators are directed to household creation in 100% of tested cases.
 
 ## Assumptions & Open Questions *(mandatory)*
 

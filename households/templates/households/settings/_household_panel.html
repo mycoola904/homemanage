@@ -1,0 +1,15 @@
+<section id="settings-household-panel" class="card bg-base-100 border border-base-300 p-4">
+  <h2 class="text-lg font-semibold">Households</h2>
+
+  {% if households %}
+    <ul class="mt-3 space-y-2">
+      {% for household in households %}
+        <li class="rounded border border-base-300 px-3 py-2">{{ household.name }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="mt-3 text-sm text-base-content/70">No households yet.</p>
+  {% endif %}
+
+  {% include "households/settings/_household_form.html" %}
+</section>

@@ -1,0 +1,68 @@
+<form
+  class="mt-4 space-y-3"
+  method="post"
+  action="{% url 'household:settings-users-create' %}"
+  hx-post="{% url 'household:settings-users-create' %}"
+  hx-target="#settings-user-panel"
+  hx-swap="innerHTML"
+>
+  {% csrf_token %}
+  {% if user_form.non_field_errors %}
+    <div class="alert alert-error py-2">
+      <ul>
+        {% for err in user_form.non_field_errors %}
+          <li>{{ err }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <div class="grid gap-3 md:grid-cols-2">
+    <div>
+      <input name="username" class="input input-bordered w-full" type="text" placeholder="Username" value="{{ user_form.username.value|default:'' }}" required>
+      {% if user_form.username.errors %}
+        <p class="mt-1 text-sm text-error">{{ user_form.username.errors.0 }}</p>
+      {% endif %}
+    </div>
+    <div>
+      <input name="email" class="input input-bordered w-full" type="email" placeholder="Email" value="{{ user_form.email.value|default:'' }}" required>
+      {% if user_form.email.errors %}
+        <p class="mt-1 text-sm text-error">{{ user_form.email.errors.0 }}</p>
+      {% endif %}
+    </div>
+  </div>
+
+  <div>
+    <input name="password" class="input input-bordered w-full" type="password" placeholder="Password" required>
+    {% if user_form.password.errors %}
+      <p class="mt-1 text-sm text-error">{{ user_form.password.errors.0 }}</p>
+    {% endif %}
+  </div>
+
+  {% if has_households %}
+    <fieldset class="space-y-2">
+      <legend class="text-sm font-medium">Households</legend>
+      {% with selected_household_ids=user_form.household_ids.value %}
+        {% for household in households %}
+          <label class="label cursor-pointer justify-start gap-2">
+            <input
+              type="checkbox"
+              class="checkbox checkbox-sm"
+              name="household_ids"
+              value="{{ household.id }}"
+              {% if selected_household_ids and household.id|stringformat:"s" in selected_household_ids %}checked{% endif %}
+            >
+            <span>{{ household.name }}</span>
+          </label>
+        {% endfor %}
+      {% endwith %}
+    </fieldset>
+    {% if user_form.household_ids.errors %}
+      <p class="mt-1 text-sm text-error">{{ user_form.household_ids.errors.0 }}</p>
+    {% endif %}
+    <button class="btn btn-primary" type="submit">Create User</button>
+  {% else %}
+    <div class="alert alert-warning py-2">Create a household before creating user accounts.</div>
+    <button class="btn btn-primary" type="submit" disabled>Create User</button>
+  {% endif %}
+</form>

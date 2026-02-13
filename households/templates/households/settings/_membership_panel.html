@@ -1,0 +1,50 @@
+<section id="settings-membership-panel" class="card bg-base-100 border border-base-300 p-4">
+  <h2 class="text-lg font-semibold">Memberships</h2>
+
+  {% if membership_error %}
+    <div class="alert alert-error mt-3 py-2">{{ membership_error }}</div>
+  {% endif %}
+  {% if membership_message %}
+    <div class="alert alert-success mt-3 py-2">{{ membership_message }}</div>
+  {% endif %}
+
+  {% if households and users %}
+    <div class="mt-4 space-y-3">
+      {% for household in households %}
+        <form
+          class="rounded border border-base-300 p-3 space-y-2"
+          method="post"
+          action="{% url 'household:settings-memberships-add' household_id=household.id %}"
+          hx-post="{% url 'household:settings-memberships-add' household_id=household.id %}"
+          hx-target="#settings-membership-panel"
+          hx-swap="innerHTML"
+        >
+          {% csrf_token %}
+          <p class="text-sm font-medium">Add member to {{ household.name }}</p>
+          <div class="grid gap-2 md:grid-cols-3">
+            <select name="user_id" class="select select-bordered w-full" required>
+              <option value="">Select user</option>
+              {% for candidate in users %}
+                <option value="{{ candidate.id }}">{{ candidate.username }}</option>
+              {% endfor %}
+            </select>
+            <select name="role" class="select select-bordered w-full">
+              {% for role_value, role_label in membership_roles %}
+                <option value="{{ role_value }}">{{ role_label }}</option>
+              {% endfor %}
+            </select>
+            <button class="btn btn-primary" type="submit">Add Member</button>
+          </div>
+        </form>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="mt-4 space-y-2">
+    {% for membership in memberships %}
+      {% include "households/settings/_membership_row.html" with membership=membership %}
+    {% empty %}
+      <p class="text-sm text-base-content/70">No memberships yet.</p>
+    {% endfor %}
+  </div>
+</section>

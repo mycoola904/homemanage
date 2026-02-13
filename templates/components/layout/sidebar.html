@@ -47,6 +47,19 @@
       </li>
       {% endif %}
 
+      {% if can_access_settings %}
+      <li>
+        <a href="{% url 'household:settings-index' %}"
+           class="is-drawer-close:tooltip is-drawer-close:tooltip-right flex items-center gap-2"
+           data-tip="Settings">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12a7.5 7.5 0 0 1 15 0m-15 0a7.5 7.5 0 0 0 15 0m-15 0H3m1.5 0h15m0 0H21m-9 0v9m0-9V3" />
+            </svg>
+            <span class="is-drawer-close:hidden">Settings</span>
+        </a>
+      </li>
+      {% endif %}
+
       {% endwith %}
 
     </ul>

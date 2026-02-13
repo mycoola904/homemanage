@@ -1,0 +1,13 @@
+<div class="flex items-center justify-between border-b border-base-300 py-2">
+  <span>{{ membership.user.username }} in {{ membership.household.name }} ({{ membership.get_role_display }})</span>
+  <form
+    method="post"
+    action="{% url 'household:settings-memberships-remove' household_id=membership.household_id user_id=membership.user_id %}"
+    hx-post="{% url 'household:settings-memberships-remove' household_id=membership.household_id user_id=membership.user_id %}"
+    hx-target="#settings-membership-panel"
+    hx-swap="innerHTML"
+  >
+    {% csrf_token %}
+    <button class="btn btn-ghost btn-xs" type="submit">Remove</button>
+  </form>
+</div>

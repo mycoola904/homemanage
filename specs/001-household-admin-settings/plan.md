@@ -34,6 +34,17 @@ Add a server-driven Settings workflow for global administrators (MVP: Django sup
 
 Document evidence for every checkbox. If any item is unresolved, stop and revise the spec/plan before coding.
 
+### HTMX Form Endpoint Matrix (Principle IV)
+
+| Endpoint | hx-target | hx-swap | Returned Partial Root Element |
+|----------|-----------|---------|-------------------------------|
+| `POST /settings/households/` | `#settings-household-panel` | `innerHTML` | `<section id="settings-household-panel">` |
+| `POST /settings/users/` | `#settings-user-panel` | `innerHTML` | `<section id="settings-user-panel">` |
+| `POST /settings/households/{householdId}/memberships/` | `#settings-membership-panel` | `innerHTML` | `<section id="settings-membership-panel">` |
+| `POST /settings/households/{householdId}/memberships/{userId}/remove/` | `#settings-membership-panel` | `innerHTML` | `<section id="settings-membership-panel">` |
+
+All listed endpoints must keep trigger elements intact by targeting stable container sections only.
+
 ### Post-Design Constitution Re-Check
 
 - [x] Research/design artifacts keep scope within `spec.md` clarifications and FR/SC list.
@@ -41,6 +52,20 @@ Document evidence for every checkbox. If any item is unresolved, stop and revise
 - [x] No dependency additions introduced in design artifacts.
 - [x] HTMX contracts explicitly define target/swap and stable container behavior.
 - [x] AI-generated decisions are documented in `research.md` and referenced by this plan.
+
+### Schema Impact Decision (T011)
+
+- Current decision: **No schema migration required for Phase 1/2 foundational scaffolding**.
+- Rationale: Existing `Household` and `HouseholdMember` tables already represent required associations for foundational authorization/forms/services.
+- Migration trigger: If implementation of user-story endpoints requires new DB fields/constraints, add reversible migration(s) under `households/migrations/` and update deterministic evidence in plan/tasks.
+
+### AI Accountability Notes (T003)
+
+- Prompt/response provenance for this feature is stored in:
+  - `spec.md` Clarifications section
+  - `research.md` decisions log
+  - this implementation conversation transcript
+- PR description must reference these artifacts to satisfy Constitution Principle V.
 
 ## Project Structure
 
@@ -87,3 +112,27 @@ specs/001-household-admin-settings/
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
 | None | N/A | N/A |
+
+## Validation Evidence (T044)
+
+- Focused feature tests executed:
+  - `python manage.py test financial.tests.test_nav_auth_visibility financial.tests.test_admin_settings_access financial.tests.test_admin_households financial.tests.test_admin_user_creation financial.tests.test_admin_memberships --settings=core.settings_test`
+  - Result: `Ran 25 tests ... OK`
+- Full regression suite executed:
+  - `python manage.py test --settings=core.settings_test`
+  - Result: `Ran 96 tests ... OK`
+
+## Determinism & Rollback Evidence (T045, T048)
+
+- Migration drift validation:
+  - `python manage.py makemigrations --check --dry-run --settings=core.settings_test`
+  - Result: `No changes detected`
+- Migration file scope verification:
+  - `git diff --name-only -- households/migrations financial/migrations`
+  - Result: no changed migration files for this feature
+- Fixture scope verification:
+  - `git diff --name-only -- financial/fixtures`
+  - Result: no changed fixture files for this feature
+- Rollback evidence:
+  - No feature migration files were added/changed; rollback for this feature is code-only reversion.
+  - Existing schema remains compatible with prior revisions.

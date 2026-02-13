@@ -24,9 +24,11 @@
     <a href="{% url 'household:home' %}" class="link link-hover">{{ navbar_title|default:"Home Management" }}</a>
   </div>
 
+  {% if user.is_authenticated %}
   <div class="flex-none mr-2">
     <a href="{% url 'financial:accounts-index' %}" class="btn btn-ghost btn-md">Finance</a>
   </div>
+  {% endif %}
 
   {% if user.is_authenticated and available_households %}
   <div class="flex-none mr-2">
