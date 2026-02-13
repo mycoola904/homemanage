@@ -18,8 +18,14 @@
     </label>
   </div>
 
+
+
   <div class="flex-1 px-4 font-semibold">
     <a href="{% url 'household:home' %}" class="link link-hover">{{ navbar_title|default:"Home Management" }}</a>
+  </div>
+
+  <div class="flex-none mr-2">
+    <a href="{% url 'financial:accounts-index' %}" class="btn btn-ghost btn-md">Finance</a>
   </div>
 
   {% if user.is_authenticated and available_households %}
@@ -36,9 +42,7 @@
   </div>
   {% endif %}
 
-  <div class="flex-none mr-2">
-    <a href="{% url 'financial:accounts-index' %}" class="btn btn-ghost btn-sm">Finance</a>
-  </div>
+ 
 
   <div class="flex-none">
     <c-auth.menu />

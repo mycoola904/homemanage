@@ -1,28 +1,55 @@
-## Here is the current code for the Accounts url sidebar entry:
+Build a spec to refactor this Django project so Household becomes a top-level tenant boundary app (option 1: destructive refactor; OK to delete/recreate DB; regenerate migrations). The end state must keep the current UX/behavior identical (session-scoped active household, switching UI, finance scoping/guards), but move all household concepts out of financial into a new dedicated app.
 
-```html
-<li>
-        <a href="{% url 'financial:accounts-index' %}"
-           class="is-drawer-close:tooltip is-drawer-close:tooltip-right flex items-center gap-2"
-           data-tip="Accounts">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
-            </svg>
+Context (current repo state):
 
-            <span class="is-drawer-close:hidden">Accounts</span>
-        </a>
-      </li>
-```
+- Household and HouseholdMember models live in models.py.
+Household selection/switching/session logic lives in households.py and is used by views.py and views.py.
+Global template context current_household and available_households is provided by context_processors.py and configured in settings.py.
+Routes: /household/ (home), /household/switch/, /household/no-access/ in pages; finance is mounted at /household/finance/ and every finance view scopes by resolved household.
+There is a migration-history-specific test at test_migrations_backfill.py that asserts behaviors across historical migrations (this will need to be removed or rewritten since we are regenerating migrations).
+Goal:
 
-###  I want to make this a Menu with a title of Financial and Accounts as a sub-item using the following template:
+Create a new Django app named households (or tenancy if that fits better; pick one and use it consistently) that owns:
+Household model
+HouseholdMember model (roles + primary membership constraint)
+household session selection/switching utilities (currently households.py)
+context processor (currently context_processors.py)
+Update all references across the codebase to import from the new app.
+Update settings.py:
+add the new app to INSTALLED_APPS
+change the context processor path to the new app’s context processor
+Update financial models to FK to the new Household model:
+Account.household and Transaction.household
+ensure the existing invariants remain: Transaction.household derived from its Account.household, and cross-household edits are rejected
+Update views.py to use the new app’s household resolver/switch logic and model imports.
+Update tests:
+change imports from financial.models import Household, HouseholdMember to households.models import Household, HouseholdMember
+ensure all existing tests continue to pass with identical behavior
+remove/replace test_migrations_backfill.py since migration history is being regenerated (do not keep a test that depends on old migration names)
+Migrations strategy (destructive allowed):
+regenerate migrations cleanly for financial and the new households app
+ok to delete existing migration files and create new initial migrations that reflect the new structure
+include in the spec explicit commands a developer will run locally to reset DB and apply migrations (e.g., delete sqlite db if used; if Postgres, drop/recreate db; then makemigrations and migrate)
+Non-goals:
+no new UX pages, no new features
+do not change template structure beyond import/path changes; keep current navbar household switcher and finance link working
+do not add new dependencies
+Acceptance criteria:
 
-```html
-<ul class="menu bg-base-200 rounded-box w-56">
-  <li class="menu-title">Financial</li>
-  <li><a>Accounts</a></li>
-</ul>
-```
+App structure:
+new households/ app exists with models.py, apps.py, households.py (or similar), and context_processors.py.
+Settings:
+settings.py references the new context processor and includes the app.
+Behavior:
+login selects a household deterministically (prefers primary) and stores current_household_id in session
+switching household via POST to /household/switch/ updates session and redirects home
+archived household in session falls back to an active membership
+users with no active memberships are redirected to no-access and see 403 on the no-access page
+finance views only show accounts/transactions for the active household; cross-household access returns 404; cross-household transaction edit is rejected (same as existing tests)
+Tests:
+all tests pass after the refactor, except the migration-history test which must be removed or replaced with a non-migration behavioral test.
+Deliverables the spec should produce:
 
-### While preserving the drawer functionality. This is so when I add future apps to Homemanage project, they will each have their own menu item per app.
-
-### What would be way to accomplish this?
+A step-by-step implementation checklist (file-by-file)
+Any new files to create and existing files to edit/remove
+A testing plan (which commands to run) and what success looks like
