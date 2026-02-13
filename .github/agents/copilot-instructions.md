@@ -13,6 +13,8 @@ Auto-generated from all feature plans. Last updated: 2026-02-09
 - SQLite for tests/local deterministic runs (`core.settings_test`), PostgreSQL-compatible schema semantics for production (001-add-household-container)
 - Python 3.11+, Django 6.x templates + HTMX + Django auth, Django ModelForms, HTMX, Tailwind CSS + DaisyUI (existing) (001-household-admin-settings)
 - SQLite for local/tests (`core.settings_test`), production engine unchanged (001-household-admin-settings)
+- Python 3.11+, Django 6.0.x, HTML templates with HTMX + Django, django-htmx, django-cotton, Python stdlib `csv` (no new runtime package) (001-account-import)
+- SQLite (local/tests via `core.settings_test`), production DB compatible via Django ORM (001-account-import)
 
 - Python 3.11 + Django 5.0 (per starter settings) + Django ORM & templates, HTMX (already wired), django-cotton components, Tailwind + DaisyUI watcher (001-accounts-home)
 
@@ -32,9 +34,9 @@ cd src; pytest; ruff check .
 Python 3.11 + Django 5.0 (per starter settings): Follow standard conventions
 
 ## Recent Changes
+- 001-account-import: Added Python 3.11+, Django 6.0.x, HTML templates with HTMX + Django, django-htmx, django-cotton, Python stdlib `csv` (no new runtime package)
 - 001-household-admin-settings: Added Python 3.11+, Django 6.x templates + HTMX + Django auth, Django ModelForms, HTMX, Tailwind CSS + DaisyUI (existing)
 - 001-add-household-container: Added Python 3.11+, Django 6.0.2 + Django, django-htmx, django-cotton, Tailwind CLI + DaisyUI (existing only; no new dependencies)
-- 001-account-transaction-evolution: Added Python 3.11 with Django 6.0.2 + Django 6.0.2, django-htmx 1.27.0, django-cotton 2.6.1, Tailwind CLI 4.1.18 + DaisyUI 5.5.17, psycopg 3.3.x (already present)
 
 
 <!-- MANUAL ADDITIONS START -->

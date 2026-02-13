@@ -1,0 +1,134 @@
+openapi: 3.0.3
+info:
+  title: Financial Account Import Contract
+  version: 0.1.0
+  description: |
+    Server-rendered/HTMX contract for CSV account import scoped to the active household.
+servers:
+  - url: /
+paths:
+  /financial/import/:
+    get:
+      summary: Render account import page
+      operationId: getAccountImportPage
+      responses:
+        '200':
+          description: Full page HTML with finance main content and import panel.
+          content:
+            text/html:
+              schema:
+                type: string
+    post:
+      summary: Upload and import account CSV
+      operationId: postAccountImport
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [import_file]
+              properties:
+                import_file:
+                  type: string
+                  format: binary
+                  description: CSV file, max 5 MB and 1,000 data rows.
+      responses:
+        '200':
+          description: Import succeeded; returns updated import panel with summary.
+          content:
+            text/html:
+              schema:
+                type: string
+        '422':
+          description: Validation failed; returns import panel with row-level errors and no inserts.
+          content:
+            text/html:
+              schema:
+                type: string
+  /financial/import/panel/:
+    get:
+      summary: Render import panel partial for HTMX content swap
+      operationId: getAccountImportPanel
+      responses:
+        '200':
+          description: HTML partial root element is section#account-import-panel.
+          content:
+            text/html:
+              schema:
+                type: string
+  /financial/import/template/:
+    get:
+      summary: Download template CSV
+      operationId: getAccountImportTemplate
+      responses:
+        '200':
+          description: Template CSV file.
+          content:
+            text/csv:
+              schema:
+                type: string
+components:
+  schemas:
+    ImportHeaders:
+      type: object
+      required:
+        - name
+        - institution
+        - account_type
+        - account_number
+        - routing_number
+        - interest_rate
+        - status
+        - current_balance
+        - credit_limit_or_principal
+        - statement_close_date
+        - payment_due_day
+        - online_access_url
+        - notes
+      properties:
+        name:
+          type: string
+        institution:
+          type: string
+        account_type:
+          type: string
+          enum: [checking, savings, credit_card, loan, other]
+        account_number:
+          type: string
+        routing_number:
+          type: string
+        interest_rate:
+          type: string
+        status:
+          type: string
+          enum: [active, closed, pending]
+        current_balance:
+          type: string
+        credit_limit_or_principal:
+          type: string
+        statement_close_date:
+          type: string
+          pattern: '^\\d{4}-\\d{2}-\\d{2}$'
+        payment_due_day:
+          type: string
+        online_access_url:
+          type: string
+          format: uri
+          description: Absolute http/https URL when present.
+        notes:
+          type: string
+x-htmx:
+  endpoints:
+    - path: /financial/import/
+      method: POST
+      hx-target: '#account-import-panel'
+      hx-swap: innerHTML
+      partialRoot: section#account-import-panel
+      triggerPreserved: true
+    - path: /financial/import/panel/
+      method: GET
+      hx-target: '#financial-main-content'
+      hx-swap: innerHTML
+      partialRoot: section#financial-main-content
+      triggerPreserved: true

@@ -3,9 +3,20 @@
 **Feature Branch**: `001-account-import`  
 **Created**: 2026-02-13  
 **Status**: Draft  
-**Input**: User description: "Add an import feature for the financial app. The link to this will be in the finance side bar. Clicking this link will show the upload form in the main content area. The upload form will ask for the path to the import file, upload the file and insert into the database. This import feature will be for the Account model in the financial app. The file can be csv or excel formats. The accounts uploaded should be imported to the household that the user is logged into. At the end of the implementation, deliver the proper template csv file."
+**Input**: User description: "Add an import feature for the financial app via the finance sidebar. Clicking it shows an upload form in the main content area, accepts a CSV import file, inserts Account records, scopes them to the logged-in user's active household, and provides a template CSV file."
 
 > Per the Constitution, this spec must be reviewed and approved before any code is written. Capture determinism, dependency, and UI safety decisions here rather than deferring to implementation.
+
+## Clarifications
+
+### Session 2026-02-13
+
+- Q: Which CSV columns should be required for account import? → A: Option C - Required near full Account model field set.
+- Q: What upload limit should the importer enforce for each CSV file? → A: Option A - Maximum 1,000 rows and 5 MB per file.
+- Q: What uniqueness scope should the importer enforce for Account.name duplicates? → A: Option A - Name must be unique within the active household (case-insensitive).
+- Q: Which values should the CSV use for enum fields like account_type and status? → A: Option A - Require canonical internal values only.
+- Q: Which date format should the CSV require for statement_close_date? → A: Option A - `YYYY-MM-DD` only.
+- Q: Post-clarify addition requested: include online access URL for Account import. → A: Added `online_access_url` to required CSV headers and validation rules.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -21,7 +32,7 @@ As a household member managing finances, I can open an account import screen fro
 
 1. **Given** a logged-in user is viewing finance pages for Household A, **When** they click the Import link in the finance sidebar, **Then** the account import form is shown in the main content area.
 2. **Given** a logged-in user in Household A has a valid CSV file, **When** they upload and submit it, **Then** the system creates account records for Household A and shows an import summary.
-3. **Given** a logged-in user in Household A has a valid Excel file, **When** they upload and submit it, **Then** the system creates account records for Household A and shows an import summary.
+3. **Given** a logged-in user in Household A has a valid CSV file with multiple rows, **When** they upload and submit it, **Then** the system creates account records for Household A and shows an import summary.
 
 ---
 
@@ -59,8 +70,9 @@ As a household member, I can access a template CSV so I can prepare import files
 - File contains duplicate account names that already exist in the active household.
 - File includes duplicate rows within the same upload batch.
 - File includes leading/trailing whitespace in fields.
+- File includes an invalid online access URL format.
 - User switches households between opening the form and submitting the file.
-- File exceeds the permitted upload size or row count limit.
+- File exceeds 5 MB or 1,000 data rows.
 
 ## Requirements *(mandatory)*
 
@@ -69,20 +81,28 @@ As a household member, I can access a template CSV so I can prepare import files
 - **FR-001**: The finance sidebar MUST include an "Import" navigation entry for accounts.
 - **FR-002**: Selecting the import entry MUST render the account import form in the page's main content area.
 - **FR-003**: The import form MUST allow the user to choose a local file and display the selected file path or filename before submission.
-- **FR-004**: The system MUST accept account import files in CSV and Excel formats only.
+- **FR-004**: The system MUST accept account import files in CSV format only.
 - **FR-005**: The system MUST validate file type, required columns, and row-level data before persisting any imported account records.
+- **FR-005a**: The CSV MUST include this near-full account header set: `name`, `institution`, `account_type`, `account_number`, `routing_number`, `interest_rate`, `status`, `current_balance`, `credit_limit_or_principal`, `statement_close_date`, `payment_due_day`, `online_access_url`, `notes`.
+- **FR-005b**: Columns listed in FR-005a are required as headers in every import file; individual cell values may be empty only when the corresponding Account field allows blank or null values.
 - **FR-006**: The system MUST treat each upload as an atomic operation: if any validation error exists, no accounts from that upload are created.
 - **FR-007**: The system MUST create imported accounts only in the household context active for the logged-in user at submission time.
 - **FR-008**: The system MUST ignore any household identifier provided in the uploaded file and use the active household context instead.
-- **FR-009**: The system MUST prevent creating duplicate account names within the same household and report duplicates in the import feedback.
+- **FR-009**: The system MUST prevent creating duplicate account names within the same active household using case-insensitive comparison and report duplicates in the import feedback.
 - **FR-010**: After processing, the system MUST show a result summary including total rows processed, rows imported, and rows rejected with reasons.
 - **FR-011**: The import form MUST provide access to a template CSV that contains the exact required headers for account import.
 - **FR-012**: The template CSV MUST be included as a tracked project artifact deliverable for this feature.
+- **FR-013**: The system MUST reject files larger than 5 MB.
+- **FR-014**: The system MUST reject files containing more than 1,000 data rows (excluding the header row).
+- **FR-015**: Enum fields in CSV MUST use canonical internal values only (`account_type`: `checking|savings|credit_card|loan|other`; `status`: `active|closed|pending`).
+- **FR-016**: `statement_close_date` values in CSV MUST use ISO format `YYYY-MM-DD` only.
+- **FR-017**: `online_access_url` values MUST be either blank or a valid absolute HTTP/HTTPS URL.
 
 ### Key Entities *(include if feature involves data)*
 
-- **Account Import File**: A user-provided CSV or Excel document containing rows intended to create account records.
-- **Account Import Row**: One logical account entry from the file, including required account fields and optional metadata.
+- **Account Import File**: A user-provided CSV document containing rows intended to create account records.
+- **Account Import Row**: One logical account entry from the file, including the full required header set and row values mapped to Account fields.
+- **Account Import Row**: One logical account entry from the file, including the full required header set and row values mapped to Account fields, including optional `online_access_url`.
 - **Import Result Summary**: Outcome data for one upload attempt, including counts and row-level validation messages.
 - **Household Context**: The active household selected by the logged-in user that determines ownership of imported records.
 
@@ -96,7 +116,7 @@ As a household member, I can access a template CSV so I can prepare import files
 ## Deterministic Data & Integrity *(mandatory)*
 
 - **Schema Changes**: No schema change is required; account records are created using existing Account model fields and constraints.
-- **Data Fixtures**: Provide a deterministic template CSV with stable header ordering and representative sample rows; repeated use of the same valid import file must produce the same resulting account set when starting from the same database state.
+- **Data Fixtures**: Provide a deterministic template CSV with stable header ordering using the FR-005a header set and representative sample rows; repeated use of the same valid import file must produce the same resulting account set when starting from the same database state.
 - **External Inputs**: Import behavior must not depend on randomness; parsing and validation outcomes must be deterministic for the same file content and household context.
 
 ## Success Criteria *(mandatory)*
