@@ -32,4 +32,4 @@
 ## Notes
 
 - Items marked incomplete require spec updates before `/speckit.clarify` or `/speckit.plan`
-- Scope intentionally excludes creating new user accounts; member management associates existing users to households.
+- Scope includes creating user login accounts in Settings and assigning those users to households.

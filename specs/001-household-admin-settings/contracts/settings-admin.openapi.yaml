@@ -1,0 +1,161 @@
+openapi: 3.0.3
+info:
+  title: Household Admin Settings API Contract
+  version: 0.1.0
+  description: |
+    Server-rendered/HTMX-oriented contract for global admin settings workflows.
+servers:
+  - url: /
+paths:
+  /settings/:
+    get:
+      summary: Settings landing page
+      description: Returns Settings page (full) for global administrators.
+      responses:
+        '200':
+          description: Settings page rendered
+        '302':
+          description: Redirect to login when unauthenticated
+        '403':
+          description: Forbidden for authenticated non-admin users
+  /settings/households/:
+    post:
+      summary: Create household
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateHouseholdRequest'
+      responses:
+        '200':
+          description: Household created; returns updated households partial
+        '400':
+          description: Validation error partial
+        '403':
+          description: Forbidden
+  /settings/users/:
+    post:
+      summary: Create user login with one-or-more memberships
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '200':
+          description: User and memberships created; returns updated users/memberships partial
+        '400':
+          description: Validation error partial (duplicate identity, weak password, missing membership)
+        '409':
+          description: Conflict if concurrent duplicate identity attempt
+        '403':
+          description: Forbidden
+  /settings/households/{householdId}/memberships/:
+    post:
+      summary: Add existing user to household
+      parameters:
+        - $ref: '#/components/parameters/HouseholdId'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/AddMembershipRequest'
+      responses:
+        '200':
+          description: Membership add processed (idempotent); returns updated membership list partial
+        '400':
+          description: Validation error partial
+        '403':
+          description: Forbidden
+  /settings/households/{householdId}/memberships/{userId}/remove/:
+    post:
+      summary: Remove user from household
+      parameters:
+        - $ref: '#/components/parameters/HouseholdId'
+        - $ref: '#/components/parameters/UserId'
+      responses:
+        '200':
+          description: Membership removed (or already absent) and updated list partial returned
+        '403':
+          description: Forbidden
+components:
+  parameters:
+    HouseholdId:
+      name: householdId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    UserId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: integer
+  schemas:
+    CreateHouseholdRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          minLength: 1
+          description: Human-friendly household name; normalized uniqueness enforced.
+    CreateUserRequest:
+      type: object
+      required:
+        - username
+        - email
+        - password
+        - household_ids
+      properties:
+        username:
+          type: string
+          minLength: 1
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          minLength: 8
+        household_ids:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            format: uuid
+          description: One or more household memberships required at creation.
+    AddMembershipRequest:
+      type: object
+      required:
+        - user_id
+      properties:
+        user_id:
+          type: integer
+        role:
+          type: string
+          enum: [owner, admin, member]
+          default: member
+x-htmx:
+  interactions:
+    - endpoint: POST /settings/households/
+      hx-target: '#settings-household-panel'
+      hx-swap: 'innerHTML'
+      stable-container: '#settings-household-panel'
+    - endpoint: POST /settings/users/
+      hx-target: '#settings-user-panel'
+      hx-swap: 'innerHTML'
+      stable-container: '#settings-user-panel'
+    - endpoint: POST /settings/households/{householdId}/memberships/
+      hx-target: '#settings-membership-panel'
+      hx-swap: 'innerHTML'
+      stable-container: '#settings-membership-panel'
+    - endpoint: POST /settings/households/{householdId}/memberships/{userId}/remove/
+      hx-target: '#settings-membership-panel'
+      hx-swap: 'innerHTML'
+      stable-container: '#settings-membership-panel'
