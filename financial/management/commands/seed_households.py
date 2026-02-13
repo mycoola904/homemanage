@@ -8,11 +8,10 @@ from financial.models import (
     Account,
     AccountStatus,
     AccountType,
-    Household,
-    HouseholdMember,
     Transaction,
     TransactionType,
 )
+from households.models import Household, HouseholdMember
 
 
 class Command(BaseCommand):

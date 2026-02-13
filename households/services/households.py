@@ -3,9 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from django.http import HttpResponseRedirect
-from django.urls import reverse
 
-from financial.models import Household, HouseholdMember
+from households.models import Household, HouseholdMember
 
 
 CURRENT_HOUSEHOLD_SESSION_KEY = "current_household_id"

@@ -2,7 +2,8 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from financial.models import Account, AccountStatus, AccountType, Household, HouseholdMember
+from financial.models import Account, AccountStatus, AccountType
+from households.models import Household, HouseholdMember
 
 
 User = get_user_model()

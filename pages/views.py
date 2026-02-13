@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.views.decorators.http import require_POST
 from django.contrib.auth.decorators import login_required
 
-from financial.services.households import can_switch_to_household, resolve_current_household, set_current_household
+from households.services.households import can_switch_to_household, resolve_current_household, set_current_household
 
 
 class HomeView(TemplateView):
@@ -45,7 +45,7 @@ def switch_household(request):
     if not household_id or not can_switch_to_household(request.user, household_id):
         return render(request, "pages/no_household_access.html", status=403)
 
-    from financial.models import Household
+    from households.models import Household
 
     household = Household.objects.filter(pk=household_id, is_archived=False).first()
     if household is None:

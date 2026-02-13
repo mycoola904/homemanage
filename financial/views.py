@@ -11,7 +11,7 @@ from django.views.generic import CreateView, DetailView, ListView
 
 from financial.forms import AccountForm, CategoryForm, TransactionForm
 from financial.models import Account, Transaction, UserAccountQuerysetMixin
-from financial.services.households import resolve_current_household
+from households.services.households import resolve_current_household
 from financial.services.accounts import (
 	AccountSummaryRow,
 	build_account_preview,

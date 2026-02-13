@@ -1,7 +1,8 @@
 from django.core.management import call_command
 from django.test import TestCase
 
-from financial.models import Account, Household, HouseholdMember, Transaction
+from financial.models import Account, Transaction
+from households.models import Household, HouseholdMember
 
 
 class HouseholdSeedCommandTests(TestCase):

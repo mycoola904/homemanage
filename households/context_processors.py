@@ -1,4 +1,4 @@
-from financial.services.households import get_user_households, resolve_current_household
+from households.services.households import get_user_households, resolve_current_household
 
 
 def household_context(request):

@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django_htmx',
     'pages',
     'financial',
+    'households',
 
   
 ]
@@ -73,7 +74,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'financial.context_processors.household_context',
+                'households.context_processors.household_context',
             ],
         # Cotton loader + keep normal Django template discovery
             "loaders": [
