@@ -1,7 +1,9 @@
+from pathlib import Path
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import Http404, HttpResponse
+from django.http import FileResponse, Http404, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
@@ -9,15 +11,21 @@ from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from django.views.generic import CreateView, DetailView, ListView
 
-from financial.forms import AccountForm, CategoryForm, TransactionForm
+from financial.forms import AccountForm, AccountImportForm, CategoryForm, TransactionForm
 from financial.models import Account, Transaction, UserAccountQuerysetMixin
 from households.services.households import resolve_current_household
+from financial.services.account_import import AccountImportValidationError, import_accounts_from_csv
 from financial.services.accounts import (
 	AccountSummaryRow,
 	build_account_preview,
 	serialize_account_rows,
 )
 from financial.services.transactions import serialize_transaction_rows
+
+
+ACCOUNT_IMPORT_PANEL_ID = "account-import-panel"
+ACCOUNT_IMPORT_HX_TARGET = "#account-import-panel"
+ACCOUNT_IMPORT_HX_SWAP = "innerHTML"
 
 
 def _get_current_household_or_redirect(request):
@@ -150,6 +158,126 @@ def _get_account_for_transactions(request, household, pk) -> Account | None:
 
 def _get_transaction_for_account(account: Account, transaction_id) -> Transaction | None:
 	return Transaction.objects.filter(account=account, pk=transaction_id).first()
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def account_import_page(request):
+	household, redirect_response = _get_current_household_or_redirect(request)
+	if redirect_response is not None:
+		return redirect_response
+
+	is_htmx = request.headers.get("HX-Request") == "true"
+	if request.method == "GET":
+		form = AccountImportForm()
+		context = {
+			"form": form,
+			"post_hx_url": reverse("financial:accounts-import"),
+			"template_download_url": reverse("financial:accounts-import-template"),
+			"import_panel_id": ACCOUNT_IMPORT_PANEL_ID,
+			"import_hx_target": ACCOUNT_IMPORT_HX_TARGET,
+			"import_hx_swap": ACCOUNT_IMPORT_HX_SWAP,
+			"summary_message": "",
+			"import_errors": [],
+		}
+		if is_htmx:
+			return render(request, "financial/accounts/_import_panel.html", context)
+		return render(request, "financial/accounts/import.html", context)
+
+	form = AccountImportForm(request.POST, request.FILES)
+	if not form.is_valid():
+		context = {
+			"form": form,
+			"post_hx_url": reverse("financial:accounts-import"),
+			"template_download_url": reverse("financial:accounts-import-template"),
+			"import_panel_id": ACCOUNT_IMPORT_PANEL_ID,
+			"import_hx_target": ACCOUNT_IMPORT_HX_TARGET,
+			"import_hx_swap": ACCOUNT_IMPORT_HX_SWAP,
+			"summary_message": "",
+			"import_errors": ["Upload a CSV file to continue."],
+		}
+		if is_htmx:
+			return render(request, "financial/accounts/_import_panel.html", context, status=422)
+		return render(request, "financial/accounts/import.html", context, status=422)
+
+	try:
+		result = import_accounts_from_csv(
+			uploaded_file=form.cleaned_data["import_file"],
+			user=request.user,
+			household=household,
+		)
+		context = {
+			"form": AccountImportForm(),
+			"post_hx_url": reverse("financial:accounts-import"),
+			"template_download_url": reverse("financial:accounts-import-template"),
+			"import_panel_id": ACCOUNT_IMPORT_PANEL_ID,
+			"import_hx_target": ACCOUNT_IMPORT_HX_TARGET,
+			"import_hx_swap": ACCOUNT_IMPORT_HX_SWAP,
+			"summary_message": f"Imported {result.imported_rows} of {result.total_rows} rows.",
+			"import_errors": [],
+		}
+		if is_htmx:
+			return render(request, "financial/accounts/_import_panel.html", context)
+		return render(request, "financial/accounts/import.html", context)
+	except AccountImportValidationError as exc:
+		context = {
+			"form": form,
+			"post_hx_url": reverse("financial:accounts-import"),
+			"template_download_url": reverse("financial:accounts-import-template"),
+			"import_panel_id": ACCOUNT_IMPORT_PANEL_ID,
+			"import_hx_target": ACCOUNT_IMPORT_HX_TARGET,
+			"import_hx_swap": ACCOUNT_IMPORT_HX_SWAP,
+			"summary_message": "",
+			"import_errors": exc.errors,
+		}
+		if is_htmx:
+			return render(request, "financial/accounts/_import_panel.html", context, status=422)
+		return render(request, "financial/accounts/import.html", context, status=422)
+
+
+@login_required
+@require_http_methods(["GET"])
+def account_import_panel(request):
+	household, redirect_response = _get_current_household_or_redirect(request)
+	if redirect_response is not None:
+		return redirect_response
+	if household is None:
+		return HttpResponse(status=404)
+	return render(
+		request,
+		"financial/accounts/_import_panel.html",
+		{
+			"form": AccountImportForm(),
+			"post_hx_url": reverse("financial:accounts-import"),
+			"template_download_url": reverse("financial:accounts-import-template"),
+			"import_panel_id": ACCOUNT_IMPORT_PANEL_ID,
+			"import_hx_target": ACCOUNT_IMPORT_HX_TARGET,
+			"import_hx_swap": ACCOUNT_IMPORT_HX_SWAP,
+			"summary_message": "",
+			"import_errors": [],
+		},
+	)
+
+
+@login_required
+@require_http_methods(["GET"])
+def account_import_template(request):
+	household, redirect_response = _get_current_household_or_redirect(request)
+	if redirect_response is not None:
+		return redirect_response
+	if household is None:
+		return HttpResponse(status=404)
+
+	template_path = Path(__file__).resolve().parent / "fixtures" / "account_import_template.csv"
+	if not template_path.exists():
+		return HttpResponse("Template CSV is unavailable.", status=404)
+
+	return FileResponse(
+		template_path.open("rb"),
+		as_attachment=True,
+		filename="account_import_template.csv",
+		content_type="text/csv",
+	)
 
 
 class AccountsIndexView(LoginRequiredMixin, UserAccountQuerysetMixin, ListView):

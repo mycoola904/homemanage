@@ -6,6 +6,9 @@ app_name = "financial"
 
 urlpatterns = [
     path("", views.AccountsIndexView.as_view(), name="accounts-index"),
+    path("import/", views.account_import_page, name="accounts-import"),
+    path("import/panel/", views.account_import_panel, name="accounts-import-panel"),
+    path("import/template/", views.account_import_template, name="accounts-import-template"),
     path("new/", views.AccountCreateView.as_view(), name="accounts-new"),
     path("<uuid:pk>/preview/", views.account_preview, name="accounts-preview"),
     path("<uuid:pk>/edit/", views.account_edit, name="accounts-edit"),

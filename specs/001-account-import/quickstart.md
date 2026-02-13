@@ -73,3 +73,37 @@ Expected result:
 - Link spec/plan/tasks artifacts.
 - Include migration summary + deterministic test evidence.
 - Include prompt/response references used for AI-assisted changes.
+
+## 8) Validation notes (Phase 6 evidence)
+- **T035 schema/header parity check**:
+   - Verified schema-change wording in `specs/001-account-import/spec.md` reflects migration-backed `online_access_url`.
+   - Verified FR-005a header list equals contract/template header order.
+   - Scripted parity result: `HEADER_PARITY_OK=True`.
+- **T038 test evidence**:
+   - `python manage.py test financial.tests.test_account_import financial.tests.test_account_import_validation financial.tests.test_account_import_template --settings=core.settings_test`
+      - Result: `Ran 14 tests ... OK`
+   - `python manage.py test financial.tests --settings=core.settings_test`
+      - Result: `Ran 111 tests ... OK`
+- **T041 performance evidence (SC-002)**:
+   - Scripted 1,000-row import result: `PERF_ROWS=1000; PERF_IMPORTED=1000; PERF_SECONDS=2.241`
+   - Threshold check: `2.241s < 10s` ✅
+- **T042 SC-003 protocol evidence**:
+   - Ran 10 first-time template-based scripted import trials (new user + first upload each trial).
+   - Result: `SC3_TRIALS=10; SC3_SUCCESSES=10; SC3_SUCCESS_RATE=100.00%`
+   - Threshold check: `100% >= 90%` ✅
+
+## 9) AI traceability notes
+- Planning/spec prompts referenced:
+   - `.github/prompts/speckit.specify.prompt.md`
+   - `.github/prompts/speckit.clarify.prompt.md`
+   - `.github/prompts/speckit.plan.prompt.md`
+   - `.github/prompts/speckit.tasks.prompt.md`
+   - `.github/prompts/speckit.analyze.prompt.md`
+   - `.github/prompts/speckit.implement.prompt.md`
+- Implementation generated/updated artifacts tied to those prompts:
+   - `specs/001-account-import/spec.md`
+   - `specs/001-account-import/plan.md`
+   - `specs/001-account-import/tasks.md`
+   - `specs/001-account-import/research.md`
+   - `specs/001-account-import/data-model.md`
+   - `specs/001-account-import/contracts/account-import.openapi.yaml`

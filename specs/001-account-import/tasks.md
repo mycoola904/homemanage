@@ -19,9 +19,9 @@
 
 **Purpose**: Prepare files and verification scaffolding for implementation.
 
-- [ ] T001 Verify Tailwind watcher workflow notes in specs/001-account-import/quickstart.md for FR-001/FR-002 UI safety evidence
-- [ ] T002 Create import feature test module stubs in financial/tests/test_account_import.py and financial/tests/test_account_import_validation.py for US1/US2 scenario coverage
-- [ ] T003 [P] Create template download test module stub in financial/tests/test_account_import_template.py for US3 scenario coverage
+- [X] T001 Verify Tailwind watcher workflow notes in specs/001-account-import/quickstart.md for FR-001/FR-002 UI safety evidence
+- [X] T002 Create import feature test module stubs in financial/tests/test_account_import.py and financial/tests/test_account_import_validation.py for US1/US2 scenario coverage
+- [X] T003 [P] Create template download test module stub in financial/tests/test_account_import_template.py for US3 scenario coverage
 
 ---
 
@@ -31,11 +31,11 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T004 Add `online_access_url` field to Account model in financial/models.py for FR-017 entity update
-- [ ] T005 Create migration for `online_access_url` in financial/migrations/NNNN_account_online_access_url.py (next sequential number) with deterministic forward/backward behavior
-- [ ] T006 [P] Add import form class shell (file upload + basic field wiring) in financial/forms.py for FR-003/FR-004
-- [ ] T007 [P] Create import service module skeleton for CSV parsing pipeline in financial/services/account_import.py for FR-005/FR-006
-- [ ] T008 Add import URL route placeholders in financial/urls.py for /financial/import/, /financial/import/panel/, /financial/import/template/
+- [X] T004 Add `online_access_url` field to Account model in financial/models.py for FR-017 entity update
+- [X] T005 Create migration for `online_access_url` in financial/migrations/0002_account_online_access_url.py with deterministic forward/backward behavior
+- [X] T006 [P] Add import form class shell (file upload + basic field wiring) in financial/forms.py for FR-003/FR-004
+- [X] T007 [P] Create import service module skeleton for CSV parsing pipeline in financial/services/account_import.py for FR-005/FR-006
+- [X] T008 Add import URL route placeholders in financial/urls.py for /financial/import/, /financial/import/panel/, /financial/import/template/
 
 **Checkpoint**: Foundation ready; user story tasks can proceed.
 
@@ -49,22 +49,22 @@
 
 ### Tests for User Story 1
 
-- [ ] T009 [P] [US1] Add navigation + panel rendering integration test in financial/tests/test_account_import.py covering FR-001/FR-002
-- [ ] T010 [P] [US1] Add successful CSV import integration test in financial/tests/test_account_import.py covering FR-005/FR-006/FR-007/FR-010
-- [ ] T011 [P] [US1] Add active-household scoping test in financial/tests/test_account_import.py covering FR-007/FR-008
+- [X] T009 [P] [US1] Add navigation + panel rendering integration test in financial/tests/test_account_import.py covering FR-001/FR-002
+- [X] T010 [P] [US1] Add successful CSV import integration test in financial/tests/test_account_import.py covering FR-005/FR-006/FR-007/FR-010
+- [X] T011 [P] [US1] Add active-household scoping test in financial/tests/test_account_import.py covering FR-007/FR-008
 
 ### Implementation for User Story 1
 
-- [ ] T012 [P] [US1] Add finance sidebar Import link entry in templates/components/layout/sidebar.html targeting financial import UI (FR-001)
-- [ ] T013 [P] [US1] Create import page template with stable main container in financial/templates/financial/accounts/import.html using `#financial-main-content` (FR-002/UI-001)
-- [ ] T014 [P] [US1] Create import panel partial root section in financial/templates/financial/accounts/_import_panel.html using `#account-import-panel` (UI-002)
-- [ ] T015 [US1] Implement GET import page and GET panel views in financial/views.py for /financial/import/ and /financial/import/panel/ (FR-002, contract GET endpoints)
-- [ ] T016 [US1] Implement valid CSV parse-to-domain row mapping in financial/services/account_import.py using `csv.DictReader` (FR-004/FR-005)
-- [ ] T017 [US1] Implement atomic account creation transaction and success summary builder in financial/services/account_import.py (FR-006/FR-010)
-- [ ] T018 [US1] Implement POST import view in financial/views.py with `hx-target="#account-import-panel"` and `hx-swap="innerHTML"` success path (UI-001/UI-002, contract POST 200)
-- [ ] T019 [US1] Wire import views to named routes in financial/urls.py and update any finance navigation links as needed (FR-001/FR-002)
-- [ ] T039 [P] [US1] Add test in financial/tests/test_account_import.py verifying selected filename is shown before submit (FR-003)
-- [ ] T040 [US1] Implement selected filename display behavior in financial/templates/financial/accounts/_import_panel.html and supporting view/form wiring (FR-003)
+- [X] T012 [P] [US1] Add finance sidebar Import link entry in templates/components/layout/sidebar.html targeting financial import UI (FR-001)
+- [X] T013 [P] [US1] Create import page template with stable main container in financial/templates/financial/accounts/import.html using `#financial-main-content` (FR-002/UI-001)
+- [X] T014 [P] [US1] Create import panel partial root section in financial/templates/financial/accounts/_import_panel.html using `#account-import-panel` (UI-002)
+- [X] T015 [US1] Implement GET import page and GET panel views in financial/views.py for /financial/import/ and /financial/import/panel/ (FR-002, contract GET endpoints)
+- [X] T016 [US1] Implement valid CSV parse-to-domain row mapping in financial/services/account_import.py using `csv.DictReader` (FR-004/FR-005)
+- [X] T017 [US1] Implement atomic account creation transaction and success summary builder in financial/services/account_import.py (FR-006/FR-010)
+- [X] T018 [US1] Implement POST import view in financial/views.py with `hx-target="#account-import-panel"` and `hx-swap="innerHTML"` success path (UI-001/UI-002, contract POST 200)
+- [X] T019 [US1] Wire import views to named routes in financial/urls.py and update any finance navigation links as needed (FR-001/FR-002)
+- [X] T039 [P] [US1] Add test in financial/tests/test_account_import.py verifying selected filename is shown before submit (FR-003)
+- [X] T040 [US1] Implement selected filename display behavior in financial/templates/financial/accounts/_import_panel.html and supporting view/form wiring (FR-003)
 
 **Checkpoint**: US1 is independently functional and testable.
 
@@ -78,19 +78,19 @@
 
 ### Tests for User Story 2
 
-- [ ] T020 [P] [US2] Add unsupported file type and missing-header tests in financial/tests/test_account_import_validation.py for FR-004/FR-005
-- [ ] T021 [P] [US2] Add row-level validation tests (enum/date/url/day) in financial/tests/test_account_import_validation.py for FR-015/FR-016/FR-017 and model constraints
-- [ ] T022 [P] [US2] Add duplicate detection tests (within-file + household existing, case-insensitive) in financial/tests/test_account_import_validation.py for FR-009
-- [ ] T023 [P] [US2] Add file size and row limit tests in financial/tests/test_account_import_validation.py for FR-013/FR-014
-- [ ] T024 [P] [US2] Add atomic rollback test ensuring zero inserts on any validation error in financial/tests/test_account_import_validation.py for FR-006
+- [X] T020 [P] [US2] Add unsupported file type and missing-header tests in financial/tests/test_account_import_validation.py for FR-004/FR-005
+- [X] T021 [P] [US2] Add row-level validation tests (enum/date/url/day) in financial/tests/test_account_import_validation.py for FR-015/FR-016/FR-017 and model constraints
+- [X] T022 [P] [US2] Add duplicate detection tests (within-file + household existing, case-insensitive) in financial/tests/test_account_import_validation.py for FR-009
+- [X] T023 [P] [US2] Add file size and row limit tests in financial/tests/test_account_import_validation.py for FR-013/FR-014
+- [X] T024 [P] [US2] Add atomic rollback test ensuring zero inserts on any validation error in financial/tests/test_account_import_validation.py for FR-006
 
 ### Implementation for User Story 2
 
-- [ ] T025 [US2] Implement strict header and file-type validation in financial/services/account_import.py including CSV-only enforcement (FR-004/FR-005a/FR-005b)
-- [ ] T026 [US2] Implement canonical enum/date/url/field normalization and validation errors in financial/services/account_import.py (FR-015/FR-016/FR-017)
-- [ ] T027 [US2] Implement duplicate detection against active household and upload batch in financial/services/account_import.py (FR-009)
-- [ ] T028 [US2] Implement file size and max-row guards in financial/forms.py and/or financial/services/account_import.py (FR-013/FR-014)
-- [ ] T029 [US2] Implement 422 error response rendering with row-level messages in financial/views.py and financial/templates/financial/accounts/_import_panel.html (FR-010, contract POST 422)
+- [X] T025 [US2] Implement strict header and file-type validation in financial/services/account_import.py including CSV-only enforcement (FR-004/FR-005a/FR-005b)
+- [X] T026 [US2] Implement canonical enum/date/url/field normalization and validation errors in financial/services/account_import.py (FR-015/FR-016/FR-017)
+- [X] T027 [US2] Implement duplicate detection against active household and upload batch in financial/services/account_import.py (FR-009)
+- [X] T028 [US2] Implement file size and max-row guards in financial/forms.py and/or financial/services/account_import.py (FR-013/FR-014)
+- [X] T029 [US2] Implement 422 error response rendering with row-level messages in financial/views.py and financial/templates/financial/accounts/_import_panel.html (FR-010, contract POST 422)
 
 **Checkpoint**: US2 is independently functional and testable.
 
@@ -104,14 +104,14 @@
 
 ### Tests for User Story 3
 
-- [ ] T030 [P] [US3] Add template download endpoint test in financial/tests/test_account_import_template.py for content type and filename (FR-011/contract GET template)
-- [ ] T031 [P] [US3] Add template header order/content contract test in financial/tests/test_account_import_template.py for FR-005a/FR-011/FR-012
+- [X] T030 [P] [US3] Add template download endpoint test in financial/tests/test_account_import_template.py for content type and filename (FR-011/contract GET template)
+- [X] T031 [P] [US3] Add template header order/content contract test in financial/tests/test_account_import_template.py for FR-005a/FR-011/FR-012
 
 ### Implementation for User Story 3
 
-- [ ] T032 [P] [US3] Add deterministic template CSV artifact in financial/fixtures/account_import_template.csv with required header order and sample row
-- [ ] T033 [US3] Implement template download view in financial/views.py serving financial/fixtures/account_import_template.csv (FR-011/FR-012)
-- [ ] T034 [US3] Add template download route in financial/urls.py and import-panel link/button in financial/templates/financial/accounts/_import_panel.html
+- [X] T032 [P] [US3] Add deterministic template CSV artifact in financial/fixtures/account_import_template.csv with required header order and sample row
+- [X] T033 [US3] Implement template download view in financial/views.py serving financial/fixtures/account_import_template.csv (FR-011/FR-012)
+- [X] T034 [US3] Add template download route in financial/urls.py and import-panel link/button in financial/templates/financial/accounts/_import_panel.html
 
 **Checkpoint**: US3 is independently functional and testable.
 
@@ -121,12 +121,12 @@
 
 **Purpose**: Final consistency, traceability, and verification across stories.
 
-- [ ] T035 [P] Verify final schema-change wording and FR-to-contract header parity between specs/001-account-import/spec.md and specs/001-account-import/contracts/account-import.openapi.yaml
-- [ ] T036 Document HTMX target/swap decisions in inline template/view context where applicable in financial/views.py and financial/templates/financial/accounts/_import_panel.html (UI-001/UI-002 evidence)
-- [ ] T037 [P] Update AI prompt/response traceability notes in specs/001-account-import/quickstart.md and PR checklist section for Principle V evidence
-- [ ] T038 Run feature-targeted and financial test suites via core.settings_test and record outcomes in specs/001-account-import/quickstart.md validation notes
-- [ ] T041 [P] Add performance validation task for 1,000-row import under 10s and record evidence in quickstart.md (SC-002)
-- [ ] T042 [P] Add SC-003 validation protocol task: run and record at least 10 first-time template-based import trials with >=90% successful completion evidence in specs/001-account-import/quickstart.md
+- [X] T035 [P] Verify final schema-change wording and FR-to-contract header parity between specs/001-account-import/spec.md and specs/001-account-import/contracts/account-import.openapi.yaml
+- [X] T036 Document HTMX target/swap decisions in inline template/view context where applicable in financial/views.py and financial/templates/financial/accounts/_import_panel.html (UI-001/UI-002 evidence)
+- [X] T037 [P] Update AI prompt/response traceability notes in specs/001-account-import/quickstart.md and PR checklist section for Principle V evidence
+- [X] T038 Run feature-targeted and financial test suites via core.settings_test and record outcomes in specs/001-account-import/quickstart.md validation notes
+- [X] T041 [P] Add performance validation task for 1,000-row import under 10s and record evidence in quickstart.md (SC-002)
+- [X] T042 [P] Add SC-003 validation protocol task: run and record at least 10 first-time template-based import trials with >=90% successful completion evidence in specs/001-account-import/quickstart.md
 
 ---
 

@@ -5,6 +5,32 @@ from django import forms
 from financial.models import Account, Category, Transaction, TransactionType
 
 
+class AccountImportForm(forms.Form):
+    """Foundational CSV upload form for account import flow."""
+
+    MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024
+
+    import_file = forms.FileField(
+        label="Import file",
+        widget=forms.ClearableFileInput(
+            attrs={
+                "accept": ".csv",
+                "onchange": "document.getElementById('selected-import-filename').textContent = this.files.length ? this.files[0].name : 'No file selected';",
+            }
+        ),
+    )
+
+    def clean_import_file(self):
+        uploaded_file = self.cleaned_data.get("import_file")
+        if uploaded_file is None:
+            return uploaded_file
+        if uploaded_file.size > self.MAX_FILE_SIZE_BYTES:
+            raise forms.ValidationError("Import file must be 5 MB or smaller.")
+        if not uploaded_file.name.lower().endswith(".csv"):
+            raise forms.ValidationError("Upload a CSV file.")
+        return uploaded_file
+
+
 class AccountForm(forms.ModelForm):
     """Model-backed form used for create/edit flows."""
 

@@ -176,6 +176,7 @@ class Account(models.Model):
 	)
 	statement_close_date = models.DateField(blank=True, null=True)
 	payment_due_day = models.PositiveSmallIntegerField(blank=True, null=True)
+	online_access_url = models.URLField(blank=True)
 	notes = models.TextField(blank=True)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
