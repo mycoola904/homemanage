@@ -126,6 +126,8 @@ Notes:
 - Module changes (`/household/` → `/household/finance/`) occur via normal route navigation only.
 - HTMX responses must not remove their triggering controls unless explicitly planned; this feature keeps triggers intact.
 
+Confirmation (2026-02-12): Matrix entries above are validated against implemented finance endpoints and template container IDs.
+
 ## Phase 2 Planning Preview (for `/speckit.tasks`)
 
 1. Add `Household` + `HouseholdMember` models and constraints.

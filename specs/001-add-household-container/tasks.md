@@ -19,10 +19,10 @@
 
 **Purpose**: Establish baseline artifacts and execution environment for deterministic household work.
 
-- [ ] T001 Document no-new-dependency decision from plan in specs/001-add-household-container/research.md and README.md
-- [ ] T002 Create AI prompt/response log scaffold in docs/ai/003-household-top-level-container-log.md
-- [ ] T003 [P] Verify and record Tailwind watcher command evidence (`npm run dev:css`) in docs/ai/003-household-top-level-container-log.md
-- [ ] T004 [P] Add feature route map notes for `/household/` and `/household/finance/` in specs/001-add-household-container/quickstart.md
+- [X] T001 Document no-new-dependency decision from plan in specs/001-add-household-container/research.md and README.md
+- [X] T002 Create AI prompt/response log scaffold in docs/ai/003-household-top-level-container-log.md
+- [X] T003 [P] Verify and record Tailwind watcher command evidence (`npm run dev:css`) in docs/ai/003-household-top-level-container-log.md
+- [X] T004 [P] Add feature route map notes for `/household/` and `/household/finance/` in specs/001-add-household-container/quickstart.md
 
 ---
 
@@ -32,13 +32,13 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T005 Create `Household` and `HouseholdMember` models with constraints in financial/models.py
-- [ ] T006 [P] Add household session resolver utilities (select primary/first/fallback non-archived) in financial/services/households.py
-- [ ] T007 Add household FK and invariant wiring for `Account` and `Transaction` in financial/models.py
-- [ ] T008 Create migrations for household entities and financial FK updates in financial/migrations/0005_household.py and financial/migrations/0006_financial_household_scope.py
-- [ ] T009 [P] Implement deterministic seed command for two canonical households in financial/management/commands/seed_households.py
-- [ ] T010 [P] Add migration + seed repeatability tests under SQLite in financial/tests/test_migrations_backfill.py and financial/tests/test_household_seed.py
-- [ ] T011 Add `current_household` template context processor wiring (no middleware in this task) in core/settings.py and core/settings_test.py
+- [X] T005 Create `Household` and `HouseholdMember` models with constraints in financial/models.py
+- [X] T006 [P] Add household session resolver utilities (select primary/first/fallback non-archived) in financial/services/households.py
+- [X] T007 Add household FK and invariant wiring for `Account` and `Transaction` in financial/models.py
+- [X] T008 Create migrations for household entities and financial FK updates in financial/migrations/0005_household.py and financial/migrations/0006_financial_household_scope.py
+- [X] T009 [P] Implement deterministic seed command for two canonical households in financial/management/commands/seed_households.py
+- [X] T010 [P] Add migration + seed repeatability tests under SQLite in financial/tests/test_migrations_backfill.py and financial/tests/test_household_seed.py
+- [X] T011 Add `current_household` template context processor wiring (no middleware in this task) in core/settings.py and core/settings_test.py
 
 **Checkpoint**: Foundation ready — user story implementation can now begin.
 
@@ -52,16 +52,16 @@
 
 ### Tests for User Story 1
 
-- [ ] T012 [P] [US1] Add login household-selection tests for single/primary/fallback flows in financial/tests/test_household_login_selection.py
-- [ ] T013 [P] [US1] Add no-household-access 403 page and navigation omission test in financial/tests/test_household_no_access.py
-- [ ] T014 [P] [US1] Add archived-current-household fallback and 403 fallback tests in financial/tests/test_household_archived_fallback.py
+- [X] T012 [P] [US1] Add login household-selection tests for single/primary/fallback flows in financial/tests/test_household_login_selection.py
+- [X] T013 [P] [US1] Add no-household-access 403 page and navigation omission test in financial/tests/test_household_no_access.py
+- [X] T014 [P] [US1] Add archived-current-household fallback and 403 fallback tests in financial/tests/test_household_archived_fallback.py
 
 ### Implementation for User Story 1
 
-- [ ] T015 [US1] Implement post-login household selection and redirect to `/household/` in core/urls.py and financial/views.py
-- [ ] T016 [US1] Implement no-household-access endpoint/template with HTTP 403 in pages/views.py and templates/pages/no_household_access.html
-- [ ] T017 [US1] Enforce single primary membership per user and owner-preservation validation in financial/models.py
-- [ ] T018 [US1] Wire archived-household revalidation on household-scoped requests in financial/services/households.py and financial/views.py
+- [X] T015 [US1] Implement post-login household selection and redirect to `/household/` in core/urls.py and financial/views.py
+- [X] T016 [US1] Implement no-household-access endpoint/template with HTTP 403 in pages/views.py and templates/pages/no_household_access.html
+- [X] T017 [US1] Enforce single primary membership per user and owner-preservation validation in financial/models.py
+- [X] T018 [US1] Wire archived-household revalidation on household-scoped requests in financial/services/households.py and financial/views.py
 
 **Checkpoint**: User Story 1 is independently functional and testable.
 
@@ -75,17 +75,17 @@
 
 ### Tests for User Story 2
 
-- [ ] T019 [P] [US2] Add household home launcher rendering test in financial/tests/test_household_home.py
-- [ ] T020 [P] [US2] Add household finance root route/navigation test in financial/tests/test_household_finance_routing.py
-- [ ] T021 [P] [US2] Add namespace-driven sidebar menu rendering test in financial/tests/test_household_navigation_menus.py
+- [X] T019 [P] [US2] Add household home launcher rendering test in financial/tests/test_household_home.py
+- [X] T020 [P] [US2] Add household finance root route/navigation test in financial/tests/test_household_finance_routing.py
+- [X] T021 [P] [US2] Add namespace-driven sidebar menu rendering test in financial/tests/test_household_navigation_menus.py
 
 ### Implementation for User Story 2
 
-- [ ] T022 [US2] Add `household` namespace routes for home, switch, and finance root in core/urls.py and pages/urls.py
-- [ ] T023 [US2] Implement household home view and module launcher template in pages/views.py and templates/pages/household_home.html
-- [ ] T024 [US2] Update global navbar to include household switcher and `/household/` title link in templates/components/layout/navbar.html
-- [ ] T025 [US2] Implement namespace-aware sidebar menu branching in templates/components/layout/sidebar.html
-- [ ] T026 [US2] Record HTMX target/swap/root/container matrix confirmation for touched finance endpoints in specs/001-add-household-container/plan.md
+- [X] T022 [US2] Add `household` namespace routes for home, switch, and finance root in core/urls.py and pages/urls.py
+- [X] T023 [US2] Implement household home view and module launcher template in pages/views.py and templates/pages/household_home.html
+- [X] T024 [US2] Update global navbar to include household switcher and `/household/` title link in templates/components/layout/navbar.html
+- [X] T025 [US2] Implement namespace-aware sidebar menu branching in templates/components/layout/sidebar.html
+- [X] T026 [US2] Record HTMX target/swap/root/container matrix confirmation for touched finance endpoints in specs/001-add-household-container/plan.md
 
 **Checkpoint**: User Story 2 is independently functional and testable.
 
@@ -99,19 +99,19 @@
 
 ### Tests for User Story 3
 
-- [ ] T027 [P] [US3] Add household-scoped accounts list/detail isolation tests in financial/tests/test_household_accounts_scope.py
-- [ ] T028 [P] [US3] Add household-scoped transaction isolation tests in financial/tests/test_household_transactions_scope.py
-- [ ] T029 [P] [US3] Add cross-household account/transaction direct-access guard tests (404) in financial/tests/test_household_object_guards.py
-- [ ] T030 [P] [US3] Add transaction invariant tests (`transaction.household == account.household`) including account-change reject path in financial/tests/test_household_transaction_invariants.py
+- [X] T027 [P] [US3] Add household-scoped accounts list/detail isolation tests in financial/tests/test_household_accounts_scope.py
+- [X] T028 [P] [US3] Add household-scoped transaction isolation tests in financial/tests/test_household_transactions_scope.py
+- [X] T029 [P] [US3] Add cross-household account/transaction direct-access guard tests (404) in financial/tests/test_household_object_guards.py
+- [X] T030 [P] [US3] Add transaction invariant tests (`transaction.household == account.household`) including account-change reject path in financial/tests/test_household_transaction_invariants.py
 
 ### Implementation for User Story 3
 
-- [ ] T031 [US3] Scope account querysets/services by `current_household_id` in financial/services/accounts.py and financial/views.py
-- [ ] T032 [US3] Scope transaction querysets/services by `current_household_id` in financial/services/transactions.py and financial/views.py
-- [ ] T033 [US3] Enforce object-level 404 guards on finance detail/edit/delete endpoints in financial/views.py
-- [ ] T034 [US3] Update account/transaction forms to deterministic `instance=` binding on GET/POST in financial/forms.py and financial/views.py
-- [ ] T035 [US3] Derive transaction household from selected account and reject out-of-scope account changes in financial/forms.py and financial/models.py
-- [ ] T036 [US3] Align finance URLs to household-prefixed route contract while preserving `financial` namespace in financial/urls.py and core/urls.py
+- [X] T031 [US3] Scope account querysets/services by `current_household_id` in financial/services/accounts.py and financial/views.py
+- [X] T032 [US3] Scope transaction querysets/services by `current_household_id` in financial/services/transactions.py and financial/views.py
+- [X] T033 [US3] Enforce object-level 404 guards on finance detail/edit/delete endpoints in financial/views.py
+- [X] T034 [US3] Update account/transaction forms to deterministic `instance=` binding on GET/POST in financial/forms.py and financial/views.py
+- [X] T035 [US3] Derive transaction household from selected account and reject out-of-scope account changes in financial/forms.py and financial/models.py
+- [X] T036 [US3] Align finance URLs to household-prefixed route contract while preserving `financial` namespace in financial/urls.py and core/urls.py
 
 **Checkpoint**: User Story 3 is independently functional and testable.
 
@@ -125,15 +125,15 @@
 
 ### Tests for User Story 4
 
-- [ ] T037 [P] [US4] Add household switch success redirect/session update tests in financial/tests/test_household_switching.py
-- [ ] T038 [P] [US4] Add forbidden switch-to-non-member test with unchanged session context in financial/tests/test_household_switching.py
-- [ ] T039 [P] [US4] Add post-switch finance context reset test in financial/tests/test_household_switching_context_reset.py
+- [X] T037 [P] [US4] Add household switch success redirect/session update tests in financial/tests/test_household_switching.py
+- [X] T038 [P] [US4] Add forbidden switch-to-non-member test with unchanged session context in financial/tests/test_household_switching.py
+- [X] T039 [P] [US4] Add post-switch finance context reset test in financial/tests/test_household_switching_context_reset.py
 
 ### Implementation for User Story 4
 
-- [ ] T040 [US4] Implement household switch POST endpoint with membership validation in financial/views.py and financial/urls.py
-- [ ] T041 [US4] Connect navbar switcher form to switch endpoint and selected-household rendering in templates/components/layout/navbar.html
-- [ ] T042 [US4] Ensure post-switch redirect and scoped finance cache/query reset behavior in financial/services/households.py and financial/views.py
+- [X] T040 [US4] Implement household switch POST endpoint with membership validation in financial/views.py and financial/urls.py
+- [X] T041 [US4] Connect navbar switcher form to switch endpoint and selected-household rendering in templates/components/layout/navbar.html
+- [X] T042 [US4] Ensure post-switch redirect and scoped finance cache/query reset behavior in financial/services/households.py and financial/views.py
 
 **Checkpoint**: User Story 4 is independently functional and testable.
 
@@ -143,16 +143,16 @@
 
 **Purpose**: Final reliability, docs, and full validation across stories.
 
-- [ ] T043 [P] Update feature documentation and deterministic verification notes in specs/001-add-household-container/quickstart.md and README.md
-- [ ] T044 [P] Add/refresh AI implementation log entries with prompt and response references in docs/ai/003-household-top-level-container-log.md
-- [ ] T045 Run full SQLite suite for feature behavior (`core.settings_test`) and capture results in docs/error.txt
-- [ ] T046 Run migration-from-fresh + reseed validation sequence and record observed output in specs/001-add-household-container/quickstart.md
-- [ ] T047 Enforce constitution migration cleanliness gate by running `manage.py makemigrations --check --dry-run` and recording zero-diff evidence in docs/error.txt
-- [ ] T048 [P] Add template safety verification tests/checks for touched templates (single-line `{% %}`/`{# #}` usage) in financial/tests/test_template_safety.py
-- [ ] T049 [P] Add HTMX trigger-preservation tests for account/transaction form endpoints in financial/tests/test_hx_trigger_preservation.py
-- [ ] T050 Add explicit FR-016 non-goal guard checklist updates in specs/001-add-household-container/quickstart.md and README.md
-- [ ] T051 [P] Record fail-first evidence for each story test group (US1-US4) before implementation changes in docs/ai/003-household-top-level-container-log.md
-- [ ] T052 [P] Add finance household-scope query-count guard tests (no additional list/detail query fanout beyond household filter baseline) in financial/tests/test_household_query_counts.py
+- [X] T043 [P] Update feature documentation and deterministic verification notes in specs/001-add-household-container/quickstart.md and README.md
+- [X] T044 [P] Add/refresh AI implementation log entries with prompt and response references in docs/ai/003-household-top-level-container-log.md
+- [X] T045 Run full SQLite suite for feature behavior (`core.settings_test`) and capture results in docs/error.txt
+- [X] T046 Run migration-from-fresh + reseed validation sequence and record observed output in specs/001-add-household-container/quickstart.md
+- [X] T047 Enforce constitution migration cleanliness gate by running `manage.py makemigrations --check --dry-run` and recording zero-diff evidence in docs/error.txt
+- [X] T048 [P] Add template safety verification tests/checks for touched templates (single-line `{% %}`/`{# #}` usage) in financial/tests/test_template_safety.py
+- [X] T049 [P] Add HTMX trigger-preservation tests for account/transaction form endpoints in financial/tests/test_hx_trigger_preservation.py
+- [X] T050 Add explicit FR-016 non-goal guard checklist updates in specs/001-add-household-container/quickstart.md and README.md
+- [X] T051 [P] Record fail-first evidence for each story test group (US1-US4) before implementation changes in docs/ai/003-household-top-level-container-log.md
+- [X] T052 [P] Add finance household-scope query-count guard tests (no additional list/detail query fanout beyond household filter baseline) in financial/tests/test_household_query_counts.py
 
 ---
 

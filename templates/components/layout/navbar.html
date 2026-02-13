@@ -19,7 +19,25 @@
   </div>
 
   <div class="flex-1 px-4 font-semibold">
-    {{ navbar_title|default:"DJANGOCOTTONAUTHSTARTER" }}
+    <a href="{% url 'household:home' %}" class="link link-hover">{{ navbar_title|default:"Home Management" }}</a>
+  </div>
+
+  {% if user.is_authenticated and available_households %}
+  <div class="flex-none mr-2">
+    <form method="post" action="{% url 'household:switch' %}" class="flex items-center gap-2">
+      {% csrf_token %}
+      <label for="household-switch" class="sr-only">Household</label>
+      <select id="household-switch" name="household_id" class="select select-bordered select-sm" onchange="this.form.submit()">
+        {% for household in available_households %}
+          <option value="{{ household.id }}" {% if current_household and current_household.id == household.id %}selected{% endif %}>{{ household.name }}</option>
+        {% endfor %}
+      </select>
+    </form>
+  </div>
+  {% endif %}
+
+  <div class="flex-none mr-2">
+    <a href="{% url 'financial:accounts-index' %}" class="btn btn-ghost btn-sm">Finance</a>
   </div>
 
   <div class="flex-none">

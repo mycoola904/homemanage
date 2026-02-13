@@ -1,5 +1,9 @@
 # Research — Household Top-Level Container (MVP)
 
+## No-New-Dependency Decision (T001)
+Decision: No new runtime or infrastructure dependencies are introduced for this feature.
+Rationale: Existing Django + HTMX + Tailwind/DaisyUI stack already supports the full MVP scope and keeps rollout deterministic.
+
 ## Session Household Scoping Strategy
 Decision: Use session key `current_household_id` as the sole active scope, resolved from authenticated user memberships on login and revalidated on each household-scoped request.
 Rationale: This directly satisfies FR-002/FR-003/FR-011 and keeps tenancy deterministic with one active household at a time.

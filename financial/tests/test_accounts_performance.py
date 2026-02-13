@@ -5,7 +5,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from financial.models import Account, AccountStatus, AccountType
+from financial.models import Account, AccountStatus, AccountType, Household, HouseholdMember
 
 
 User = get_user_model()
@@ -18,6 +18,17 @@ class AccountsPerformanceTests(TestCase):
             email="perf@example.com",
             password="perf-pass-123",
         )
+        self.household = Household.objects.create(
+            name="Perf Household",
+            slug="perf-household",
+            created_by=self.user,
+        )
+        HouseholdMember.objects.create(
+            household=self.household,
+            user=self.user,
+            role=HouseholdMember.Role.OWNER,
+            is_primary=True,
+        )
         self.url = reverse("financial:accounts-index")
 
     def test_accounts_index_renders_under_two_seconds(self):
@@ -26,6 +37,7 @@ class AccountsPerformanceTests(TestCase):
             bulk_accounts.append(
                 Account(
                     user=self.user,
+                    household=self.household,
                     name=f"Load Test Account {idx:03d}",
                     institution="Perf Bank",
                     account_type=AccountType.CHECKING if idx % 2 == 0 else AccountType.SAVINGS,

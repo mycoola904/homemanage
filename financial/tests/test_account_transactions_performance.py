@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from financial.models import Account, AccountStatus, AccountType, Transaction, TransactionType
+from financial.models import Account, AccountStatus, AccountType, Household, HouseholdMember, Transaction, TransactionType
 
 User = get_user_model()
 
@@ -14,8 +14,16 @@ User = get_user_model()
 class AccountTransactionsPerformanceTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user("perf-user", "perf@example.com", "perf-pass-123")
+        self.household = Household.objects.create(name="Perf Household", slug="perf-household", created_by=self.user)
+        HouseholdMember.objects.create(
+            household=self.household,
+            user=self.user,
+            role=HouseholdMember.Role.OWNER,
+            is_primary=True,
+        )
         self.account = Account.objects.create(
             user=self.user,
+            household=self.household,
             name="Performance Checking",
             institution="Perf Bank",
             account_type=AccountType.CHECKING,
@@ -31,6 +39,7 @@ class AccountTransactionsPerformanceTests(TestCase):
             transactions.append(
                 Transaction(
                     account=self.account,
+                    household=self.household,
                     posted_on=start_date + timedelta(days=idx % 14),
                     description=f"Load Test {idx:03d}",
                     transaction_type=TransactionType.EXPENSE if idx % 2 == 0 else TransactionType.DEPOSIT,

@@ -1,5 +1,11 @@
 # Quickstart — Household Top-Level Container (MVP)
 
+## Route map (feature scope)
+- `/household/` → household launcher home
+- `/household/finance/` → finance module root
+- `/household/switch/` → active household switch POST action
+- `/household/no-access/` → HTTP 403 no-household-access page
+
 ## 1) Verify environment and watcher
 - Run: `python --version`
 - Run: `npm run dev:css`
@@ -48,3 +54,14 @@
 ## 9) Migration and seed repeatability check
 - Run steps 2 and 3 again.
 - What to observe: Migration + seed workflow remains repeatable and deterministic.
+
+## 10) Observed validation output (2026-02-12)
+- `python manage.py makemigrations --check --dry-run --settings=core.settings_test` -> `No changes detected`
+- `python manage.py migrate --settings=core.settings_test --noinput` -> all migrations applied cleanly
+- `python manage.py seed_households --settings=core.settings_test` -> `Seeded households and deterministic finance data.`
+- `python manage.py test financial.tests --settings=core.settings_test` -> `Ran 55 tests ... OK`
+
+## 11) FR-016 non-goal guard checklist
+- Confirm no budget-planning UI or endpoints were added in this feature.
+- Confirm no forecasting or analytics/reporting dashboards were introduced.
+- Confirm no cross-household aggregate financial views were added.

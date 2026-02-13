@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from financial.models import Account, AccountStatus, AccountType
+from financial.models import Account, AccountStatus, AccountType, Household, HouseholdMember
 
 User = get_user_model()
 
@@ -16,8 +16,16 @@ class AccountPreviewTests(TestCase):
             email="alex@example.com",
             password="pass-1234",
         )
+        self.household = Household.objects.create(name="Alex Household", slug="alex-household", created_by=self.user)
+        HouseholdMember.objects.create(
+            household=self.household,
+            user=self.user,
+            role=HouseholdMember.Role.OWNER,
+            is_primary=True,
+        )
         self.account = Account.objects.create(
             user=self.user,
+            household=self.household,
             name="Civic Checking",
             institution="Civic Bank",
             account_type=AccountType.CHECKING,
@@ -42,6 +50,13 @@ class AccountPreviewTests(TestCase):
 
     def test_preview_handles_missing_or_unowned_account(self):
         other_user = User.objects.create_user("charlie", "charlie@example.com", "pass-4321")
+        other_household = Household.objects.create(name="Charlie Household", slug="charlie-household", created_by=other_user)
+        HouseholdMember.objects.create(
+            household=other_household,
+            user=other_user,
+            role=HouseholdMember.Role.OWNER,
+            is_primary=True,
+        )
         self.client.force_login(other_user)
         response = self.client.get(self.url, HTTP_HX_REQUEST="true")
         self.assertEqual(response.status_code, 404)

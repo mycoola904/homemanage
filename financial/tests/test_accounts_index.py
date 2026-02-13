@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from financial.models import Account, AccountStatus, AccountType
+from financial.models import Account, AccountStatus, AccountType, Household, HouseholdMember
 
 
 User = get_user_model()
@@ -15,6 +15,17 @@ class AccountsIndexViewTests(TestCase):
             email="alex@example.com",
             password="complex-pass-123",
         )
+        self.household = Household.objects.create(
+            name="Alex Household",
+            slug="alex-household",
+            created_by=self.user,
+        )
+        HouseholdMember.objects.create(
+            household=self.household,
+            user=self.user,
+            role=HouseholdMember.Role.OWNER,
+            is_primary=True,
+        )
         self.url = reverse("financial:accounts-index")
 
     def test_redirects_anonymous_users(self):
@@ -25,6 +36,7 @@ class AccountsIndexViewTests(TestCase):
     def test_lists_accounts_in_expected_order(self):
         Account.objects.create(
             user=self.user,
+            household=self.household,
             name="Savings Reserve",
             institution="Civic",
             account_type=AccountType.SAVINGS,
@@ -33,6 +45,7 @@ class AccountsIndexViewTests(TestCase):
         )
         Account.objects.create(
             user=self.user,
+            household=self.household,
             name="Checking Everyday",
             institution="Metro",
             account_type=AccountType.CHECKING,
@@ -41,6 +54,7 @@ class AccountsIndexViewTests(TestCase):
         )
         Account.objects.create(
             user=self.user,
+            household=self.household,
             name="Loan Refi",
             institution="Metro",
             account_type=AccountType.LOAN,

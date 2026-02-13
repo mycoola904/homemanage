@@ -30,6 +30,8 @@ This repository is **not** a starter template. It is a concrete application buil
 - **DaisyUI**
 - **Git + GitHub Issues** for structured feature tracking
 
+No new dependencies were added for the Household Container MVP; implementation uses the existing project stack only.
+
 ---
 
 ## Architecture Overview
@@ -68,6 +70,19 @@ All shared components are globally defined to maintain UI consistency.
 - HTMX-powered detail panel swapping
 - Database-enforced uniqueness for account names
 - Manual test-verified CRUD behavior
+
+### Household Container (MVP)
+
+- Household home route at `/household/`
+- Finance module mounted at `/household/finance/`
+- Session-scoped active household switching in navbar
+- Household-scoped account and transaction access guards
+
+### Household Container Non-Goals (FR-016)
+
+- No budget planner, forecasting, analytics dashboard, or reporting features in this MVP
+- No role-permission matrix expansion beyond owner/admin/member structure
+- No cross-household aggregate financial views in this MVP
 
 ---
 
@@ -139,8 +154,15 @@ python manage.py runserver
 ### 7. Run Tailwind watcher (if applicable)
 
 ```bash
-npx tailwindcss -i ./static/src/input.css -o ./static/dist/output.css --watch
+npm run dev:css
 ```
+
+### 8. Household routes
+
+- Household home: `/household/`
+- Finance root: `/household/finance/`
+- Household switch action: `/household/switch/`
+- No-access page: `/household/no-access/`
 
 ---
 

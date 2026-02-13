@@ -4,7 +4,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from financial.models import Account, AccountStatus, AccountType
+from financial.models import Account, AccountStatus, AccountType, Household, HouseholdMember
 
 User = get_user_model()
 
@@ -13,8 +13,23 @@ class AccountTransactionsMissingTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user("alex", "alex@example.com", "pass-1234")
         self.other_user = User.objects.create_user("jamie", "jamie@example.com", "pass-9876")
+        self.household = Household.objects.create(name="Alex Household", slug="alex-household", created_by=self.user)
+        HouseholdMember.objects.create(
+            household=self.household,
+            user=self.user,
+            role=HouseholdMember.Role.OWNER,
+            is_primary=True,
+        )
+        other_household = Household.objects.create(name="Jamie Household", slug="jamie-household", created_by=self.other_user)
+        HouseholdMember.objects.create(
+            household=other_household,
+            user=self.other_user,
+            role=HouseholdMember.Role.OWNER,
+            is_primary=True,
+        )
         self.account = Account.objects.create(
             user=self.user,
+            household=self.household,
             name="Civic Checking",
             institution="Civic",
             account_type=AccountType.CHECKING,

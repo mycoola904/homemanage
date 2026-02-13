@@ -105,6 +105,7 @@ class TransactionForm(forms.ModelForm):
     class Meta:
         model = Transaction
         fields = [
+            "account",
             "posted_on",
             "description",
             "transaction_type",
@@ -126,13 +127,33 @@ class TransactionForm(forms.ModelForm):
         if self._account is not None:
             self.instance.account = self._account
 
-        if self._account is not None:
+        active_account = self._account or getattr(self.instance, "account", None)
+
+        if active_account is not None:
             self.fields["transaction_type"].choices = TransactionType.allowed_for_account(
-                self._account.account_type,
+                active_account.account_type,
             )
 
         if self._user is not None:
             self.fields["category"].queryset = Category.objects.filter(user=self._user).order_by("name")
+
+        if active_account is not None:
+            self.fields["account"].queryset = Account.objects.filter(household=active_account.household).order_by("name")
+            self.fields["account"].initial = active_account.id
+            self.fields["account"].required = False
+        elif self._user is not None:
+            self.fields["account"].queryset = Account.objects.filter(user=self._user).order_by("name")
+
+    def clean_account(self):
+        account = self.cleaned_data.get("account")
+        if account is None and self._account is not None:
+            return self._account
+        if account is None:
+            raise forms.ValidationError("Select an account.")
+
+        if self._account is not None and account.household_id != self._account.household_id:
+            raise forms.ValidationError("Selected account is outside the active household.")
+        return account
 
     def clean_description(self):
         description = (self.cleaned_data.get("description") or "").strip()

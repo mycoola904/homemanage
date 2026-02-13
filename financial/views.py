@@ -11,6 +11,7 @@ from django.views.generic import CreateView, DetailView, ListView
 
 from financial.forms import AccountForm, CategoryForm, TransactionForm
 from financial.models import Account, Transaction, UserAccountQuerysetMixin
+from financial.services.households import resolve_current_household
 from financial.services.accounts import (
 	AccountSummaryRow,
 	build_account_preview,
@@ -19,8 +20,15 @@ from financial.services.accounts import (
 from financial.services.transactions import serialize_transaction_rows
 
 
-def _get_account_or_404(user, pk) -> Account:
-	return get_object_or_404(Account, pk=pk, user=user)
+def _get_current_household_or_redirect(request):
+	context = resolve_current_household(request)
+	if context.redirect is not None:
+		return None, context.redirect
+	return context.household, None
+
+
+def _get_account_or_404(household, pk) -> Account:
+	return get_object_or_404(Account, pk=pk, household=household)
 
 
 def _table_copy() -> dict[str, str]:
@@ -30,8 +38,8 @@ def _table_copy() -> dict[str, str]:
 	}
 
 
-def _accounts_table_component_context(request) -> dict:
-	accounts = Account.objects.for_user(request.user)
+def _accounts_table_component_context(request, household) -> dict:
+	accounts = Account.objects.for_household(household)
 	rows = serialize_account_rows(accounts)
 	copy = _table_copy()
 	return {
@@ -45,6 +53,7 @@ def _accounts_table_component_context(request) -> dict:
 
 def _render_preview_response(
 	request,
+	household,
 	account: Account,
 	*,
 	include_row_oob: bool = False,
@@ -70,7 +79,7 @@ def _render_preview_response(
 		table_html = render_to_string(
 			"components/financial/accounts_table.html",
 			{
-				**_accounts_table_component_context(request),
+				**_accounts_table_component_context(request, household),
 				"swap_oob": True,
 			},
 			request=request,
@@ -80,9 +89,10 @@ def _render_preview_response(
 
 
 def _render_accounts_table_fragment(request) -> str:
+	household, _ = _get_current_household_or_redirect(request)
 	return render_to_string(
 		"components/financial/accounts_table.html",
-		_accounts_table_component_context(request),
+		_accounts_table_component_context(request, household),
 		request=request,
 	)
 
@@ -134,8 +144,8 @@ def _transaction_form_context(
 	}
 
 
-def _get_account_for_transactions(request, pk) -> Account | None:
-	return Account.objects.filter(pk=pk, user=request.user).first()
+def _get_account_for_transactions(request, household, pk) -> Account | None:
+	return Account.objects.filter(pk=pk, household=household).first()
 
 
 def _get_transaction_for_account(account: Account, transaction_id) -> Transaction | None:
@@ -150,8 +160,9 @@ class AccountsIndexView(LoginRequiredMixin, UserAccountQuerysetMixin, ListView):
 	context_object_name = "accounts"
 
 	def get_context_data(self, **kwargs):
+		household, _ = _get_current_household_or_redirect(self.request)
 		context = super().get_context_data(**kwargs)
-		table_context = _accounts_table_component_context(self.request)
+		table_context = _accounts_table_component_context(self.request, household)
 		context.update(
 			account_rows=table_context["rows"],
 			has_accounts=table_context["has_accounts"],
@@ -162,6 +173,16 @@ class AccountsIndexView(LoginRequiredMixin, UserAccountQuerysetMixin, ListView):
 			page_title="Accounts",
 		)
 		return context
+
+	def get_queryset(self):
+		household, _ = _get_current_household_or_redirect(self.request)
+		return Account.objects.for_household(household)
+
+	def dispatch(self, request, *args, **kwargs):
+		_, redirect_response = _get_current_household_or_redirect(request)
+		if redirect_response is not None:
+			return redirect_response
+		return super().dispatch(request, *args, **kwargs)
 
 
 class AccountCreateView(LoginRequiredMixin, CreateView):
@@ -178,10 +199,20 @@ class AccountCreateView(LoginRequiredMixin, CreateView):
 		return kwargs
 
 	def form_valid(self, form):
+		household, redirect_response = _get_current_household_or_redirect(self.request)
+		if redirect_response is not None:
+			return redirect_response
 		form.instance.user = self.request.user
+		form.instance.household = household
 		response = super().form_valid(form)
 		messages.success(self.request, "Account created successfully.")
 		return response
+
+	def dispatch(self, request, *args, **kwargs):
+		_, redirect_response = _get_current_household_or_redirect(request)
+		if redirect_response is not None:
+			return redirect_response
+		return super().dispatch(request, *args, **kwargs)
 
 	def get_context_data(self, **kwargs):
 		context = super().get_context_data(**kwargs)
@@ -212,12 +243,25 @@ class AccountDetailView(LoginRequiredMixin, UserAccountQuerysetMixin, DetailView
 		)
 		return context
 
+	def get_queryset(self):
+		household, _ = _get_current_household_or_redirect(self.request)
+		return Account.objects.for_household(household)
+
+	def dispatch(self, request, *args, **kwargs):
+		_, redirect_response = _get_current_household_or_redirect(request)
+		if redirect_response is not None:
+			return redirect_response
+		return super().dispatch(request, *args, **kwargs)
+
 
 @login_required
 @require_http_methods(["GET"])
 def account_preview(request, pk):
+	household, redirect_response = _get_current_household_or_redirect(request)
+	if redirect_response is not None:
+		return redirect_response
 	try:
-		account = _get_account_or_404(request.user, pk)
+		account = _get_account_or_404(household, pk)
 	except Http404:
 		return render(
 			request,
@@ -236,7 +280,10 @@ def account_preview(request, pk):
 @login_required
 @require_http_methods(["GET", "POST"])
 def account_edit(request, pk):
-	account = _get_account_or_404(request.user, pk)
+	household, redirect_response = _get_current_household_or_redirect(request)
+	if redirect_response is not None:
+		return redirect_response
+	account = _get_account_or_404(household, pk)
 	post_hx_url = reverse("financial:accounts-edit", args=[account.id])
 	if request.method == "GET":
 		form = AccountForm(instance=account, user=request.user)
@@ -255,7 +302,7 @@ def account_edit(request, pk):
 	form = AccountForm(request.POST, instance=account, user=request.user)
 	if form.is_valid():
 		account = form.save()
-		return _render_preview_response(request, account, include_table_oob=True)
+		return _render_preview_response(request, household, account, include_table_oob=True)
 
 	return render(
 		request,
@@ -274,8 +321,11 @@ def account_edit(request, pk):
 @login_required
 @require_http_methods(["GET"])
 def account_delete_confirm(request, pk):
+	household, redirect_response = _get_current_household_or_redirect(request)
+	if redirect_response is not None:
+		return redirect_response
 	try:
-		account = _get_account_or_404(request.user, pk)
+		account = _get_account_or_404(household, pk)
 	except Http404:
 		return render(
 			request,
@@ -296,8 +346,11 @@ def account_delete_confirm(request, pk):
 @login_required
 @require_http_methods(["POST"])
 def account_delete(request, pk):
+	household, redirect_response = _get_current_household_or_redirect(request)
+	if redirect_response is not None:
+		return redirect_response
 	try:
-		account = _get_account_or_404(request.user, pk)
+		account = _get_account_or_404(household, pk)
 	except Http404:
 		return render(
 			request,
@@ -310,7 +363,7 @@ def account_delete(request, pk):
 	table_html = render_to_string(
 		"components/financial/accounts_table.html",
 		{
-			**_accounts_table_component_context(request),
+			**_accounts_table_component_context(request, household),
 			"swap_oob": True,
 		},
 		request=request,
@@ -325,7 +378,10 @@ def account_delete(request, pk):
 @login_required
 @require_http_methods(["GET"])
 def account_transactions_body(request, pk):
-	account = _get_account_for_transactions(request, pk)
+	household, redirect_response = _get_current_household_or_redirect(request)
+	if redirect_response is not None:
+		return redirect_response
+	account = _get_account_for_transactions(request, household, pk)
 	if account is None:
 		return _render_transactions_missing(request, pk)
 	return _render_transactions_body(request, account)
@@ -334,7 +390,10 @@ def account_transactions_body(request, pk):
 @login_required
 @require_http_methods(["GET", "POST"])
 def account_transactions_new(request, pk):
-	account = _get_account_for_transactions(request, pk)
+	household, redirect_response = _get_current_household_or_redirect(request)
+	if redirect_response is not None:
+		return redirect_response
+	account = _get_account_for_transactions(request, household, pk)
 	if account is None:
 		return _render_transactions_missing(request, pk)
 
@@ -343,7 +402,7 @@ def account_transactions_new(request, pk):
 	category_post_url = reverse("financial:account-transactions-category-new", args=[account.id])
 	if request.method == "GET":
 		form = TransactionForm(
-			initial={"posted_on": timezone.localdate()},
+			initial={"posted_on": timezone.localdate(), "account": account.id},
 			account=account,
 			user=request.user,
 		)
@@ -363,9 +422,10 @@ def account_transactions_new(request, pk):
 	form = TransactionForm(request.POST, account=account, user=request.user)
 	if form.is_valid():
 		transaction = form.save(commit=False)
-		transaction.account = account
+		transaction.account = form.cleaned_data["account"]
+		transaction.household = transaction.account.household
 		transaction.save()
-		return _render_transactions_body(request, account)
+		return _render_transactions_body(request, transaction.account)
 
 	category_form = CategoryForm(user=request.user)
 
@@ -386,7 +446,10 @@ def account_transactions_new(request, pk):
 @login_required
 @require_http_methods(["GET", "POST"])
 def account_transactions_edit(request, pk, transaction_id):
-	account = _get_account_for_transactions(request, pk)
+	household, redirect_response = _get_current_household_or_redirect(request)
+	if redirect_response is not None:
+		return redirect_response
+	account = _get_account_for_transactions(request, household, pk)
 	if account is None:
 		return _render_transactions_missing(request, pk)
 
@@ -415,8 +478,13 @@ def account_transactions_edit(request, pk, transaction_id):
 
 	form = TransactionForm(request.POST, instance=transaction, account=account, user=request.user)
 	if form.is_valid():
-		form.save()
-		return _render_transactions_body(request, account)
+		updated_transaction = form.save(commit=False)
+		if updated_transaction.account.household_id != household.id:
+			form.add_error("account", "Selected account is outside the active household.")
+		else:
+			updated_transaction.household = updated_transaction.account.household
+			updated_transaction.save()
+			return _render_transactions_body(request, updated_transaction.account)
 
 	category_form = CategoryForm(user=request.user)
 	return render(
@@ -436,7 +504,10 @@ def account_transactions_edit(request, pk, transaction_id):
 @login_required
 @require_http_methods(["POST"])
 def account_transactions_category_new(request, pk):
-	account = _get_account_for_transactions(request, pk)
+	household, redirect_response = _get_current_household_or_redirect(request)
+	if redirect_response is not None:
+		return redirect_response
+	account = _get_account_for_transactions(request, household, pk)
 	if account is None:
 		return _render_transactions_missing(request, pk)
 

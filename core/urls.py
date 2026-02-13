@@ -23,6 +23,7 @@ from django.urls import include, path
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('django.contrib.auth.urls')),
-    path('accounts/', include(('financial.urls', 'financial'), namespace='financial')),
+    path("household/", include(("pages.household_urls", "household"), namespace="household")),
+    path('household/finance/', include(('financial.urls', 'financial'), namespace='financial')),
     path("", include("pages.urls")),
 ]

@@ -73,6 +73,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'financial.context_processors.household_context',
             ],
         # Cotton loader + keep normal Django template discovery
             "loaders": [
@@ -148,6 +149,6 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 COTTON_DIR = "components"
 
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'home'
+LOGIN_REDIRECT_URL = 'household:home'
 LOGOUT_REDIRECT_URL = 'home'
 

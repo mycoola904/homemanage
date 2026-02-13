@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+{% block title %}Household Home{% endblock title %}
+
+{% block content %}
+<div class="p-6 space-y-6">
+    <div>
+        <h1 class="text-3xl font-bold">Household</h1>
+        {% if current_household %}
+            <p class="text-base-content/70">Active household: {{ current_household.name }}</p>
+        {% endif %}
+    </div>
+
+    <div class="grid gap-4 md:grid-cols-2">
+        <a class="card bg-base-200 hover:bg-base-300 transition-colors" href="{% url 'financial:accounts-index' %}">
+            <div class="card-body">
+                <h2 class="card-title">Finance</h2>
+                <p>View accounts and transactions for the active household.</p>
+            </div>
+        </a>
+    </div>
+</div>
+{% endblock content %}
