@@ -1,0 +1,137 @@
+openapi: 3.1.0
+info:
+  title: Bill Pay Feature (Server-Rendered)
+  version: 0.1.0
+  description: >-
+    HTML-only endpoints for Bill Pay. Endpoints require authentication and
+    household/account scoping, return server-rendered fragments for HTMX swaps,
+    and never return JSON payloads for interactive flows.
+servers:
+  - url: https://app.example.com
+paths:
+  /accounts/bill-pay/:
+    get:
+      summary: Bill Pay page (default current month)
+      description: >-
+        Returns the full Bill Pay page with month selector and monthly table
+        for liability accounts.
+      parameters:
+        - name: month
+          in: query
+          required: false
+          description: >-
+            Selected month in YYYY-MM format. If omitted, defaults to current month.
+          schema:
+            type: string
+            pattern: '^\d{4}-\d{2}$'
+      responses:
+        '200':
+          description: Full Bill Pay page (HTML)
+          content:
+            text/html: {}
+
+  /accounts/bill-pay/table-body/:
+    get:
+      summary: Month-swapped Bill Pay table body fragment
+      description: >-
+        Returns only the table-body fragment for the selected month and is
+        swapped into #bill-pay-table-body using innerHTML.
+      parameters:
+        - name: month
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: '^\d{4}-\d{2}$'
+      responses:
+        '200':
+          description: Bill Pay table body fragment (HTML)
+          content:
+            text/html: {}
+        '400':
+          description: Invalid month parameter response (HTML)
+          content:
+            text/html: {}
+
+  /accounts/bill-pay/{accountId}/row/:
+    parameters:
+      - $ref: '#/components/parameters/AccountId'
+    get:
+      summary: Editable row fragment
+      description: >-
+        Returns an editable row fragment for the selected account in the selected month.
+      parameters:
+        - $ref: '#/components/parameters/MonthQuery'
+      responses:
+        '200':
+          description: Editable row fragment (HTML)
+          content:
+            text/html: {}
+        '404':
+          description: Account not found or out of scope (HTML)
+          content:
+            text/html: {}
+
+    post:
+      summary: Save Bill Pay row for selected account-month
+      description: >-
+        Persists the account-month bill payment record only on explicit Save.
+        Success returns display row fragment (200). Validation errors return
+        editable row with inline errors (422).
+      parameters:
+        - $ref: '#/components/parameters/MonthQuery'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BillPayRowForm'
+      responses:
+        '200':
+          description: Saved display row fragment (HTML)
+          content:
+            text/html: {}
+        '422':
+          description: Editable row fragment with validation errors (HTML)
+          content:
+            text/html: {}
+        '404':
+          description: Account not found or out of scope (HTML)
+          content:
+            text/html: {}
+
+components:
+  parameters:
+    AccountId:
+      name: accountId
+      in: path
+      required: true
+      description: UUID primary key of the account
+      schema:
+        type: string
+        format: uuid
+
+    MonthQuery:
+      name: month
+      in: query
+      required: true
+      description: Selected month in YYYY-MM format
+      schema:
+        type: string
+        pattern: '^\d{4}-\d{2}$'
+
+  schemas:
+    BillPayRowForm:
+      type: object
+      required:
+        - paid
+      properties:
+        actual_payment_amount:
+          type: string
+          nullable: true
+          pattern: '^[0-9]+(\.[0-9]{1,2})?$'
+        paid:
+          type: boolean
+      description: >-
+        `paid` is independent from `actual_payment_amount`; blank/0.00 amount
+        with paid=true is valid. Negative amounts are invalid.
