@@ -49,5 +49,5 @@ class AccountImportTemplateTests(TestCase):
 
         self.assertEqual(
             header_line,
-            "name,institution,account_type,account_number,routing_number,interest_rate,status,current_balance,credit_limit_or_principal,statement_close_date,payment_due_day,online_access_url,notes",
+            "name,institution,account_type,account_number,routing_number,interest_rate,status,current_balance,credit_limit_or_principal,statement_close_date,payment_due_day,minimum_amount_due,online_access_url,notes",
         )

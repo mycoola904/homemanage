@@ -1,2 +1,2 @@
-name,institution,account_type,account_number,routing_number,interest_rate,status,current_balance,credit_limit_or_principal,statement_close_date,payment_due_day,online_access_url,notes
-Example Checking,Metro Bank,checking,123456789,021000021,,active,1250.00,,,https://examplebank.com/login,Primary household checking account
+name,institution,account_type,account_number,routing_number,interest_rate,status,current_balance,credit_limit_or_principal,statement_close_date,payment_due_day,minimum_amount_due,online_access_url,notes
+Example Checking,Metro Bank,checking,123456789,021000021,,active,1250.00,,,,,https://examplebank.com/login,Primary household checking account

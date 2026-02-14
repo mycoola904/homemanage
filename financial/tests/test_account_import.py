@@ -50,10 +50,10 @@ class AccountImportTests(TestCase):
         headers = (
             "name,institution,account_type,account_number,routing_number,interest_rate,"
             "status,current_balance,credit_limit_or_principal,statement_close_date,"
-            "payment_due_day,online_access_url,notes\n"
+            "payment_due_day,minimum_amount_due,online_access_url,notes\n"
         )
         row = (
-            f"{name},Metro,checking,123456,021000021,,active,250.00,,,,"
+            f"{name},Metro,checking,123456,021000021,,active,250.00,,,,,"
             "https://example.com,Imported from CSV\n"
         )
         return (headers + row).encode("utf-8")

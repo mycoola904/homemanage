@@ -47,6 +47,7 @@ class AccountForm(forms.ModelForm):
         )
         routing_allowed = {"checking", "savings"}
         interest_allowed = {"credit_card", "loan", "other"}
+        liability_allowed = {"credit_card", "loan", "other"}
 
         self.hidden_field_names: list[str] = []
         if account_type:
@@ -54,6 +55,8 @@ class AccountForm(forms.ModelForm):
                 self.hidden_field_names.append("routing_number")
             if account_type not in interest_allowed:
                 self.hidden_field_names.append("interest_rate")
+            if account_type not in liability_allowed:
+                self.hidden_field_names.append("minimum_amount_due")
 
     class Meta:
         model = Account
@@ -69,6 +72,7 @@ class AccountForm(forms.ModelForm):
             "credit_limit_or_principal",
             "statement_close_date",
             "payment_due_day",
+            "minimum_amount_due",
             "notes",
         ]
         widgets = {
@@ -97,6 +101,7 @@ class AccountForm(forms.ModelForm):
 
         routing_number = cleaned_data.get("routing_number")
         interest_rate = cleaned_data.get("interest_rate")
+        minimum_amount_due = cleaned_data.get("minimum_amount_due")
 
         if account_type not in {"checking", "savings"}:
             if routing_number:
@@ -121,6 +126,23 @@ class AccountForm(forms.ModelForm):
                     "Interest rates are only for credit or loan accounts.",
                 )
             cleaned_data["interest_rate"] = None
+
+        if account_type not in {"credit_card", "loan", "other"}:
+            if minimum_amount_due is not None:
+                self.add_error(
+                    "minimum_amount_due",
+                    "Minimum amount due is only for liability accounts.",
+                )
+                self.add_error(
+                    None,
+                    "Minimum amount due is only for liability accounts.",
+                )
+            cleaned_data["minimum_amount_due"] = None
+        elif minimum_amount_due is not None and minimum_amount_due < 0:
+            self.add_error(
+                "minimum_amount_due",
+                "Minimum amount due cannot be negative.",
+            )
 
         return cleaned_data
 

@@ -25,6 +25,7 @@ REQUIRED_HEADERS = [
     "credit_limit_or_principal",
     "statement_close_date",
     "payment_due_day",
+    "minimum_amount_due",
     "online_access_url",
     "notes",
 ]
@@ -178,6 +179,7 @@ def import_accounts_from_csv(*, uploaded_file, user, household) -> AccountImport
                 credit_limit_or_principal=_to_optional_decimal(row["credit_limit_or_principal"]),
                 statement_close_date=statement_close_date,
                 payment_due_day=payment_due_day,
+                minimum_amount_due=_to_optional_decimal(row["minimum_amount_due"]),
                 online_access_url=row["online_access_url"],
                 notes=row["notes"],
             )

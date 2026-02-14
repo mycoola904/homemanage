@@ -176,6 +176,12 @@ class Account(models.Model):
 	)
 	statement_close_date = models.DateField(blank=True, null=True)
 	payment_due_day = models.PositiveSmallIntegerField(blank=True, null=True)
+	minimum_amount_due = models.DecimalField(
+		max_digits=12,
+		decimal_places=2,
+		blank=True,
+		null=True,
+	)
 	online_access_url = models.URLField(blank=True)
 	notes = models.TextField(blank=True)
 	created_at = models.DateTimeField(auto_now_add=True)
@@ -215,6 +221,15 @@ class Account(models.Model):
 			if self.interest_rate is not None:
 				raise ValidationError({"interest_rate": "Interest rates are only for credit or loan accounts."})
 			self.interest_rate = None
+
+		liability_allowed = {AccountType.CREDIT_CARD, AccountType.LOAN, AccountType.OTHER}
+		if self.account_type in liability_allowed:
+			if self.minimum_amount_due is not None and self.minimum_amount_due < Decimal("0"):
+				raise ValidationError({"minimum_amount_due": "Minimum amount due cannot be negative."})
+		else:
+			if self.minimum_amount_due is not None:
+				raise ValidationError({"minimum_amount_due": "Minimum amount due is only for liability accounts."})
+			self.minimum_amount_due = None
 		if self.payment_due_day is not None:
 			if not 1 <= self.payment_due_day <= 31:
 				raise ValidationError({"payment_due_day": "Day must be between 1 and 31."})
