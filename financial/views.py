@@ -194,10 +194,13 @@ def _render_bill_pay_row_edit(request, *, account: Account, month_param: str, st
 	row = build_bill_pay_row(account=account, month=month)
 	instance = get_or_initialize_monthly_payment(account=account, month=month)
 	form = BillPayRowForm(instance=instance, account=account, month=month)
+	form_id = f"bill-pay-form-{account.id}"
+	form.fields["actual_payment_amount"].widget.attrs["form"] = form_id
+	form.fields["paid"].widget.attrs["form"] = form_id
 	return render(
 		request,
 		"financial/bill_pay/_row_edit.html",
-		{"row": row, "form": form, "post_hx_url": row.save_url},
+		{"row": row, "form": form, "post_hx_url": row.save_url, "form_id": form_id},
 		status=status,
 	)
 
@@ -433,6 +436,9 @@ def bill_pay_row(request, account_id):
 	instance = get_or_initialize_monthly_payment(account=account, month=month)
 	form = BillPayRowForm(request.POST, instance=instance, account=account, month=month)
 	row = build_bill_pay_row(account=account, month=month)
+	form_id = f"bill-pay-form-{account.id}"
+	form.fields["actual_payment_amount"].widget.attrs["form"] = form_id
+	form.fields["paid"].widget.attrs["form"] = form_id
 	if form.is_valid():
 		saved = form.save(commit=False)
 		payment = upsert_monthly_payment(
@@ -447,7 +453,12 @@ def bill_pay_row(request, account_id):
 	return render(
 		request,
 		"financial/bill_pay/_row_edit.html",
-		{"row": row, "form": form, "post_hx_url": row.save_url},
+		{
+			"row": row,
+			"form": form,
+			"post_hx_url": row.save_url,
+			"form_id": form_id,
+		},
 		status=422,
 	)
 

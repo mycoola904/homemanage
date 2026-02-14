@@ -29,6 +29,7 @@
     </td>
     <td class="text-right">
         <form method="post"
+              id="{{ form_id }}"
               action="{{ post_hx_url }}"
               hx-post="{{ post_hx_url }}"
               hx-target="#bill-pay-row-{{ row.account_id }}"

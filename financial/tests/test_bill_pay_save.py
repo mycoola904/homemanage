@@ -46,6 +46,15 @@ class BillPaySaveTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'value="225.50"')
 
+    def test_get_edit_row_inputs_are_bound_to_save_form(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.row_url, {"month": "2026-02"}, HTTP_HX_REQUEST="true")
+
+        self.assertEqual(response.status_code, 200)
+        expected_form_id = f'bill-pay-form-{self.account.id}'
+        self.assertContains(response, f'id="{expected_form_id}"')
+        self.assertContains(response, f'form="{expected_form_id}"')
+
     def test_post_creates_account_month_record(self):
         self.client.force_login(self.user)
         response = self.client.post(
