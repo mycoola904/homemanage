@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Bill Pay{% endblock title %}
+
+{% block content %}
+<div class="p-6 space-y-6">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-bold">Bill Pay</h1>
+            <p class="text-base-content/70">Track monthly liability payments by account.</p>
+        </div>
+        <form method="get"
+              action="{{ table_body_url }}"
+              class="flex items-end gap-2"
+              hx-get="{{ table_body_url }}"
+              hx-target="#{{ table_body_id }}"
+              hx-swap="innerHTML"
+              hx-request="queue:last"
+              hx-disabled-elt="button">
+            <div class="form-control">
+                <label class="label" for="bill-pay-month">
+                    <span class="label-text">Month</span>
+                </label>
+                <input id="bill-pay-month"
+                       name="month"
+                       type="month"
+                       value="{{ selected_month }}"
+                       class="input input-bordered input-sm" />
+            </div>
+            <button type="submit" class="btn btn-sm btn-primary">Load</button>
+        </form>
+    </div>
+
+    <div class="overflow-x-auto rounded-2xl border border-base-200 bg-base-100 shadow-sm">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Account</th>
+                    <th>Institution</th>
+                    <th>Due Day</th>
+                    <th>Minimum Due</th>
+                    <th>Online Access</th>
+                    <th>Actual Payment</th>
+                    <th>Paid</th>
+                    <th class="text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="{{ table_body_id }}">
+                {% include "financial/bill_pay/_table_body.html" with rows=rows has_rows=has_rows selected_month=selected_month table_body_id=table_body_id only %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock content %}

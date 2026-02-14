@@ -1,4 +1,5 @@
 import uuid
+from datetime import date
 from decimal import Decimal
 from typing import Any
 
@@ -277,6 +278,72 @@ class TransactionQuerySet(models.QuerySet):
 
 
 TransactionManager = models.Manager.from_queryset(TransactionQuerySet)
+
+
+class MonthlyBillPaymentQuerySet(models.QuerySet):
+	def for_month(self, month: date):
+		if month is None:
+			return self.none()
+		return self.filter(month=month)
+
+	def for_account(self, account: Account):
+		if account is None:
+			return self.none()
+		return self.filter(account=account)
+
+
+MonthlyBillPaymentManager = models.Manager.from_queryset(MonthlyBillPaymentQuerySet)
+
+
+class MonthlyBillPayment(models.Model):
+	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+	account = models.ForeignKey(
+		Account,
+		related_name="monthly_bill_payments",
+		on_delete=models.CASCADE,
+	)
+	month = models.DateField()
+	actual_payment_amount = models.DecimalField(
+		max_digits=12,
+		decimal_places=2,
+		null=True,
+		blank=True,
+	)
+	paid = models.BooleanField(default=False)
+	created_at = models.DateTimeField(auto_now_add=True)
+	updated_at = models.DateTimeField(auto_now=True)
+
+	objects = MonthlyBillPaymentManager()
+
+	class Meta:
+		ordering = ("month", "account_id")
+		constraints = [
+			models.UniqueConstraint(
+				fields=["account", "month"],
+				name="financial_monthly_bill_payment_account_month_unique",
+			)
+		]
+		indexes = [
+			models.Index(fields=["month", "account"], name="fin_billpay_month_account_idx"),
+		]
+
+	@staticmethod
+	def normalize_month(value: date | str) -> date | None:
+		if value is None:
+			return None
+		if isinstance(value, str):
+			value = date.fromisoformat(value[:10])
+		return date(value.year, value.month, 1)
+
+	def clean(self):
+		super().clean()
+		self.month = self.normalize_month(self.month)
+		if self.actual_payment_amount is not None and self.actual_payment_amount < Decimal("0"):
+			raise ValidationError({"actual_payment_amount": "Actual payment amount cannot be negative."})
+
+	def save(self, *args, **kwargs):
+		self.month = self.normalize_month(self.month)
+		return super().save(*args, **kwargs)
 
 
 class Transaction(models.Model):

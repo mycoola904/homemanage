@@ -55,6 +55,16 @@
             <span class="is-drawer-close:hidden">Import</span>
         </a>
       </li>
+      <li>
+        <a href="{% url 'financial:bill-pay-index' %}"
+           class="is-drawer-close:tooltip is-drawer-close:tooltip-right flex items-center gap-2"
+           data-tip="Bill Pay">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5m-19.5 0v7.5a2.25 2.25 0 0 0 2.25 2.25h15a2.25 2.25 0 0 0 2.25-2.25v-7.5m-19.5 0A2.25 2.25 0 0 1 4.5 6h15a2.25 2.25 0 0 1 2.25 2.25M6 12h.008v.008H6V12Zm3 0h.008v.008H9V12Z" />
+            </svg>
+            <span class="is-drawer-close:hidden">Bill Pay</span>
+        </a>
+      </li>
       {% endif %}
 
       {% if can_access_settings %}

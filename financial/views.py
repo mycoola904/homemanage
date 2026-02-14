@@ -11,7 +11,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from django.views.generic import CreateView, DetailView, ListView
 
-from financial.forms import AccountForm, AccountImportForm, CategoryForm, TransactionForm
+from financial.forms import AccountForm, AccountImportForm, BillPayRowForm, CategoryForm, TransactionForm
 from financial.models import Account, Transaction, UserAccountQuerysetMixin
 from households.services.households import resolve_current_household
 from financial.services.account_import import AccountImportValidationError, import_accounts_from_csv
@@ -20,12 +20,22 @@ from financial.services.accounts import (
 	build_account_preview,
 	serialize_account_rows,
 )
+from financial.services.bill_pay import (
+	build_bill_pay_row,
+	build_bill_pay_rows,
+	get_or_initialize_monthly_payment,
+	liability_accounts_for_household,
+	month_to_query_value,
+	parse_month_param,
+	upsert_monthly_payment,
+)
 from financial.services.transactions import serialize_transaction_rows
 
 
 ACCOUNT_IMPORT_PANEL_ID = "account-import-panel"
 ACCOUNT_IMPORT_HX_TARGET = "#account-import-panel"
 ACCOUNT_IMPORT_HX_SWAP = "innerHTML"
+BILL_PAY_TABLE_BODY_ID = "bill-pay-table-body"
 
 
 def _get_current_household_or_redirect(request):
@@ -130,6 +140,65 @@ def _render_transactions_missing(request, account_id) -> HttpResponse:
 		"financial/accounts/transactions/_missing.html",
 		{"account_id": account_id},
 		status=200,
+	)
+
+
+def _bill_pay_context(request, household, *, month_param: str | None = None) -> dict:
+	selected_month = parse_month_param(month_param)
+	accounts = liability_accounts_for_household(household)
+	rows = build_bill_pay_rows(accounts, selected_month)
+	return {
+		"rows": rows,
+		"has_rows": bool(rows),
+		"selected_month": month_to_query_value(selected_month),
+		"table_body_id": BILL_PAY_TABLE_BODY_ID,
+	}
+
+
+def _render_bill_pay_table_body(request, household, *, month_param: str | None = None, status: int = 200) -> HttpResponse:
+	try:
+		context = _bill_pay_context(request, household, month_param=month_param)
+	except ValueError:
+		return render(
+			request,
+			"financial/bill_pay/_table_body.html",
+			{
+				"rows": [],
+				"has_rows": False,
+				"selected_month": timezone.localdate().strftime("%Y-%m"),
+				"table_body_id": BILL_PAY_TABLE_BODY_ID,
+				"table_error": "Invalid month format.",
+			},
+			status=400,
+		)
+	return render(request, "financial/bill_pay/_table_body.html", context, status=status)
+
+
+def _render_bill_pay_row_missing(request, account_id, *, status: int = 404) -> HttpResponse:
+	return render(
+		request,
+		"financial/bill_pay/_row_missing.html",
+		{"account_id": account_id},
+		status=status,
+	)
+
+
+def _render_bill_pay_row_display(request, *, account: Account, month_param: str) -> HttpResponse:
+	month = parse_month_param(month_param)
+	row = build_bill_pay_row(account=account, month=month)
+	return render(request, "financial/bill_pay/_row.html", {"row": row})
+
+
+def _render_bill_pay_row_edit(request, *, account: Account, month_param: str, status: int = 200) -> HttpResponse:
+	month = parse_month_param(month_param)
+	row = build_bill_pay_row(account=account, month=month)
+	instance = get_or_initialize_monthly_payment(account=account, month=month)
+	form = BillPayRowForm(instance=instance, account=account, month=month)
+	return render(
+		request,
+		"financial/bill_pay/_row_edit.html",
+		{"row": row, "form": form, "post_hx_url": row.save_url},
+		status=status,
 	)
 
 
@@ -311,6 +380,76 @@ class AccountsIndexView(LoginRequiredMixin, UserAccountQuerysetMixin, ListView):
 		if redirect_response is not None:
 			return redirect_response
 		return super().dispatch(request, *args, **kwargs)
+
+
+@login_required
+@require_http_methods(["GET"])
+def bill_pay_index(request):
+	household, redirect_response = _get_current_household_or_redirect(request)
+	if redirect_response is not None:
+		return redirect_response
+	context = _bill_pay_context(request, household, month_param=request.GET.get("month"))
+	context.update(
+		page_title="Bill Pay",
+		table_body_url=reverse("financial:bill-pay-table-body"),
+	)
+	return render(request, "financial/bill_pay/index.html", context)
+
+
+@login_required
+@require_http_methods(["GET"])
+def bill_pay_table_body(request):
+	household, redirect_response = _get_current_household_or_redirect(request)
+	if redirect_response is not None:
+		return redirect_response
+	return _render_bill_pay_table_body(request, household, month_param=request.GET.get("month"))
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def bill_pay_row(request, account_id):
+	household, redirect_response = _get_current_household_or_redirect(request)
+	if redirect_response is not None:
+		return redirect_response
+	month_param = request.GET.get("month")
+	if not month_param:
+		return _render_bill_pay_row_missing(request, account_id, status=404)
+	try:
+		month = parse_month_param(month_param)
+	except ValueError:
+		return _render_bill_pay_row_missing(request, account_id, status=404)
+
+	try:
+		account = _get_account_or_404(household, account_id)
+	except Http404:
+		return _render_bill_pay_row_missing(request, account_id, status=404)
+
+	if account.account_type not in {"credit_card", "loan", "other"}:
+		return _render_bill_pay_row_missing(request, account_id, status=404)
+
+	if request.method == "GET":
+		return _render_bill_pay_row_edit(request, account=account, month_param=month_param)
+
+	instance = get_or_initialize_monthly_payment(account=account, month=month)
+	form = BillPayRowForm(request.POST, instance=instance, account=account, month=month)
+	row = build_bill_pay_row(account=account, month=month)
+	if form.is_valid():
+		saved = form.save(commit=False)
+		payment = upsert_monthly_payment(
+			account=account,
+			month=month,
+			actual_payment_amount=saved.actual_payment_amount,
+			paid=saved.paid,
+		)
+		_ = payment
+		return _render_bill_pay_row_display(request, account=account, month_param=month_param)
+
+	return render(
+		request,
+		"financial/bill_pay/_row_edit.html",
+		{"row": row, "form": form, "post_hx_url": row.save_url},
+		status=422,
+	)
 
 
 class AccountCreateView(LoginRequiredMixin, CreateView):

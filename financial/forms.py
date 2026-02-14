@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from django import forms
 
-from financial.models import Account, Category, Transaction, TransactionType
+from financial.models import Account, Category, MonthlyBillPayment, Transaction, TransactionType
 
 
 class AccountImportForm(forms.Form):
@@ -217,6 +217,43 @@ class TransactionForm(forms.ModelForm):
         if amount <= Decimal("0"):
             raise forms.ValidationError("Amount must be greater than 0.")
         return amount
+
+
+class BillPayRowForm(forms.ModelForm):
+    class Meta:
+        model = MonthlyBillPayment
+        fields = ["actual_payment_amount", "paid"]
+        widgets = {
+            "actual_payment_amount": forms.NumberInput(attrs={"step": "0.01", "min": "0", "class": "input input-bordered input-sm w-28"}),
+            "paid": forms.CheckboxInput(attrs={"class": "checkbox checkbox-sm"}),
+        }
+
+    def __init__(self, *args, account=None, month=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._account = account
+        self._month = month
+        if self.instance is not None and self.instance.pk is None and account is not None:
+            self.instance.account = account
+        if self.instance is not None and self.instance.pk is None and month is not None:
+            self.instance.month = month
+
+    def clean_actual_payment_amount(self):
+        amount = self.cleaned_data.get("actual_payment_amount")
+        if amount is None:
+            return amount
+        if amount < Decimal("0"):
+            raise forms.ValidationError("Actual payment amount cannot be negative.")
+        return amount
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if self._account is not None:
+            instance.account = self._account
+        if self._month is not None:
+            instance.month = self._month
+        if commit:
+            instance.save()
+        return instance
 
 
 class CategoryForm(forms.ModelForm):

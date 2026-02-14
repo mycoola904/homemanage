@@ -1,0 +1,48 @@
+<tr id="bill-pay-row-{{ row.account_id }}" data-account-id="{{ row.account_id }}">
+    <td class="font-semibold">{{ row.name }}</td>
+    <td>{{ row.institution|default:"—" }}</td>
+    <td>{{ row.payment_due_day_display }}</td>
+    <td>{{ row.minimum_amount_due_display }}</td>
+    <td>
+        {% if row.online_access_url %}
+            <a href="{{ row.online_access_url }}" class="link link-primary" target="_blank" rel="noopener noreferrer">Open</a>
+        {% else %}
+            —
+        {% endif %}
+    </td>
+    <td>
+        <div class="space-y-1">
+            {{ form.actual_payment_amount }}
+            {% for error in form.actual_payment_amount.errors %}
+                <p class="text-xs text-error">{{ error }}</p>
+            {% endfor %}
+        </div>
+    </td>
+    <td>
+        <label class="inline-flex items-center gap-2">
+            {{ form.paid }}
+            <span class="text-sm">Paid</span>
+        </label>
+        {% for error in form.paid.errors %}
+            <p class="text-xs text-error">{{ error }}</p>
+        {% endfor %}
+    </td>
+    <td class="text-right">
+        <form method="post"
+              action="{{ post_hx_url }}"
+              hx-post="{{ post_hx_url }}"
+              hx-target="#bill-pay-row-{{ row.account_id }}"
+              hx-swap="outerHTML"
+              class="inline-flex items-center gap-2">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-xs btn-primary" hx-disabled-elt="this">Save</button>
+        </form>
+        {% if form.non_field_errors %}
+            <div class="mt-2 space-y-1 text-left">
+                {% for error in form.non_field_errors %}
+                    <p class="text-xs text-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </td>
+</tr>

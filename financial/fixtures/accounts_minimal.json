@@ -1,18 +1,37 @@
 [
   {
+    "model": "households.household",
+    "pk": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+    "fields": {
+      "name": "Fixture Household",
+      "slug": "fixture-household",
+      "is_archived": false,
+      "timezone": "",
+      "currency_code": "USD",
+      "created_by": 1,
+      "created_at": "2026-02-01T12:00:00Z",
+      "updated_at": "2026-02-01T12:00:00Z"
+    }
+  },
+  {
     "model": "financial.account",
     "pk": "11111111-1111-1111-1111-111111111111",
     "fields": {
       "user": 1,
+      "household": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
       "name": "Household Checking",
       "institution": "Civic Bank",
       "account_type": "checking",
-      "number_last4": "1234",
+      "account_number": "1234",
+      "routing_number": "",
+      "interest_rate": null,
       "status": "active",
       "current_balance": "2450.75",
       "credit_limit_or_principal": null,
       "statement_close_date": null,
       "payment_due_day": null,
+      "minimum_amount_due": null,
+      "online_access_url": "",
       "notes": "Primary operating account",
       "created_at": "2026-02-01T12:00:00Z",
       "updated_at": "2026-02-01T12:00:00Z"
@@ -23,15 +42,20 @@
     "pk": "22222222-2222-2222-2222-222222222222",
     "fields": {
       "user": 1,
+      "household": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
       "name": "Everyday Credit",
       "institution": "CloudCard",
       "account_type": "credit_card",
-      "number_last4": "9876",
+      "account_number": "9876",
+      "routing_number": "",
+      "interest_rate": "21.490",
       "status": "active",
       "current_balance": "-815.34",
       "credit_limit_or_principal": "5000.00",
       "statement_close_date": "2026-02-15",
       "payment_due_day": 5,
+      "minimum_amount_due": "45.00",
+      "online_access_url": "https://cloudcard.example/login",
       "notes": "Used for groceries",
       "created_at": "2026-02-02T12:00:00Z",
       "updated_at": "2026-02-02T12:00:00Z"
@@ -42,18 +66,83 @@
     "pk": "33333333-3333-3333-3333-333333333333",
     "fields": {
       "user": 1,
+      "household": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
       "name": "Hybrid Auto Loan",
       "institution": "Metro Finance",
       "account_type": "loan",
-      "number_last4": "4567",
+      "account_number": "4567",
+      "routing_number": "",
+      "interest_rate": "6.250",
       "status": "active",
       "current_balance": "14500.00",
       "credit_limit_or_principal": "22000.00",
       "statement_close_date": null,
       "payment_due_day": 18,
+      "minimum_amount_due": "310.00",
+      "online_access_url": "",
       "notes": "2019 crossover",
       "created_at": "2026-02-03T12:00:00Z",
       "updated_at": "2026-02-03T12:00:00Z"
+    }
+  },
+  {
+    "model": "financial.account",
+    "pk": "44444444-4444-4444-4444-444444444444",
+    "fields": {
+      "user": 1,
+      "household": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "name": "Medical Payment Plan",
+      "institution": "CareCredit",
+      "account_type": "other",
+      "account_number": "7766",
+      "routing_number": "",
+      "interest_rate": "0.000",
+      "status": "active",
+      "current_balance": "1800.00",
+      "credit_limit_or_principal": "1800.00",
+      "statement_close_date": null,
+      "payment_due_day": 23,
+      "minimum_amount_due": "75.00",
+      "online_access_url": "https://carecredit.example/pay",
+      "notes": "No-interest promotional period",
+      "created_at": "2026-02-04T12:00:00Z",
+      "updated_at": "2026-02-04T12:00:00Z"
+    }
+  },
+  {
+    "model": "financial.monthlybillpayment",
+    "pk": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
+    "fields": {
+      "account": "22222222-2222-2222-2222-222222222222",
+      "month": "2026-02-01",
+      "actual_payment_amount": "52.00",
+      "paid": true,
+      "created_at": "2026-02-05T08:00:00Z",
+      "updated_at": "2026-02-05T08:00:00Z"
+    }
+  },
+  {
+    "model": "financial.monthlybillpayment",
+    "pk": "cccccccc-cccc-cccc-cccc-cccccccccccc",
+    "fields": {
+      "account": "33333333-3333-3333-3333-333333333333",
+      "month": "2026-02-01",
+      "actual_payment_amount": "0.00",
+      "paid": false,
+      "created_at": "2026-02-05T08:05:00Z",
+      "updated_at": "2026-02-05T08:05:00Z"
+    }
+  },
+  {
+    "model": "financial.monthlybillpayment",
+    "pk": "dddddddd-dddd-dddd-dddd-dddddddddddd",
+    "fields": {
+      "account": "44444444-4444-4444-4444-444444444444",
+      "month": "2026-01-01",
+      "actual_payment_amount": "80.00",
+      "paid": true,
+      "created_at": "2026-01-24T08:05:00Z",
+      "updated_at": "2026-01-24T08:05:00Z"
     }
   }
 ]
