@@ -31,7 +31,8 @@
 - [ ] T005 [P] Create deterministic migration for monthly bill pay schema in financial/migrations/0004_monthly_bill_payment.py
 - [ ] T006 [P] Add Bill Pay row/month forms and validation rules in financial/forms.py
 - [ ] T007 [P] Implement liability query, ordering, month parsing, and upsert helpers in financial/services/bill_pay.py
-- [ ] T008 Add Bill Pay routes (`/accounts/bill-pay/`, `/table-body/`, `/{accountId}/row/`) in financial/urls.py
+- [ ] T008 [P] Add deterministic fixture data for liability accounts + monthly bill payments in financial/fixtures/accounts_minimal.json
+- [ ] T009 Add Bill Pay routes (`/accounts/bill-pay/`, `/table-body/`, `/{accountId}/row/`) in financial/urls.py
 
 **Checkpoint**: Foundation complete; user stories can proceed.
 
@@ -43,14 +44,21 @@
 
 **Independent Test**: Navigate to Bill Pay and confirm liability-only rows, due-day ordering, and month selector defaulting to current month.
 
+### Tests for User Story 1 (write first; must fail before implementation)
+
+- [ ] T010 [P] [US1] Add index + sidebar navigation tests in financial/tests/test_bill_pay_index.py (FR-001, FR-002)
+- [ ] T011 [P] [US1] Add liability filtering + deterministic due-day ordering tests in financial/tests/test_bill_pay_index.py (FR-003, FR-005, SC-004)
+- [ ] T012 [P] [US1] Add month-selector default + historical month-view tests in financial/tests/test_bill_pay_months.py (FR-015)
+- [ ] T013 [US1] Add household scoping tests for Bill Pay page and month-body endpoint in financial/tests/test_bill_pay_months.py (FR-012)
+
 ### Implementation for User Story 1
 
-- [ ] T009 [US1] Implement Bill Pay index view with selected-month context in financial/views.py
-- [ ] T010 [P] [US1] Create Bill Pay page shell with month selector and stable table container in financial/templates/financial/bill_pay/index.html
-- [ ] T011 [P] [US1] Create month-swapped table body fragment in financial/templates/financial/bill_pay/_table_body.html
-- [ ] T012 [P] [US1] Create read-only Bill Pay row fragment with required display columns in financial/templates/financial/bill_pay/_row.html
-- [ ] T013 [US1] Implement table-body fragment endpoint for month switch HTMX swaps in financial/views.py
-- [ ] T014 [US1] Add Bill Pay navigation entry in sidebar menu in templates/components/layout/sidebar.html
+- [ ] T014 [US1] Implement Bill Pay index view with selected-month context in financial/views.py
+- [ ] T015 [P] [US1] Create Bill Pay page shell with month selector and stable table container in financial/templates/financial/bill_pay/index.html
+- [ ] T016 [P] [US1] Create month-swapped table body fragment in financial/templates/financial/bill_pay/_table_body.html
+- [ ] T017 [P] [US1] Create read-only Bill Pay row fragment with required display columns in financial/templates/financial/bill_pay/_row.html
+- [ ] T018 [US1] Implement table-body fragment endpoint for month switch HTMX swaps in financial/views.py
+- [ ] T019 [US1] Add Bill Pay navigation entry in sidebar menu in templates/components/layout/sidebar.html
 
 **Checkpoint**: US1 is fully functional and independently testable.
 
@@ -62,14 +70,20 @@
 
 **Independent Test**: Edit and save a row, reload same month, and confirm persisted values; invalid negative amount returns inline row errors.
 
+### Tests for User Story 2 (write first; must fail before implementation)
+
+- [ ] T020 [P] [US2] Add row-save create/update persistence tests in financial/tests/test_bill_pay_save.py (FR-008, FR-009, FR-010)
+- [ ] T021 [P] [US2] Add row validation tests for `422`, negative amount rejection, and paid/amount independence in financial/tests/test_bill_pay_validation.py (FR-011, FR-016)
+- [ ] T022 [US2] Add regression tests requiring update endpoints to bind ModelForm with `instance=` on GET and POST in financial/tests/test_bill_pay_save.py (Constitution Principle II)
+
 ### Implementation for User Story 2
 
-- [ ] T015 [US2] Implement row-edit fragment GET endpoint for selected account-month in financial/views.py
-- [ ] T016 [P] [US2] Create editable row fragment with explicit Save control in financial/templates/financial/bill_pay/_row_edit.html
-- [ ] T017 [US2] Implement row-save POST endpoint with create/update semantics in financial/views.py
-- [ ] T018 [US2] Apply row validation behavior (`422` on invalid, paid independent from amount, negative blocked) in financial/forms.py
-- [ ] T019 [US2] Wire HTMX row targets/swaps to replace only the edited row in financial/templates/financial/bill_pay/_row.html
-- [ ] T020 [US2] Persist account-month updates with deterministic upsert path in financial/services/bill_pay.py
+- [ ] T023 [US2] Implement row-edit fragment GET endpoint for selected account-month using `ModelForm(instance=...)` in financial/views.py
+- [ ] T024 [P] [US2] Create editable row fragment with explicit Save control in financial/templates/financial/bill_pay/_row_edit.html
+- [ ] T025 [US2] Implement row-save POST endpoint using `ModelForm(instance=...)` with create/update semantics in financial/views.py
+- [ ] T026 [US2] Apply row validation behavior (`422` on invalid, paid independent from amount, negative blocked) in financial/forms.py
+- [ ] T027 [US2] Wire HTMX row targets/swaps to replace only the edited row in financial/templates/financial/bill_pay/_row.html
+- [ ] T028 [US2] Persist account-month updates with deterministic upsert path in financial/services/bill_pay.py
 
 **Checkpoint**: US2 is fully functional and independently testable.
 
@@ -81,11 +95,17 @@
 
 **Independent Test**: Open Bill Pay for a month and verify URL rendering for rows with and without online access links.
 
+### Tests for User Story 3 (write first; must fail before implementation)
+
+- [ ] T029 [P] [US3] Add URL-present and URL-empty rendering tests in financial/tests/test_bill_pay_index.py (FR-004)
+- [ ] T030 [P] [US3] Add missing/unowned row endpoint `404` behavior tests in financial/tests/test_bill_pay_months.py (contract + plan alignment)
+
 ### Implementation for User Story 3
 
-- [ ] T021 [US3] Render online access URL cell with clickable link behavior in financial/templates/financial/bill_pay/_row.html
-- [ ] T022 [US3] Add URL empty-state rendering and label copy for missing links in financial/templates/financial/bill_pay/_row.html
-- [ ] T023 [US3] Ensure URL values are prepared consistently for table and row responses in financial/services/bill_pay.py
+- [ ] T031 [US3] Render online access URL cell with clickable link behavior in financial/templates/financial/bill_pay/_row.html
+- [ ] T032 [US3] Add URL empty-state rendering and label copy for missing links in financial/templates/financial/bill_pay/_row.html
+- [ ] T033 [US3] Ensure URL values are prepared consistently for table and row responses in financial/services/bill_pay.py
+- [ ] T034 [US3] Enforce canonical missing/unowned row response status `404` in financial/views.py
 
 **Checkpoint**: US3 is fully functional and independently testable.
 
@@ -95,11 +115,14 @@
 
 **Purpose**: Final alignment, evidence capture, and readiness checks across stories.
 
-- [ ] T024 [P] Reconcile endpoint docs with final route/response behavior in specs/001-bill-pay/contracts/bill-pay.yaml
-- [ ] T025 Validate quickstart scenario execution and record outcomes in docs/ai/004-bill-pay-log.md
-- [ ] T026 Record migration determinism evidence (`migrate --check` and rollback notes) in docs/ai/004-bill-pay-log.md
-- [ ] T027 Update manual test steps if implementation details changed in specs/001-bill-pay/quickstart.md
-- [ ] T028 Record final AI prompt/response references for PR traceability in docs/ai/004-bill-pay-log.md
+- [ ] T035 [P] Reconcile endpoint docs with final route/response behavior in specs/001-bill-pay/contracts/bill-pay.yaml
+- [ ] T036 Record fixture load determinism evidence and fixture idempotency notes in docs/ai/004-bill-pay-log.md
+- [ ] T037 Record migration determinism evidence (`migrate --check` and rollback notes) in docs/ai/004-bill-pay-log.md
+- [ ] T038 Record full failing-then-passing test evidence per story in docs/ai/004-bill-pay-log.md
+- [ ] T039 Validate quickstart scenario execution and record outcomes in docs/ai/004-bill-pay-log.md
+- [ ] T040 Record timed evidence for SC-001 and SC-002 in docs/ai/004-bill-pay-log.md
+- [ ] T041 Update manual test steps if implementation details changed in specs/001-bill-pay/quickstart.md
+- [ ] T042 Record final AI prompt/response references for PR traceability in docs/ai/004-bill-pay-log.md
 
 ---
 
@@ -137,32 +160,32 @@ graph TD
 ## Parallel Opportunities
 
 - Phase 2 parallel tasks: `T005`, `T006`, `T007` (different files).
-- US1 parallel tasks: `T010`, `T011`, `T012` (template files).
-- US2 parallel tasks: `T016` can run while endpoint scaffolding (`T015`, `T017`) is in progress.
-- Polish parallel tasks: `T024` and `T025` can run together.
+- US1 parallel tasks: `T011`, `T012` (tests) and `T015`, `T016`, `T017` (template files).
+- US2 parallel tasks: `T020`, `T021` (tests) and `T024` while endpoint scaffolding (`T023`, `T025`) is in progress.
+- Polish parallel tasks: `T035` and `T039` can run together.
 
 ---
 
 ## Parallel Example: User Story 1
 
 ```bash
-Task: T010 [US1] Create Bill Pay page shell in financial/templates/financial/bill_pay/index.html
-Task: T011 [US1] Create table body fragment in financial/templates/financial/bill_pay/_table_body.html
-Task: T012 [US1] Create read-only row fragment in financial/templates/financial/bill_pay/_row.html
+Task: T015 [US1] Create Bill Pay page shell in financial/templates/financial/bill_pay/index.html
+Task: T016 [US1] Create table body fragment in financial/templates/financial/bill_pay/_table_body.html
+Task: T017 [US1] Create read-only row fragment in financial/templates/financial/bill_pay/_row.html
 ```
 
 ## Parallel Example: User Story 2
 
 ```bash
-Task: T016 [US2] Create editable row fragment in financial/templates/financial/bill_pay/_row_edit.html
-Task: T017 [US2] Implement row-save POST in financial/views.py
+Task: T024 [US2] Create editable row fragment in financial/templates/financial/bill_pay/_row_edit.html
+Task: T025 [US2] Implement row-save POST in financial/views.py
 ```
 
 ## Parallel Example: User Story 3
 
 ```bash
-Task: T021 [US3] Implement URL link rendering in financial/templates/financial/bill_pay/_row.html
-Task: T023 [US3] Normalize URL context in financial/services/bill_pay.py
+Task: T031 [US3] Implement URL link rendering in financial/templates/financial/bill_pay/_row.html
+Task: T033 [US3] Normalize URL context in financial/services/bill_pay.py
 ```
 
 ---
@@ -172,7 +195,7 @@ Task: T023 [US3] Normalize URL context in financial/services/bill_pay.py
 ### MVP First (User Story 1 Only)
 
 1. Complete Phase 1 and Phase 2.
-2. Complete US1 tasks (`T009`-`T014`).
+2. Complete US1 tasks (`T010`-`T019`).
 3. Validate US1 independent test criteria.
 4. Demo/deploy MVP slice.
 
@@ -186,6 +209,6 @@ Task: T023 [US3] Normalize URL context in financial/services/bill_pay.py
 ### Parallel Team Strategy
 
 1. One developer handles persistence and forms (`T004`-`T007`).
-2. One developer handles US1 templates/view shell (`T009`-`T014`).
-3. One developer handles US2 row edit/save path (`T015`-`T020`).
+2. One developer handles US1 templates/view shell (`T014`-`T019`).
+3. One developer handles US2 row edit/save path (`T023`-`T028`).
 4. US3 and polish work proceed after US1 foundations stabilize.

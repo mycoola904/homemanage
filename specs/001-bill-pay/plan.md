@@ -52,7 +52,7 @@ Implement a Bill Pay view in the `financial` app that lists liability accounts f
     - Month switch target: `#bill-pay-table-body` with `hx-swap="innerHTML"`.
 - [x] **HTMX Failure Handling** (Principle IV)
   - Validation errors return row form fragment with status `422`.
-  - Missing/unowned account-month updates return safe HTML fragment with no data leakage (`404` for direct access, or guarded fragment response per existing app conventions).
+  - Missing/unowned account-month updates return a safe HTML response with status `404` and no data leakage.
   - Trigger preservation: row Save trigger remains inside the replaced row fragment; table-level month controls live outside row swap targets.
 - [x] **AI Accountability** (Principle V)
   - Clarification decisions tracked in `specs/001-bill-pay/spec.md`.

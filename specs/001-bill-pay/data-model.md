@@ -19,7 +19,7 @@ Relevant existing fields used by Bill Pay presentation:
 - `minimum_amount_due`
 - `online_access_url`
 
-### MonthlyBillPayment (new)
+### Monthly Bill Payment (`MonthlyBillPayment`) (new)
 
 Represents one bill-pay entry for one account in one calendar month.
 
@@ -50,7 +50,7 @@ Represents one bill-pay entry for one account in one calendar month.
 For selected month `$M`:
 
 1. Fetch liability accounts for the active household.
-2. Left-join/lookup `MonthlyBillPayment` for each account with `month=$M`.
+2. Left-join/lookup Monthly Bill Payment records for each account with `month=$M`.
 3. Sort rows deterministically:
    - non-null `payment_due_day` first, ascending
    - null `payment_due_day` last
