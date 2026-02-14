@@ -73,6 +73,7 @@ class AccountForm(forms.ModelForm):
             "statement_close_date",
             "payment_due_day",
             "minimum_amount_due",
+            "online_access_url",
             "notes",
         ]
         widgets = {

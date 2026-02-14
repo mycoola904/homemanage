@@ -33,6 +33,7 @@ class AccountSummaryRow:
     institution: str
     account_type_value: str
     account_type_label: str
+    online_access_url: str
     status_value: str
     status_label: str
     status_badge_class: str
@@ -44,12 +45,15 @@ class AccountSummaryRow:
 
     @classmethod
     def from_account(cls, account: Account) -> "AccountSummaryRow":
+        account_type_label_check = "CC" if account.account_type == "credit_card" else account.get_account_type_display()
+        
         return cls(
             id=str(account.id),
             name=account.name,
             institution=account.institution,
             account_type_value=account.account_type,
-            account_type_label=account.get_account_type_display(),
+            account_type_label=account_type_label_check,
+            online_access_url=account.online_access_url or "",
             status_value=account.status,
             status_label=account.get_status_display(),
             status_badge_class=STATUS_BADGE_CLASSES.get(account.status, "badge"),

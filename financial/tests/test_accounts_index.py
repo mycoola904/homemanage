@@ -52,6 +52,7 @@ class AccountsIndexViewTests(TestCase):
             account_type=AccountType.CHECKING,
             status=AccountStatus.ACTIVE,
             current_balance=255.30,
+            online_access_url="https://metro.example/login",
         )
         Account.objects.create(
             user=self.user,
@@ -78,6 +79,8 @@ class AccountsIndexViewTests(TestCase):
         self.assertContains(response, "Open")
         self.assertContains(response, "Edit")
         self.assertContains(response, "Delete")
+        self.assertContains(response, "Online Access")
+        self.assertContains(response, 'href="https://metro.example/login"')
 
     def test_empty_state_includes_cta(self):
         self.client.force_login(self.user)

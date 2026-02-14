@@ -17,6 +17,15 @@ Context:
         <span class="badge badge-outline">{{ row.account_type_label }}</span>
     </td>
     <td>
+        {% if row.online_access_url %}
+            <a href="{{ row.online_access_url }}" class="link link-primary" target="_blank" rel="noopener noreferrer">
+                Open
+            </a>
+        {% else %}
+            —
+        {% endif %}
+    </td>
+    <td>
         <span class="{{ row.status_badge_class }}">{{ row.status_label }}</span>
     </td>
     <td class="text-right font-mono">
