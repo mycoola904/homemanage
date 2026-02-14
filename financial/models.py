@@ -302,6 +302,13 @@ class MonthlyBillPayment(models.Model):
 		related_name="monthly_bill_payments",
 		on_delete=models.CASCADE,
 	)
+	funding_account = models.ForeignKey(
+		Account,
+		related_name="funded_monthly_bill_payments",
+		on_delete=models.PROTECT,
+		null=True,
+		blank=True,
+	)
 	month = models.DateField()
 	actual_payment_amount = models.DecimalField(
 		max_digits=12,
@@ -340,6 +347,9 @@ class MonthlyBillPayment(models.Model):
 		self.month = self.normalize_month(self.month)
 		if self.actual_payment_amount is not None and self.actual_payment_amount < Decimal("0"):
 			raise ValidationError({"actual_payment_amount": "Actual payment amount cannot be negative."})
+		if self.funding_account_id is not None and self.account_id is not None:
+			if self.funding_account.household_id != self.account.household_id:
+				raise ValidationError({"funding_account": "Funding account must be in the same household."})
 
 	def save(self, *args, **kwargs):
 		self.month = self.normalize_month(self.month)

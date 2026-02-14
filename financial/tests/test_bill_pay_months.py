@@ -43,8 +43,18 @@ class BillPayMonthTests(TestCase):
             payment_due_day=8,
             minimum_amount_due=120,
         )
+        self.funding_account = Account.objects.create(
+            user=self.user,
+            household=self.household,
+            name="Household Checking",
+            institution="Civic",
+            account_type=AccountType.CHECKING,
+            status=AccountStatus.ACTIVE,
+            current_balance=900,
+        )
         MonthlyBillPayment.objects.create(
             account=self.account,
+            funding_account=self.funding_account,
             month="2026-01-01",
             actual_payment_amount="140.00",
             paid=True,
@@ -89,8 +99,8 @@ class BillPayMonthTests(TestCase):
     def test_row_post_missing_or_unowned_returns_404(self):
         self.client.force_login(self.other)
         response = self.client.post(
-            self.row_url,
-            {"actual_payment_amount": "20.00", "paid": "on"},
+            self.row_url + "?month=2026-02",
+            {"funding_account": str(self.funding_account.id), "actual_payment_amount": "20.00", "paid": "on"},
             HTTP_HX_REQUEST="true",
         )
         self.assertEqual(response.status_code, 404)

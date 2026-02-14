@@ -8,7 +8,7 @@ from django.db.models import Case, IntegerField, QuerySet, When
 from django.db.models.functions import Lower
 from django.urls import reverse
 
-from financial.models import Account, AccountType, MonthlyBillPayment
+from financial.models import Account, AccountStatus, AccountType, MonthlyBillPayment
 from financial.services.formatters import format_usd
 
 LIABILITY_TYPES = [AccountType.CREDIT_CARD, AccountType.LOAN, AccountType.OTHER]
@@ -25,6 +25,8 @@ class BillPayRow:
     online_access_url: str
     actual_payment_amount_display: str
     actual_payment_amount_value: str
+    funding_account_id: str
+    funding_account_display: str
     paid: bool
     paid_label: str
     edit_url: str
@@ -67,6 +69,10 @@ def liability_accounts_for_household(household) -> QuerySet[Account]:
     ).order_by("_due_day_null_order", "payment_due_day", Lower("name"), "id")
 
 
+def active_funding_accounts_for_household(household) -> QuerySet[Account]:
+    return Account.objects.for_household(household).filter(status=AccountStatus.ACTIVE).order_by(Lower("name"), "id")
+
+
 def monthly_payments_by_account(accounts: QuerySet[Account], month: date) -> dict[str, MonthlyBillPayment]:
     account_ids = [account.id for account in accounts]
     if not account_ids:
@@ -84,6 +90,7 @@ def build_bill_pay_rows(accounts: QuerySet[Account], month: date) -> list[BillPa
     for account in accounts:
         payment = payments_map.get(str(account.id))
         amount = payment.actual_payment_amount if payment else None
+        funding_account = payment.funding_account if payment else None
         paid = bool(payment.paid) if payment else False
 
         rows.append(
@@ -97,6 +104,8 @@ def build_bill_pay_rows(accounts: QuerySet[Account], month: date) -> list[BillPa
                 online_access_url=account.online_access_url or "",
                 actual_payment_amount_display=format_usd(amount) if amount is not None else "—",
                 actual_payment_amount_value=f"{amount:.2f}" if amount is not None else "",
+                funding_account_id=str(funding_account.id) if funding_account is not None else "",
+                funding_account_display=funding_account.name if funding_account is not None else "—",
                 paid=paid,
                 paid_label="Paid" if paid else "Not paid",
                 edit_url=f"{reverse('financial:bill-pay-row', args=[account.id])}?month={month_param}",
@@ -121,18 +130,31 @@ def get_or_initialize_monthly_payment(*, account: Account, month: date) -> Month
     return MonthlyBillPayment(account=account, month=normalized_month)
 
 
-def upsert_monthly_payment(*, account: Account, month: date, actual_payment_amount: Decimal | None, paid: bool) -> MonthlyBillPayment:
+def upsert_monthly_payment(
+    *,
+    account: Account,
+    month: date,
+    funding_account: Account | None,
+    actual_payment_amount: Decimal | None,
+    paid: bool,
+) -> MonthlyBillPayment:
     normalized_month = normalize_month(month)
     payment, _created = MonthlyBillPayment.objects.get_or_create(
         account=account,
         month=normalized_month,
         defaults={
+            "funding_account": funding_account,
             "actual_payment_amount": actual_payment_amount,
             "paid": paid,
         },
     )
-    if payment.actual_payment_amount != actual_payment_amount or payment.paid != paid:
+    if (
+        payment.funding_account_id != (funding_account.id if funding_account is not None else None)
+        or payment.actual_payment_amount != actual_payment_amount
+        or payment.paid != paid
+    ):
+        payment.funding_account = funding_account
         payment.actual_payment_amount = actual_payment_amount
         payment.paid = paid
-        payment.save(update_fields=["actual_payment_amount", "paid", "updated_at"])
+        payment.save(update_fields=["funding_account", "actual_payment_amount", "paid", "updated_at"])
     return payment

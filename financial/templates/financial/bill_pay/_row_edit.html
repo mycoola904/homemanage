@@ -12,6 +12,17 @@
     </td>
     <td>
         <div class="space-y-1">
+            {{ form.funding_account }}
+            {% if no_funding_options %}
+                <p class="text-xs text-error">No active funding accounts are available.</p>
+            {% endif %}
+            {% for error in form.funding_account.errors %}
+                <p class="text-xs text-error">{{ error }}</p>
+            {% endfor %}
+        </div>
+    </td>
+    <td>
+        <div class="space-y-1">
             {{ form.actual_payment_amount }}
             {% for error in form.actual_payment_amount.errors %}
                 <p class="text-xs text-error">{{ error }}</p>

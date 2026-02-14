@@ -110,10 +110,35 @@
     }
   },
   {
+    "model": "financial.account",
+    "pk": "55555555-5555-5555-5555-555555555555",
+    "fields": {
+      "user": 1,
+      "household": "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa",
+      "name": "Closed Legacy Checking",
+      "institution": "Civic Bank",
+      "account_type": "checking",
+      "account_number": "9988",
+      "routing_number": "123456789",
+      "interest_rate": null,
+      "status": "closed",
+      "current_balance": "0.00",
+      "credit_limit_or_principal": null,
+      "statement_close_date": null,
+      "payment_due_day": null,
+      "minimum_amount_due": null,
+      "online_access_url": "",
+      "notes": "Closed account retained for historical references",
+      "created_at": "2026-01-10T12:00:00Z",
+      "updated_at": "2026-01-20T12:00:00Z"
+    }
+  },
+  {
     "model": "financial.monthlybillpayment",
     "pk": "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb",
     "fields": {
       "account": "22222222-2222-2222-2222-222222222222",
+      "funding_account": "11111111-1111-1111-1111-111111111111",
       "month": "2026-02-01",
       "actual_payment_amount": "52.00",
       "paid": true,
@@ -126,6 +151,7 @@
     "pk": "cccccccc-cccc-cccc-cccc-cccccccccccc",
     "fields": {
       "account": "33333333-3333-3333-3333-333333333333",
+      "funding_account": "55555555-5555-5555-5555-555555555555",
       "month": "2026-02-01",
       "actual_payment_amount": "0.00",
       "paid": false,
@@ -138,6 +164,7 @@
     "pk": "dddddddd-dddd-dddd-dddd-dddddddddddd",
     "fields": {
       "account": "44444444-4444-4444-4444-444444444444",
+      "funding_account": "11111111-1111-1111-1111-111111111111",
       "month": "2026-01-01",
       "actual_payment_amount": "80.00",
       "paid": true,
