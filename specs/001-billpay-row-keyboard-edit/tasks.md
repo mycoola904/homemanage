@@ -59,7 +59,7 @@
 ### Tests for User Story 2
 
 - [ ] T014 [P] [US2] Add keyboard tab-order and cycle tests for edit-row controls in financial/tests/test_bill_pay_row_keyboard.py (Spec US2 Scenario 1-2, FR-003, FR-004)
-- [ ] T015 [P] [US2] Add Enter-save and Esc-cancel keyboard behavior tests in financial/tests/test_bill_pay_row_keyboard.py (Spec US2 Scenario 3-4, FR-005, FR-006)
+- [ ] T015 [P] [US2] Add Enter-save and Esc-cancel keyboard behavior tests in financial/tests/test_bill_pay_row_keyboard_shortcuts.py (Spec US2 Scenario 3-4, FR-005, FR-006)
 
 ### Implementation for User Story 2
 
@@ -99,8 +99,10 @@
 **Purpose**: Finalize documentation, regression confidence, and readiness checks across stories.
 
 - [ ] T026 [P] Update quick verification steps and expected outcomes in specs/001-billpay-row-keyboard-edit/quickstart.md
-- [ ] T027 Run focused regression suite for BillPay row behavior in financial/tests/test_bill_pay_index.py, financial/tests/test_bill_pay_save.py, financial/tests/test_bill_pay_validation.py, financial/tests/test_bill_pay_row_focus_entry.py, financial/tests/test_bill_pay_row_keyboard.py
+- [ ] T027 Run focused regression suite for BillPay row behavior in financial/tests/test_bill_pay_index.py, financial/tests/test_bill_pay_save.py, financial/tests/test_bill_pay_validation.py, financial/tests/test_bill_pay_row_focus_entry.py, financial/tests/test_bill_pay_row_keyboard.py, financial/tests/test_bill_pay_row_keyboard_shortcuts.py
 - [ ] T028 [P] Record implementation evidence and AI attribution links for PR in specs/001-billpay-row-keyboard-edit/research.md (Principle V)
+- [ ] T029 Define SC-004 usability protocol (participant criteria, scripted task, pass/fail capture) in specs/001-billpay-row-keyboard-edit/quickstart.md
+- [ ] T030 Execute SC-004 keyboard-only usability check and record completion metric evidence in specs/001-billpay-row-keyboard-edit/research.md
 
 ---
 
@@ -134,6 +136,7 @@
 - **US1**: T008 and T009 can run in parallel; T012 and T013 can run in parallel after T011.
 - **US2**: T014 and T015 can run in parallel; T017 and T019 can run in parallel after T016.
 - **US3**: T021 and T022 can run in parallel; T024 and T025 can run in parallel after T023.
+- **Polish**: T028 and T029 can run in parallel; T030 depends on T029.
 
 ---
 
@@ -167,7 +170,7 @@
 1. Deliver US1 (click-to-edit focus) as first shippable increment.
 2. Add US2 (keyboard tab/Enter/Esc) and validate keyboard-only flow.
 3. Add US3 parity hardening and regression coverage.
-4. Execute Phase 6 polish and regression suite.
+4. Execute Phase 6 polish, including SC-004 usability protocol and evidence capture.
 
 ### Suggested MVP Scope
 

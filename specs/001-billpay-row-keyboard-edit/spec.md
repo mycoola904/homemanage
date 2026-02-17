@@ -68,11 +68,11 @@ As a BillPay user, I want keyboard-triggered save/cancel to behave the same as b
 
 - **FR-001**: System MUST allow entry into edit mode by clicking any editable BillPay row field.
 - **FR-002**: System MUST place focus on the specific field that triggered row edit mode.
-- **FR-003**: System MUST support keyboard tab navigation within an editing row in this exact order: Funding Account, Actual Payment, Paid, Save button, Cancel button.
+- **FR-003**: System MUST support keyboard tab navigation within an editing row in this exact order: Funding Account control, Actual Payment input, Paid checkbox, Save button, Cancel button.
 - **FR-004**: System MUST cycle Tab focus within the active editing row so keyboard users can continue editing without leaving the row unintentionally.
 - **FR-005**: System MUST treat Enter as Save for the active editing row.
 - **FR-006**: System MUST treat Esc as Cancel for the active editing row.
-- **FR-007**: System MUST ensure Enter-based save and Esc-based cancel produce the same data and UI outcomes as clicking Save or Cancel.
+- **FR-007**: System MUST ensure keyboard-triggered actions (Enter save, Esc cancel) use the same underlying save/cancel outcomes as button-triggered actions, including persisted data and returned row state.
 - **FR-008**: System MUST keep row-level editing scoped to one active row at a time.
 - **FR-009**: System MUST preserve existing validation behavior during keyboard-triggered save attempts.
 - **FR-010**: System MUST return the row to non-edit mode after successful save or cancel.
@@ -80,7 +80,8 @@ As a BillPay user, I want keyboard-triggered save/cancel to behave the same as b
 ### Key Entities *(include if feature involves data)*
 
 - **BillPay Row**: A single account-month payment row with read and edit states and row-scoped actions.
-- **Editable Field**: Row controls for Funding Account, Actual Payment, and Paid that can receive focus and be changed in edit mode.
+- **Editable Inputs**: Row inputs that can be changed in edit mode: Actual Payment and Paid.
+- **Funding Account Control**: A focusable row control used for edit-entry and keyboard order; it does not introduce a new persisted field in this feature.
 - **Row Action Controls**: Save and Cancel controls tied to a specific row edit session.
 
 ### Server-Driven UI & Template Safety *(mandatory for UI work)*
@@ -103,7 +104,7 @@ As a BillPay user, I want keyboard-triggered save/cancel to behave the same as b
 - **SC-001**: In acceptance testing, 100% of editable-field clicks enter edit mode on the same row and focus the clicked field.
 - **SC-002**: In acceptance testing, Tab navigation follows the required control order for 100% of tested rows.
 - **SC-003**: In acceptance testing, Enter saves and Esc cancels with outcome parity to button clicks in 100% of tested scenarios.
-- **SC-004**: During keyboard-only usability checks, at least 90% of participants complete a row edit (enter edit mode, modify value, save or cancel) without using a mouse.
+- **SC-004**: In a scripted keyboard-only usability check with at least 10 participants on desktop browsers, at least 90% complete a row edit (enter edit mode, modify value, save or cancel) without using a mouse.
 
 ## Assumptions & Open Questions *(mandatory)*
 

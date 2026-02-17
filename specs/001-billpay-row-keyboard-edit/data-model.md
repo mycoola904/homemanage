@@ -33,6 +33,7 @@ No new persisted entities are introduced. This feature reuses existing BillPay p
 - Purpose: Canonical row display/edit metadata for templates.
 - Relevant attributes:
   - `account_id`
+  - funding account control metadata (focus/entry target only, non-persisted)
   - display values (`name`, `institution`, `payment_due_day_display`, `minimum_amount_due_display`, `actual_payment_amount_display`, `paid_label`)
   - links (`edit_url`, `save_url`)
 
@@ -46,12 +47,13 @@ No new persisted entities are introduced. This feature reuses existing BillPay p
 ## Validation Rules
 - Month query must parse (`YYYY-MM`) or endpoint returns row-missing/error response.
 - Liability account membership required for row operations.
+- Funding account control is focusable and participates in tab order but does not create/update a persisted field in this feature.
 - Save intent must continue existing form validation semantics.
 - Cancel intent must never mutate persisted values.
 
 ## State Transitions
 1. Display row → Edit row
-   - Trigger: click editable field or Edit action.
+  - Trigger: click Funding Account control, Actual Payment, Paid, or Edit action.
    - Result: same row target swapped to edit partial with requested focus field.
 2. Edit row → Display row (save)
    - Trigger: Enter or Save.
