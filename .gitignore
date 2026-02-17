@@ -20,6 +20,7 @@ env/
 # Django static/media (generated)
 staticfiles/
 media/
+mydocs/
 
 # =========================
 # Node / Tailwind
@@ -54,3 +55,4 @@ Thumbs.db
 # Misc
 # =========================
 *.log
+mydocs/prompt.md
