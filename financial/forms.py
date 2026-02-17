@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from django import forms
 
-from financial.models import Account, Category, MonthlyBillPayment, Transaction, TransactionType
+from financial.models import Account, AccountStatus, Category, MonthlyBillPayment, Transaction, TransactionType
 
 
 class AccountImportForm(forms.Form):
@@ -222,8 +222,9 @@ class TransactionForm(forms.ModelForm):
 class BillPayRowForm(forms.ModelForm):
     class Meta:
         model = MonthlyBillPayment
-        fields = ["actual_payment_amount", "paid"]
+        fields = ["funding_account", "actual_payment_amount", "paid"]
         widgets = {
+            "funding_account": forms.Select(attrs={"class": "select select-bordered select-sm w-56"}),
             "actual_payment_amount": forms.NumberInput(attrs={"step": "0.01", "min": "0", "class": "input input-bordered input-sm w-28"}),
             "paid": forms.CheckboxInput(attrs={"class": "checkbox checkbox-sm"}),
         }
@@ -236,6 +237,29 @@ class BillPayRowForm(forms.ModelForm):
             self.instance.account = account
         if self.instance is not None and self.instance.pk is None and month is not None:
             self.instance.month = month
+        funding_queryset = Account.objects.none()
+        if account is not None:
+            funding_queryset = Account.objects.filter(household=account.household, status=AccountStatus.ACTIVE).order_by("name", "id")
+            existing_funding = getattr(self.instance, "funding_account", None)
+            if existing_funding is not None and existing_funding.status != AccountStatus.ACTIVE:
+                funding_queryset = Account.objects.filter(pk=existing_funding.pk) | funding_queryset
+        self.fields["funding_account"].queryset = funding_queryset
+        self.fields["funding_account"].required = True
+        self.fields["funding_account"].empty_label = "Select funding account"
+        self.fields["funding_account"].error_messages["required"] = "Select a funding account."
+
+    def clean_funding_account(self):
+        funding_account = self.cleaned_data.get("funding_account")
+        if funding_account is None:
+            raise forms.ValidationError("Select a funding account.")
+        if self._account is None:
+            return funding_account
+        if funding_account.household_id != self._account.household_id:
+            raise forms.ValidationError("Selected funding account is outside the active household.")
+        current_funding = getattr(self.instance, "funding_account", None)
+        if funding_account.status != AccountStatus.ACTIVE and (current_funding is None or current_funding.pk != funding_account.pk):
+            raise forms.ValidationError("Only active accounts can be selected as funding accounts.")
+        return funding_account
 
     def clean_actual_payment_amount(self):
         amount = self.cleaned_data.get("actual_payment_amount")

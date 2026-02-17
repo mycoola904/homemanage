@@ -1,6 +1,6 @@
 {% if table_error %}
 <tr>
-    <td colspan="8" class="text-error">{{ table_error }}</td>
+    <td colspan="9" class="text-error">{{ table_error }}</td>
 </tr>
 {% elif has_rows %}
     {% for row in rows %}
@@ -8,6 +8,6 @@
     {% endfor %}
 {% else %}
 <tr>
-    <td colspan="8" class="text-center text-base-content/70 py-6">No liability accounts for this month.</td>
+    <td colspan="9" class="text-center text-base-content/70 py-6">No liability accounts for this month.</td>
 </tr>
 {% endif %}

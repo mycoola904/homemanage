@@ -219,6 +219,7 @@ def _render_bill_pay_row_edit(request, *, account: Account, month_param: str, fo
 	instance = get_or_initialize_monthly_payment(account=account, month=month)
 	form = BillPayRowForm(instance=instance, account=account, month=month)
 	form_id = f"bill-pay-form-{account.id}"
+	form.fields["funding_account"].widget.attrs["form"] = form_id
 	form.fields["actual_payment_amount"].widget.attrs["form"] = form_id
 	form.fields["paid"].widget.attrs["form"] = form_id
 	form.fields["actual_payment_amount"].widget.attrs["data-focus-field"] = BILL_PAY_FOCUS_ACTUAL_PAYMENT
@@ -233,7 +234,11 @@ def _render_bill_pay_row_edit(request, *, account: Account, month_param: str, fo
 			"form": form,
 			"post_hx_url": row.save_url,
 			"form_id": form_id,
+<<<<<<< HEAD
 			"focus_field": focus_field,
+=======
+			"no_funding_options": not form.fields["funding_account"].queryset.exists(),
+>>>>>>> 001-bill-pay-funding-account
 		},
 		status=status,
 	)
@@ -477,6 +482,7 @@ def bill_pay_row(request, account_id):
 	form = BillPayRowForm(request.POST, instance=instance, account=account, month=month)
 	row = build_bill_pay_row(account=account, month=month)
 	form_id = f"bill-pay-form-{account.id}"
+	form.fields["funding_account"].widget.attrs["form"] = form_id
 	form.fields["actual_payment_amount"].widget.attrs["form"] = form_id
 	form.fields["paid"].widget.attrs["form"] = form_id
 	form.fields["actual_payment_amount"].widget.attrs["data-focus-field"] = BILL_PAY_FOCUS_ACTUAL_PAYMENT
@@ -488,6 +494,7 @@ def bill_pay_row(request, account_id):
 		payment = upsert_monthly_payment(
 			account=account,
 			month=month,
+			funding_account=saved.funding_account,
 			actual_payment_amount=saved.actual_payment_amount,
 			paid=saved.paid,
 		)
@@ -502,7 +509,11 @@ def bill_pay_row(request, account_id):
 			"form": form,
 			"post_hx_url": row.save_url,
 			"form_id": form_id,
+<<<<<<< HEAD
 			"focus_field": _first_bill_pay_error_focus_field(form),
+=======
+			"no_funding_options": not form.fields["funding_account"].queryset.exists(),
+>>>>>>> 001-bill-pay-funding-account
 		},
 		status=422,
 	)
