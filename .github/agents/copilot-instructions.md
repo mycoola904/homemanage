@@ -19,6 +19,8 @@ Auto-generated from all feature plans. Last updated: 2026-02-09
 - SQLite (`db.sqlite3`) for local/tests; production DB unchanged and out of feature scope (001-bill-pay)
 - Python 3.11+, Django templates, HTMX-enhanced server-rendered HTML, minimal JavaScript for focus/keyboard handling + Django, HTMX, Tailwind CSS, DaisyUI (existing only; no new packages) (001-billpay-row-keyboard-edit)
 - SQLite (existing `MonthlyBillPayment` model; no schema change planned) (001-billpay-row-keyboard-edit)
+- Python 3.11+ (Django), JavaScript (existing static script), HTML templates, CSS via Tailwind/DaisyUI build + Django, HTMX, Tailwind CSS, DaisyUI (existing project dependencies only) (001-row-swap-animation)
+- SQLite (existing app/test default); no new persistence for this feature (001-row-swap-animation)
 
 - Python 3.11 + Django 5.0 (per starter settings) + Django ORM & templates, HTMX (already wired), django-cotton components, Tailwind + DaisyUI watcher (001-accounts-home)
 
@@ -38,9 +40,9 @@ cd src; pytest; ruff check .
 Python 3.11 + Django 5.0 (per starter settings): Follow standard conventions
 
 ## Recent Changes
+- 001-row-swap-animation: Added Python 3.11+ (Django), JavaScript (existing static script), HTML templates, CSS via Tailwind/DaisyUI build + Django, HTMX, Tailwind CSS, DaisyUI (existing project dependencies only)
 - 001-billpay-row-keyboard-edit: Added Python 3.11+, Django templates, HTMX-enhanced server-rendered HTML, minimal JavaScript for focus/keyboard handling + Django, HTMX, Tailwind CSS, DaisyUI (existing only; no new packages)
 - 001-bill-pay: Added Python 3.11+ + Django 6.0.2, django-htmx 1.27.0, django-cotton 2.6.1 (existing only)
-- 001-account-import: Added Python 3.11+, Django 6.0.x, HTML templates with HTMX + Django, django-htmx, django-cotton, Python stdlib `csv` (no new runtime package)
 
 
 <!-- MANUAL ADDITIONS START -->

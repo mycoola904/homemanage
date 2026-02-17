@@ -1,0 +1,144 @@
+openapi: 3.0.3
+info:
+  title: Bill Pay Row HTMX Swap Contract
+  version: 1.0.0
+  description: |
+    Contract for existing bill-pay row endpoints used by the subtle row swap animation feature.
+    This feature does not introduce new endpoints; it constrains behavior of responses and swaps.
+servers:
+  - url: /financial
+paths:
+  /bill-pay/{account_id}/row/:
+    get:
+      summary: Load bill-pay row in edit mode
+      description: Returns edit-row partial rooted at a single `<tr id="bill-pay-row-{account_id}">`.
+      parameters:
+        - name: account_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: month
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: '^\\d{4}-\\d{2}$'
+        - name: focus_field
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Edit row partial HTML
+          content:
+            text/html:
+              schema:
+                type: string
+        '404':
+          description: Row missing partial HTML
+          content:
+            text/html:
+              schema:
+                type: string
+      x-htmx:
+        target: '#bill-pay-row-{account_id}'
+        swap: outerHTML
+        trigger-elements:
+          - 'button[data-billpay-edit-trigger]'
+          - 'button.btn.btn-xs (Edit)'
+        partial-root: 'tr#bill-pay-row-{account_id}'
+    post:
+      summary: Save or cancel bill-pay row edit
+      description: |
+        Saves edited bill-pay fields or cancels edit mode and returns display row.
+        Validation failures return edit row with errors.
+      parameters:
+        - name: account_id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: month
+          in: query
+          required: true
+          schema:
+            type: string
+            pattern: '^\\d{4}-\\d{2}$'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                funding_account:
+                  type: string
+                  format: uuid
+                  nullable: true
+                actual_payment_amount:
+                  type: string
+                paid:
+                  type: boolean
+                keyboard_intent:
+                  type: string
+                  enum: [save, cancel]
+                focus_field:
+                  type: string
+      responses:
+        '200':
+          description: Display row partial HTML after save/cancel
+          content:
+            text/html:
+              schema:
+                type: string
+        '422':
+          description: Edit row partial HTML with validation errors
+          content:
+            text/html:
+              schema:
+                type: string
+        '404':
+          description: Row missing partial HTML
+          content:
+            text/html:
+              schema:
+                type: string
+      x-htmx:
+        target: '#bill-pay-row-{account_id}'
+        swap: outerHTML
+        trigger-elements:
+          - 'form#bill-pay-form-{account_id} submit (Save)'
+          - 'button[hx-vals*="cancel"] (Cancel)'
+        partial-root: 'tr#bill-pay-row-{account_id}'
+
+  /bill-pay/table-body/:
+    get:
+      summary: Refresh bill-pay table body for month filter
+      parameters:
+        - name: month
+          in: query
+          required: false
+          schema:
+            type: string
+            pattern: '^\\d{4}-\\d{2}$'
+      responses:
+        '200':
+          description: Table body rows HTML
+          content:
+            text/html:
+              schema:
+                type: string
+        '400':
+          description: Table body with month error row
+          content:
+            text/html:
+              schema:
+                type: string
+      x-htmx:
+        target: '#bill-pay-table-body'
+        swap: innerHTML
+        partial-root: 'tr'
