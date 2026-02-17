@@ -93,30 +93,17 @@ class BillPayValidationTests(TestCase):
         self.assertEqual(str(payment.actual_payment_amount), "0.00")
         self.assertFalse(payment.paid)
 
-<<<<<<< HEAD
     def test_keyboard_cancel_matches_cancel_action_non_persistence(self):
         MonthlyBillPayment.objects.create(
             account=self.account,
             month="2026-02-01",
             actual_payment_amount="44.00",
             paid=False,
-=======
-    def test_closed_account_cannot_be_selected_as_new_funding_option(self):
-        closed_funding = Account.objects.create(
-            user=self.user,
-            household=self.household,
-            name="Closed Funding",
-            institution="Old Bank",
-            account_type=AccountType.CHECKING,
-            status=AccountStatus.CLOSED,
-            current_balance=0,
->>>>>>> 001-bill-pay-funding-account
         )
 
         self.client.force_login(self.user)
         response = self.client.post(
             self.row_url + "?month=2026-02",
-<<<<<<< HEAD
             {
                 "actual_payment_amount": "99.00",
                 "paid": "on",
@@ -131,7 +118,21 @@ class BillPayValidationTests(TestCase):
         self.assertEqual(str(payment.actual_payment_amount), "44.00")
         self.assertFalse(payment.paid)
         self.assertContains(response, "Edit")
-=======
+
+    def test_closed_account_cannot_be_selected_as_new_funding_option(self):
+        closed_funding = Account.objects.create(
+            user=self.user,
+            household=self.household,
+            name="Closed Funding",
+            institution="Old Bank",
+            account_type=AccountType.CHECKING,
+            status=AccountStatus.CLOSED,
+            current_balance=0,
+        )
+
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.row_url + "?month=2026-02",
             {"funding_account": str(closed_funding.id), "actual_payment_amount": "20.00", "paid": "on"},
             HTTP_HX_REQUEST="true",
         )
@@ -150,4 +151,4 @@ class BillPayValidationTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "No active funding accounts are available.")
->>>>>>> 001-bill-pay-funding-account
+

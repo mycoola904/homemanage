@@ -44,9 +44,19 @@ class BillPayRowKeyboardShortcutsTests(TestCase):
 
     def test_keyboard_save_intent_persists_values(self):
         self.client.force_login(self.user)
+        funding = Account.objects.create(
+            user=self.user,
+            household=self.household,
+            name="Household Checking",
+            institution="Test Bank",
+            account_type=AccountType.CHECKING,
+            status=AccountStatus.ACTIVE,
+            current_balance=1000,
+        )
         response = self.client.post(
             self.row_url + "?month=2026-02",
             {
+                "funding_account": str(funding.id),
                 "actual_payment_amount": "51.25",
                 "paid": "on",
                 "keyboard_intent": "save",

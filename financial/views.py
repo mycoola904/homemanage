@@ -234,11 +234,9 @@ def _render_bill_pay_row_edit(request, *, account: Account, month_param: str, fo
 			"form": form,
 			"post_hx_url": row.save_url,
 			"form_id": form_id,
-<<<<<<< HEAD
-			"focus_field": focus_field,
-=======
-			"no_funding_options": not form.fields["funding_account"].queryset.exists(),
->>>>>>> 001-bill-pay-funding-account
+            "focus_field": focus_field,
+            "no_funding_options": not form.fields["funding_account"].queryset.exists(),
+
 		},
 		status=status,
 	)
@@ -509,11 +507,9 @@ def bill_pay_row(request, account_id):
 			"form": form,
 			"post_hx_url": row.save_url,
 			"form_id": form_id,
-<<<<<<< HEAD
-			"focus_field": _first_bill_pay_error_focus_field(form),
-=======
-			"no_funding_options": not form.fields["funding_account"].queryset.exists(),
->>>>>>> 001-bill-pay-funding-account
+            "focus_field": _first_bill_pay_error_focus_field(form),
+            "no_funding_options": not form.fields["funding_account"].queryset.exists(),
+
 		},
 		status=422,
 	)
