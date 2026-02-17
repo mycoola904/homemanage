@@ -1,0 +1,95 @@
+openapi: 3.0.3
+info:
+  title: BillPay Row Edit Contract
+  version: 1.0.0
+  description: |
+    Contract for existing row-targeted BillPay edit flow. This feature reuses the
+    existing endpoint and HTMX row swap architecture (no new backend endpoints).
+servers:
+  - url: /
+paths:
+  /financial/bill-pay/{account_id}/row/:
+    parameters:
+      - name: account_id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: month
+        in: query
+        required: true
+        schema:
+          type: string
+          pattern: '^[0-9]{4}-[0-9]{2}$'
+        description: Billing month in YYYY-MM format.
+    get:
+      summary: Render editable row partial
+      description: |
+        Returns BillPay row edit partial (`<tr id="bill-pay-row-...">`) for the
+        specified account/month. Used by click-to-edit entry including focus intent.
+      responses:
+        '200':
+          description: Edit row HTML partial
+          content:
+            text/html:
+              schema:
+                type: string
+        '404':
+          description: Row not found/missing account/invalid month/account type
+          content:
+            text/html:
+              schema:
+                type: string
+    post:
+      summary: Save or cancel BillPay row edit
+      description: |
+        Processes row edit form for the specified account/month. Must preserve
+        existing save semantics and return row-level partials for HTMX outerHTML swaps.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                actual_payment_amount:
+                  type: string
+                  description: Decimal amount, null/blank allowed, non-negative.
+                paid:
+                  type: string
+                  description: Checkbox value when checked.
+                keyboard_intent:
+                  type: string
+                  enum: [save, cancel]
+                  description: Optional explicit keyboard action intent.
+                focus_field:
+                  type: string
+                  enum: [funding_account, actual_payment_amount, paid, save, cancel]
+                  description: Optional focus hint for returned row partial.
+      responses:
+        '200':
+          description: Successful save or cancel; display row HTML partial
+          content:
+            text/html:
+              schema:
+                type: string
+        '422':
+          description: Validation failure; edit row HTML partial with errors
+          content:
+            text/html:
+              schema:
+                type: string
+        '404':
+          description: Row not found/missing account/invalid month/account type
+          content:
+            text/html:
+              schema:
+                type: string
+x-htmx:
+  target: '#bill-pay-row-{account_id}'
+  swap: 'outerHTML'
+  partialRoot: 'tr#bill-pay-row-{account_id}'
+  notes:
+    - Triggering element remains in row container across swaps.
+    - Table-level month reload uses separate endpoint and `#bill-pay-table-body` target.
