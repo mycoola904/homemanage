@@ -34,6 +34,7 @@ class HxTriggerPreservationTests(TestCase):
         create_url = reverse("financial:account-transactions-new", args=[self.account.id])
         response = self.client.post(create_url, payload, HTTP_HX_REQUEST="true")
         self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'data-billpay-animate-row')
 
         detail_url = reverse("financial:accounts-detail", args=[self.account.id])
         detail_response = self.client.get(detail_url)

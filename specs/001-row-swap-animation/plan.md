@@ -106,3 +106,16 @@ Design outputs are documented in `data-model.md`, `contracts/bill-pay-row-animat
 | Violation | Why Needed | Simpler Alternative Rejected Because |
 |-----------|------------|-------------------------------------|
 | None | N/A | N/A |
+
+## Implementation Evidence (2026-02-17)
+
+- Added bill-pay row transition hooks and animation behavior in `static/src/bill_pay_row_keyboard.js`, `static/src/input.css`, `financial/templates/financial/bill_pay/_row.html`, and `financial/templates/financial/bill_pay/_row_edit.html`.
+- Unified invalid (`422`) and standard edit-row context construction in `financial/views.py` through shared helper context builder.
+- Added/extended focused regression tests:
+  - `financial/tests/test_bill_pay_row_keyboard.py`
+  - `financial/tests/test_bill_pay_save.py`
+  - `financial/tests/test_bill_pay_row_keyboard_shortcuts.py`
+  - `financial/tests/test_hx_trigger_preservation.py`
+- Focused validation command executed with SQLite test settings:
+  - `C:/Users/micha/Documents/homemanage/.venv/Scripts/python.exe manage.py test --settings=core.settings_test financial.tests.test_bill_pay_row_keyboard financial.tests.test_bill_pay_save financial.tests.test_bill_pay_row_keyboard_shortcuts financial.tests.test_hx_trigger_preservation`
+  - Result: `Ran 18 tests ... OK`

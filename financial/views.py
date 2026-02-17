@@ -213,6 +213,17 @@ def _first_bill_pay_error_focus_field(form: BillPayRowForm) -> str:
 	return BILL_PAY_DEFAULT_FOCUS_FIELD
 
 
+def _bill_pay_row_edit_context(*, row, form: BillPayRowForm, form_id: str, focus_field: str) -> dict:
+	return {
+		"row": row,
+		"form": form,
+		"post_hx_url": row.save_url,
+		"form_id": form_id,
+		"focus_field": focus_field,
+		"no_funding_options": not form.fields["funding_account"].queryset.exists(),
+	}
+
+
 def _render_bill_pay_row_edit(request, *, account: Account, month_param: str, focus_field: str, status: int = 200) -> HttpResponse:
 	month = parse_month_param(month_param)
 	row = build_bill_pay_row(account=account, month=month)
@@ -226,18 +237,11 @@ def _render_bill_pay_row_edit(request, *, account: Account, month_param: str, fo
 	form.fields["paid"].widget.attrs["data-focus-field"] = BILL_PAY_FOCUS_PAID
 	form.fields["actual_payment_amount"].widget.attrs["data-tab-order"] = "2"
 	form.fields["paid"].widget.attrs["data-tab-order"] = "3"
+	context = _bill_pay_row_edit_context(row=row, form=form, form_id=form_id, focus_field=focus_field)
 	return render(
 		request,
 		"financial/bill_pay/_row_edit.html",
-		{
-			"row": row,
-			"form": form,
-			"post_hx_url": row.save_url,
-			"form_id": form_id,
-            "focus_field": focus_field,
-            "no_funding_options": not form.fields["funding_account"].queryset.exists(),
-
-		},
+		context,
 		status=status,
 	)
 
@@ -499,18 +503,16 @@ def bill_pay_row(request, account_id):
 		_ = payment
 		return _render_bill_pay_row_display(request, account=account, month_param=month_param)
 
+	context = _bill_pay_row_edit_context(
+		row=row,
+		form=form,
+		form_id=form_id,
+		focus_field=_first_bill_pay_error_focus_field(form),
+	)
 	return render(
 		request,
 		"financial/bill_pay/_row_edit.html",
-		{
-			"row": row,
-			"form": form,
-			"post_hx_url": row.save_url,
-			"form_id": form_id,
-            "focus_field": _first_bill_pay_error_focus_field(form),
-            "no_funding_options": not form.fields["funding_account"].queryset.exists(),
-
-		},
+		context,
 		status=422,
 	)
 

@@ -5,6 +5,7 @@ info:
   description: |
     Contract for existing bill-pay row endpoints used by the subtle row swap animation feature.
     This feature does not introduce new endpoints; it constrains behavior of responses and swaps.
+    Contract verification: reviewed 2026-02-17 during implementation setup.
 servers:
   - url: /financial
 paths:

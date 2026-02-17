@@ -82,6 +82,18 @@ class BillPaySaveTests(TestCase):
         self.assertEqual(str(payment.actual_payment_amount), "220.00")
         self.assertTrue(payment.paid)
 
+    def test_save_response_row_includes_animation_hooks(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.row_url + "?month=2026-02",
+            {"funding_account": str(self.funding_account.id), "actual_payment_amount": "220.00", "paid": "on"},
+            HTTP_HX_REQUEST="true",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'data-billpay-animate-row')
+        self.assertContains(response, 'class="billpay-row-transition"')
+
     def test_post_updates_existing_without_duplicate(self):
         existing = MonthlyBillPayment.objects.create(
             account=self.account,

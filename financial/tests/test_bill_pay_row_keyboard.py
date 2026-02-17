@@ -58,3 +58,11 @@ class BillPayRowKeyboardTests(TestCase):
 
         self.assertEqual(response.status_code, 422)
         self.assertContains(response, 'data-initial-focus-field="actual_payment_amount"', status_code=422)
+
+    def test_edit_row_includes_animation_hook_attributes(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.row_url, {"month": "2026-02"}, HTTP_HX_REQUEST="true")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'data-billpay-animate-row')
+        self.assertContains(response, 'class="billpay-row-transition"')

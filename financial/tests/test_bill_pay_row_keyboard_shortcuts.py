@@ -94,3 +94,35 @@ class BillPayRowKeyboardShortcutsTests(TestCase):
         payment = MonthlyBillPayment.objects.get(account=self.account, month="2026-02-01")
         self.assertEqual(str(payment.actual_payment_amount), "12.00")
         self.assertFalse(payment.paid)
+
+    def test_validation_error_response_preserves_animation_hooks(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.row_url + "?month=2026-02",
+            {
+                "actual_payment_amount": "-5.00",
+                "keyboard_intent": "save",
+                "focus_field": "save",
+            },
+            HTTP_HX_REQUEST="true",
+        )
+
+        self.assertEqual(response.status_code, 422)
+        self.assertContains(response, 'data-billpay-animate-row', status_code=422)
+        self.assertContains(response, 'class="billpay-row-transition"', status_code=422)
+
+    def test_repeated_edit_and_cancel_swaps_keep_transition_hooks(self):
+        self.client.force_login(self.user)
+
+        for _ in range(3):
+            edit_response = self.client.get(self.row_url, {"month": "2026-02"}, HTTP_HX_REQUEST="true")
+            self.assertEqual(edit_response.status_code, 200)
+            self.assertContains(edit_response, 'data-billpay-animate-row')
+
+            cancel_response = self.client.post(
+                self.row_url + "?month=2026-02",
+                {"keyboard_intent": "cancel", "focus_field": "cancel"},
+                HTTP_HX_REQUEST="true",
+            )
+            self.assertEqual(cancel_response.status_code, 200)
+            self.assertContains(cancel_response, 'data-billpay-animate-row')

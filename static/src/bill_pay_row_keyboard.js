@@ -1,4 +1,60 @@
 (function () {
+  var ENTER_CLASS = 'billpay-row-enter';
+  var LEAVE_CLASS = 'billpay-row-leave';
+  var ENTER_ANIMATION_TIMEOUT_MS = 220;
+
+  function clearEnterTimer(row) {
+    if (!isBillPayRow(row)) {
+      return;
+    }
+
+    var timerId = row.getAttribute('data-billpay-enter-timeout-id');
+    if (timerId) {
+      clearTimeout(Number(timerId));
+      row.removeAttribute('data-billpay-enter-timeout-id');
+    }
+  }
+
+  function isBillPayRow(element) {
+    return element instanceof HTMLElement &&
+      (element.hasAttribute('data-billpay-animate-row') || (element.id && element.id.indexOf('bill-pay-row-') === 0));
+  }
+
+  function restartEnterAnimation(row) {
+    if (!isBillPayRow(row)) {
+      return;
+    }
+
+    clearEnterTimer(row);
+    row.classList.remove(ENTER_CLASS);
+    row.classList.remove(LEAVE_CLASS);
+    row.offsetWidth;
+
+    row.classList.add(ENTER_CLASS);
+    var timeoutId = setTimeout(function () {
+      clearEnterAnimation(row);
+    }, ENTER_ANIMATION_TIMEOUT_MS);
+    row.setAttribute('data-billpay-enter-timeout-id', String(timeoutId));
+  }
+
+  function clearEnterAnimation(row) {
+    if (!isBillPayRow(row)) {
+      return;
+    }
+    clearEnterTimer(row);
+    row.classList.remove(ENTER_CLASS);
+  }
+
+  function maybeApplyLeaveAnimation(row) {
+    if (!isBillPayRow(row)) {
+      return;
+    }
+
+    if (row.getAttribute('data-billpay-enable-leave') === 'true') {
+      row.classList.add(LEAVE_CLASS);
+    }
+  }
+
   function orderedControls(row) {
     return Array.from(row.querySelectorAll('[data-tab-order]'))
       .sort(function (left, right) {
@@ -32,11 +88,42 @@
 
   document.body.addEventListener('htmx:afterSwap', function (event) {
     var detailTarget = event.detail && event.detail.target;
-    var row = detailTarget instanceof HTMLElement ? detailTarget.closest('[data-billpay-edit-row]') : null;
-    if (!(row instanceof HTMLElement)) {
+    if (!(detailTarget instanceof HTMLElement)) {
       return;
     }
-    focusInitial(row);
+
+    if (isBillPayRow(detailTarget)) {
+      restartEnterAnimation(detailTarget);
+    }
+
+    var row = detailTarget.closest('[data-billpay-edit-row]');
+    if (row instanceof HTMLElement) {
+      focusInitial(row);
+    }
+  });
+
+  document.body.addEventListener('htmx:beforeSwap', function (event) {
+    var detailTarget = event.detail && event.detail.target;
+    if (!(detailTarget instanceof HTMLElement)) {
+      return;
+    }
+
+    if (isBillPayRow(detailTarget)) {
+      maybeApplyLeaveAnimation(detailTarget);
+    }
+  });
+
+  document.body.addEventListener('animationend', function (event) {
+    var target = event.target;
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+
+    if (event.animationName !== 'billpay-row-enter') {
+      return;
+    }
+
+    clearEnterAnimation(target);
   });
 
   document.addEventListener('DOMContentLoaded', function () {
