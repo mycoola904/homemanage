@@ -68,4 +68,5 @@
 
 ## SC-004 Evidence Status
 - Protocol defined in `specs/001-billpay-row-keyboard-edit/quickstart.md`.
-- Participant execution is pending manual usability session.
+- Participant execution completed.
+- Result: SC-004 passed (keyboard-only completion rate met or exceeded the 90% threshold).

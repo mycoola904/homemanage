@@ -102,7 +102,7 @@
 - [x] T027 Run focused regression suite for BillPay row behavior in financial/tests/test_bill_pay_index.py, financial/tests/test_bill_pay_save.py, financial/tests/test_bill_pay_validation.py, financial/tests/test_bill_pay_row_focus_entry.py, financial/tests/test_bill_pay_row_keyboard.py, financial/tests/test_bill_pay_row_keyboard_shortcuts.py
 - [x] T028 [P] Record implementation evidence and AI attribution links for PR in specs/001-billpay-row-keyboard-edit/research.md (Principle V)
 - [x] T029 Define SC-004 usability protocol (participant criteria, scripted task, pass/fail capture) in specs/001-billpay-row-keyboard-edit/quickstart.md
-- [ ] T030 Execute SC-004 keyboard-only usability check and record completion metric evidence in specs/001-billpay-row-keyboard-edit/research.md
+- [x] T030 Execute SC-004 keyboard-only usability check and record completion metric evidence in specs/001-billpay-row-keyboard-edit/research.md
 
 ---
 
