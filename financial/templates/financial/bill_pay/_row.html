@@ -21,11 +21,18 @@
             —
         {% endif %}
     </td>
-<<<<<<< HEAD
-=======
-    <td>{{ row.funding_account_display }}</td>
-    <td>{{ row.actual_payment_amount_display }}</td>
->>>>>>> 001-bill-pay-funding-account
+    <td>
+        <button type="button"
+                class="link link-hover text-left"
+                data-billpay-edit-trigger
+                hx-get="{{ row.edit_url }}&focus_field=funding_account"
+                hx-target="#bill-pay-row-{{ row.account_id }}"
+                hx-swap="outerHTML"
+                hx-request="queue:last"
+                hx-disabled-elt="this">
+            {{ row.funding_account_display }}
+        </button>
+    </td>
     <td>
         <button type="button"
                 class="link link-hover text-left"
