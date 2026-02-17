@@ -1,5 +1,15 @@
-<tr id="bill-pay-row-{{ row.account_id }}" data-account-id="{{ row.account_id }}">
-    <td class="font-semibold">{{ row.name }}</td>
+<tr id="bill-pay-row-{{ row.account_id }}"
+    data-account-id="{{ row.account_id }}"
+    data-billpay-edit-row
+    data-initial-focus-field="{{ focus_field }}">
+    <td class="font-semibold">
+        <button type="button"
+                class="btn btn-ghost btn-xs"
+                data-focus-field="funding_account"
+                data-tab-order="1">
+            {{ row.name }}
+        </button>
+    </td>
     <td>{{ row.institution|default:"—" }}</td>
     <td>{{ row.payment_due_day_display }}</td>
     <td>{{ row.minimum_amount_due_display }}</td>
@@ -36,7 +46,26 @@
               hx-swap="outerHTML"
               class="inline-flex items-center gap-2">
             {% csrf_token %}
-            <button type="submit" class="btn btn-xs btn-primary" hx-disabled-elt="this">Save</button>
+            <input type="hidden" name="keyboard_intent" value="save" />
+            <input type="hidden" name="focus_field" value="save" />
+            <button type="submit"
+                    class="btn btn-xs btn-primary"
+                    data-focus-field="save"
+                    data-tab-order="4"
+                    hx-disabled-elt="this">
+                Save
+            </button>
+            <button type="button"
+                    class="btn btn-xs"
+                    data-focus-field="cancel"
+                    data-tab-order="5"
+                    hx-post="{{ post_hx_url }}"
+                    hx-vals='{"keyboard_intent":"cancel","focus_field":"cancel"}'
+                    hx-target="#bill-pay-row-{{ row.account_id }}"
+                    hx-swap="outerHTML"
+                    hx-disabled-elt="this">
+                Cancel
+            </button>
         </form>
         {% if form.non_field_errors %}
             <div class="mt-2 space-y-1 text-left">

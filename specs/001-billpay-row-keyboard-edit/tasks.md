@@ -7,9 +7,9 @@
 
 **Purpose**: Establish execution guardrails and traceability for this feature.
 
-- [ ] T001 Confirm CSS watcher workflow and evidence steps in specs/001-billpay-row-keyboard-edit/quickstart.md (Principle IV)
-- [ ] T002 Add implementation prompt/response tracking section in specs/001-billpay-row-keyboard-edit/research.md (Principle V)
-- [ ] T003 Verify endpoint reuse scope note in specs/001-billpay-row-keyboard-edit/plan.md matches existing financial/views.py architecture
+- [x] T001 Confirm CSS watcher workflow and evidence steps in specs/001-billpay-row-keyboard-edit/quickstart.md (Principle IV)
+- [x] T002 Add implementation prompt/response tracking section in specs/001-billpay-row-keyboard-edit/research.md (Principle V)
+- [x] T003 Verify endpoint reuse scope note in specs/001-billpay-row-keyboard-edit/plan.md matches existing financial/views.py architecture
 
 ---
 
@@ -19,10 +19,10 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T004 Add row keyboard/focus intent parsing helpers in financial/views.py for bill_pay_row request handling
-- [ ] T005 [P] Add canonical focus-field constants and validation mapping in financial/services/bill_pay.py
-- [ ] T006 [P] Add stable row control identifiers/data attributes in financial/templates/financial/bill_pay/_row_edit.html for keyboard targeting
-- [ ] T007 Extend existing BillPay row contract with finalized request/response examples in specs/001-billpay-row-keyboard-edit/contracts/billpay-row-edit.openapi.yaml
+- [x] T004 Add row keyboard/focus intent parsing helpers in financial/views.py for bill_pay_row request handling
+- [x] T005 [P] Add canonical focus-field constants and validation mapping in financial/services/bill_pay.py
+- [x] T006 [P] Add stable row control identifiers/data attributes in financial/templates/financial/bill_pay/_row_edit.html for keyboard targeting
+- [x] T007 Extend existing BillPay row contract with finalized request/response examples in specs/001-billpay-row-keyboard-edit/contracts/billpay-row-edit.openapi.yaml
 
 **Checkpoint**: Foundation ready — user stories can now be implemented.
 
@@ -36,15 +36,15 @@
 
 ### Tests for User Story 1
 
-- [ ] T008 [P] [US1] Add HTMX row-edit click entry tests for focus-field intent in financial/tests/test_bill_pay_row_focus_entry.py (Spec US1, FR-001, FR-002)
-- [ ] T009 [US1] Add row edit response assertions for focus metadata and row-targeted partial root in financial/tests/test_bill_pay_row_focus_entry.py (Spec US1, UI-001)
+- [x] T008 [P] [US1] Add HTMX row-edit click entry tests for focus-field intent in financial/tests/test_bill_pay_row_focus_entry.py (Spec US1, FR-001, FR-002)
+- [x] T009 [US1] Add row edit response assertions for focus metadata and row-targeted partial root in financial/tests/test_bill_pay_row_focus_entry.py (Spec US1, UI-001)
 
 ### Implementation for User Story 1
 
-- [ ] T010 [US1] Update display row editable-cell triggers to request existing bill_pay_row endpoint with focus_field query param in financial/templates/financial/bill_pay/_row.html (Spec US1 Scenario 1-3)
-- [ ] T011 [US1] Update bill_pay_row GET path to accept/validate focus_field and pass focus context to edit partial in financial/views.py (Spec FR-002)
-- [ ] T012 [US1] Render field-specific autofocus/focus target hooks in financial/templates/financial/bill_pay/_row_edit.html (Spec FR-002, UI-002)
-- [ ] T013 [US1] Keep row swap contract stable (`hx-target` row id + `outerHTML`) while adding click-entry controls in financial/templates/financial/bill_pay/_row.html and financial/templates/financial/bill_pay/_row_edit.html (Spec UI-001)
+- [x] T010 [US1] Update display row editable-cell triggers to request existing bill_pay_row endpoint with focus_field query param in financial/templates/financial/bill_pay/_row.html (Spec US1 Scenario 1-3)
+- [x] T011 [US1] Update bill_pay_row GET path to accept/validate focus_field and pass focus context to edit partial in financial/views.py (Spec FR-002)
+- [x] T012 [US1] Render field-specific autofocus/focus target hooks in financial/templates/financial/bill_pay/_row_edit.html (Spec FR-002, UI-002)
+- [x] T013 [US1] Keep row swap contract stable (`hx-target` row id + `outerHTML`) while adding click-entry controls in financial/templates/financial/bill_pay/_row.html and financial/templates/financial/bill_pay/_row_edit.html (Spec UI-001)
 
 **Checkpoint**: User Story 1 is independently functional and testable.
 
@@ -58,16 +58,16 @@
 
 ### Tests for User Story 2
 
-- [ ] T014 [P] [US2] Add keyboard tab-order and cycle tests for edit-row controls in financial/tests/test_bill_pay_row_keyboard.py (Spec US2 Scenario 1-2, FR-003, FR-004)
-- [ ] T015 [P] [US2] Add Enter-save and Esc-cancel keyboard behavior tests in financial/tests/test_bill_pay_row_keyboard_shortcuts.py (Spec US2 Scenario 3-4, FR-005, FR-006)
+- [x] T014 [P] [US2] Add keyboard tab-order and cycle tests for edit-row controls in financial/tests/test_bill_pay_row_keyboard.py (Spec US2 Scenario 1-2, FR-003, FR-004)
+- [x] T015 [P] [US2] Add Enter-save and Esc-cancel keyboard behavior tests in financial/tests/test_bill_pay_row_keyboard_shortcuts.py (Spec US2 Scenario 3-4, FR-005, FR-006)
 
 ### Implementation for User Story 2
 
-- [ ] T016 [US2] Add explicit tab-index/control-order wiring for Funding Account, Actual Payment, Paid, Save, Cancel in financial/templates/financial/bill_pay/_row_edit.html (Spec FR-003)
-- [ ] T017 [US2] Add row-scoped keyboard handler (Tab cycle, Enter intent, Esc intent) in static/src/bill_pay_row_keyboard.js (Spec FR-004, FR-005, FR-006)
-- [ ] T018 [US2] Wire BillPay page to load row keyboard handler for edit rows in financial/templates/financial/bill_pay/index.html (Spec US2)
-- [ ] T019 [US2] Handle keyboard_intent=cancel using existing bill_pay_row endpoint to return display row without persisting edits in financial/views.py (Spec FR-006, FR-010)
-- [ ] T020 [US2] Keep validation-failure behavior row-scoped (422 edit row re-render + focus to first invalid field) in financial/views.py and financial/templates/financial/bill_pay/_row_edit.html (Spec Edge Case 2, FR-009)
+- [x] T016 [US2] Add explicit tab-index/control-order wiring for Funding Account, Actual Payment, Paid, Save, Cancel in financial/templates/financial/bill_pay/_row_edit.html (Spec FR-003)
+- [x] T017 [US2] Add row-scoped keyboard handler (Tab cycle, Enter intent, Esc intent) in static/src/bill_pay_row_keyboard.js (Spec FR-004, FR-005, FR-006)
+- [x] T018 [US2] Wire BillPay page to load row keyboard handler for edit rows in financial/templates/financial/bill_pay/index.html (Spec US2)
+- [x] T019 [US2] Handle keyboard_intent=cancel using existing bill_pay_row endpoint to return display row without persisting edits in financial/views.py (Spec FR-006, FR-010)
+- [x] T020 [US2] Keep validation-failure behavior row-scoped (422 edit row re-render + focus to first invalid field) in financial/views.py and financial/templates/financial/bill_pay/_row_edit.html (Spec Edge Case 2, FR-009)
 
 **Checkpoint**: User Story 2 is independently functional and testable.
 
@@ -81,14 +81,14 @@
 
 ### Tests for User Story 3
 
-- [ ] T021 [P] [US3] Add parity tests comparing Enter-save with Save-button persistence outcomes in financial/tests/test_bill_pay_save.py (Spec US3 Scenario 1, FR-007)
-- [ ] T022 [P] [US3] Add parity tests comparing Esc-cancel with Cancel-action non-persistence outcomes in financial/tests/test_bill_pay_validation.py (Spec US3 Scenario 2, FR-007)
+- [x] T021 [P] [US3] Add parity tests comparing Enter-save with Save-button persistence outcomes in financial/tests/test_bill_pay_save.py (Spec US3 Scenario 1, FR-007)
+- [x] T022 [P] [US3] Add parity tests comparing Esc-cancel with Cancel-action non-persistence outcomes in financial/tests/test_bill_pay_validation.py (Spec US3 Scenario 2, FR-007)
 
 ### Implementation for User Story 3
 
-- [ ] T023 [US3] Ensure keyboard save path reuses existing upsert/save logic with no duplicate code path in financial/views.py (Spec FR-007)
-- [ ] T024 [US3] Ensure keyboard cancel path returns canonical display row partial identical to cancel-action output in financial/views.py and financial/templates/financial/bill_pay/_row.html (Spec FR-007, FR-010)
-- [ ] T025 [US3] Confirm single-active-row edit scope is preserved while keyboard actions execute in financial/templates/financial/bill_pay/_row.html and static/src/bill_pay_row_keyboard.js (Spec FR-008)
+- [x] T023 [US3] Ensure keyboard save path reuses existing upsert/save logic with no duplicate code path in financial/views.py (Spec FR-007)
+- [x] T024 [US3] Ensure keyboard cancel path returns canonical display row partial identical to cancel-action output in financial/views.py and financial/templates/financial/bill_pay/_row.html (Spec FR-007, FR-010)
+- [x] T025 [US3] Confirm single-active-row edit scope is preserved while keyboard actions execute in financial/templates/financial/bill_pay/_row.html and static/src/bill_pay_row_keyboard.js (Spec FR-008)
 
 **Checkpoint**: User Story 3 is independently functional and testable.
 
@@ -98,10 +98,10 @@
 
 **Purpose**: Finalize documentation, regression confidence, and readiness checks across stories.
 
-- [ ] T026 [P] Update quick verification steps and expected outcomes in specs/001-billpay-row-keyboard-edit/quickstart.md
-- [ ] T027 Run focused regression suite for BillPay row behavior in financial/tests/test_bill_pay_index.py, financial/tests/test_bill_pay_save.py, financial/tests/test_bill_pay_validation.py, financial/tests/test_bill_pay_row_focus_entry.py, financial/tests/test_bill_pay_row_keyboard.py, financial/tests/test_bill_pay_row_keyboard_shortcuts.py
-- [ ] T028 [P] Record implementation evidence and AI attribution links for PR in specs/001-billpay-row-keyboard-edit/research.md (Principle V)
-- [ ] T029 Define SC-004 usability protocol (participant criteria, scripted task, pass/fail capture) in specs/001-billpay-row-keyboard-edit/quickstart.md
+- [x] T026 [P] Update quick verification steps and expected outcomes in specs/001-billpay-row-keyboard-edit/quickstart.md
+- [x] T027 Run focused regression suite for BillPay row behavior in financial/tests/test_bill_pay_index.py, financial/tests/test_bill_pay_save.py, financial/tests/test_bill_pay_validation.py, financial/tests/test_bill_pay_row_focus_entry.py, financial/tests/test_bill_pay_row_keyboard.py, financial/tests/test_bill_pay_row_keyboard_shortcuts.py
+- [x] T028 [P] Record implementation evidence and AI attribution links for PR in specs/001-billpay-row-keyboard-edit/research.md (Principle V)
+- [x] T029 Define SC-004 usability protocol (participant criteria, scripted task, pass/fail capture) in specs/001-billpay-row-keyboard-edit/quickstart.md
 - [ ] T030 Execute SC-004 keyboard-only usability check and record completion metric evidence in specs/001-billpay-row-keyboard-edit/research.md
 
 ---

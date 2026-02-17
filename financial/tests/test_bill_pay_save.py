@@ -89,3 +89,28 @@ class BillPaySaveTests(TestCase):
         self.assertEqual(updated.id, existing.id)
         self.assertEqual(str(updated.actual_payment_amount), "230.00")
         self.assertTrue(updated.paid)
+
+    def test_keyboard_save_intent_matches_button_save_outcome(self):
+        self.client.force_login(self.user)
+
+        button_response = self.client.post(
+            self.row_url + "?month=2026-02",
+            {"actual_payment_amount": "210.00", "paid": "on"},
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(button_response.status_code, 200)
+        button_state = MonthlyBillPayment.objects.get(account=self.account, month="2026-02-01")
+        button_amount = button_state.actual_payment_amount
+        button_paid = button_state.paid
+
+        MonthlyBillPayment.objects.filter(account=self.account, month="2026-02-01").delete()
+
+        keyboard_response = self.client.post(
+            self.row_url + "?month=2026-02",
+            {"actual_payment_amount": "210.00", "paid": "on", "keyboard_intent": "save", "focus_field": "save"},
+            HTTP_HX_REQUEST="true",
+        )
+        self.assertEqual(keyboard_response.status_code, 200)
+        keyboard_state = MonthlyBillPayment.objects.get(account=self.account, month="2026-02-01")
+        self.assertEqual(keyboard_state.actual_payment_amount, button_amount)
+        self.assertEqual(keyboard_state.paid, button_paid)

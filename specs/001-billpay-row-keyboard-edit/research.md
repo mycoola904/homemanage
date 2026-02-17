@@ -40,3 +40,32 @@
 - Return partial roots matching target element (`<tr id="bill-pay-row-...">`).
 - Preserve trigger availability after each swap (Edit button in display row, Save/Cancel controls in edit row).
 - Keep all dynamic UI state values server-computed; avoid multiline Django template tags/comments.
+
+## Implementation Evidence
+- Implemented files:
+  - `financial/services/bill_pay.py`
+  - `financial/views.py`
+  - `financial/templates/financial/bill_pay/_row.html`
+  - `financial/templates/financial/bill_pay/_row_edit.html`
+  - `financial/templates/financial/bill_pay/index.html`
+  - `static/src/bill_pay_row_keyboard.js`
+  - `financial/tests/test_bill_pay_row_focus_entry.py`
+  - `financial/tests/test_bill_pay_row_keyboard.py`
+  - `financial/tests/test_bill_pay_row_keyboard_shortcuts.py`
+  - `financial/tests/test_bill_pay_save.py`
+  - `financial/tests/test_bill_pay_validation.py`
+- Test evidence:
+  - Ran BillPay suite with `core.settings_test`.
+  - Result: 25 tests passed.
+
+## AI Accountability Log
+- Spec references implemented: User Stories 1-3, FR-001..FR-010, UI-001..UI-004.
+- Prompt lineage:
+  - `/speckit.spec` for feature scope.
+  - `/speckit.plan` for architecture constraints and HTMX contract.
+  - `/speckit.tasks` for implementation sequencing and test commitments.
+- No new runtime dependencies were introduced.
+
+## SC-004 Evidence Status
+- Protocol defined in `specs/001-billpay-row-keyboard-edit/quickstart.md`.
+- Participant execution is pending manual usability session.

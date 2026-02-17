@@ -10,9 +10,9 @@
 
 ## 2) Run targeted tests first
 1. Run BillPay-focused tests:
-   - `python manage.py test financial.tests.test_bill_pay_index financial.tests.test_bill_pay_save financial.tests.test_bill_pay_validation --settings=core.settings_test`
+   - `python manage.py test financial.tests.test_bill_pay_index financial.tests.test_bill_pay_months financial.tests.test_bill_pay_row_focus_entry financial.tests.test_bill_pay_row_keyboard financial.tests.test_bill_pay_row_keyboard_shortcuts financial.tests.test_bill_pay_save financial.tests.test_bill_pay_validation --settings=core.settings_test`
 2. Observe:
-   - Existing BillPay behavior remains green before adding keyboard cases.
+   - Existing + new keyboard/focus behavior remains green.
 
 ## 3) Add/execute keyboard interaction tests
 1. Add tests for:
@@ -48,3 +48,18 @@
    - `python manage.py test financial.tests --settings=core.settings_test`
 2. Observe:
    - No regressions in month loading, row missing behavior, or validation 422 rendering.
+
+## 7) SC-004 usability protocol
+1. Recruit at least 10 desktop-browser participants familiar with keyboard navigation basics.
+2. Scripted task for each participant:
+   - Open Bill Pay for a given month.
+   - Enter row edit from a specified editable field.
+   - Modify payment state using only keyboard.
+   - Complete with Save or Cancel.
+3. Pass criteria per participant:
+   - Completed without mouse interaction and with expected row outcome.
+4. Aggregate metric:
+   - Success rate = participants passed / total participants.
+   - SC-004 passes when success rate is at least 90%.
+5. Evidence capture:
+   - Record participant-by-participant outcomes and final percentage in `specs/001-billpay-row-keyboard-edit/research.md`.

@@ -13,6 +13,40 @@ from financial.services.formatters import format_usd
 
 LIABILITY_TYPES = [AccountType.CREDIT_CARD, AccountType.LOAN, AccountType.OTHER]
 
+BILL_PAY_FOCUS_FUNDING_ACCOUNT = "funding_account"
+BILL_PAY_FOCUS_ACTUAL_PAYMENT = "actual_payment_amount"
+BILL_PAY_FOCUS_PAID = "paid"
+BILL_PAY_FOCUS_SAVE = "save"
+BILL_PAY_FOCUS_CANCEL = "cancel"
+BILL_PAY_DEFAULT_FOCUS_FIELD = BILL_PAY_FOCUS_ACTUAL_PAYMENT
+BILL_PAY_FOCUS_FIELDS = {
+    BILL_PAY_FOCUS_FUNDING_ACCOUNT,
+    BILL_PAY_FOCUS_ACTUAL_PAYMENT,
+    BILL_PAY_FOCUS_PAID,
+    BILL_PAY_FOCUS_SAVE,
+    BILL_PAY_FOCUS_CANCEL,
+}
+
+BILL_PAY_KEYBOARD_INTENT_SAVE = "save"
+BILL_PAY_KEYBOARD_INTENT_CANCEL = "cancel"
+BILL_PAY_KEYBOARD_INTENTS = {
+    BILL_PAY_KEYBOARD_INTENT_SAVE,
+    BILL_PAY_KEYBOARD_INTENT_CANCEL,
+}
+
+
+def normalize_bill_pay_focus_field(value: str | None, *, default: str | None = None) -> str:
+    default_value = default or BILL_PAY_DEFAULT_FOCUS_FIELD
+    if value in BILL_PAY_FOCUS_FIELDS:
+        return value
+    return default_value
+
+
+def normalize_bill_pay_keyboard_intent(value: str | None) -> str | None:
+    if value in BILL_PAY_KEYBOARD_INTENTS:
+        return value
+    return None
+
 
 @dataclass(frozen=True, slots=True)
 class BillPayRow:

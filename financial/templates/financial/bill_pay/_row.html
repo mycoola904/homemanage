@@ -1,5 +1,16 @@
 <tr id="bill-pay-row-{{ row.account_id }}" data-account-id="{{ row.account_id }}">
-    <td class="font-semibold">{{ row.name }}</td>
+    <td class="font-semibold">
+        <button type="button"
+                class="link link-hover text-left"
+                data-billpay-edit-trigger
+                hx-get="{{ row.edit_url }}&focus_field=funding_account"
+                hx-target="#bill-pay-row-{{ row.account_id }}"
+                hx-swap="outerHTML"
+                hx-request="queue:last"
+                hx-disabled-elt="this">
+            {{ row.name }}
+        </button>
+    </td>
     <td>{{ row.institution|default:"—" }}</td>
     <td>{{ row.payment_due_day_display }}</td>
     <td>{{ row.minimum_amount_due_display }}</td>
@@ -10,13 +21,33 @@
             —
         {% endif %}
     </td>
-    <td>{{ row.actual_payment_amount_display }}</td>
     <td>
-        {% if row.paid %}
-            <span class="badge badge-success">{{ row.paid_label }}</span>
-        {% else %}
-            <span class="badge badge-ghost">{{ row.paid_label }}</span>
-        {% endif %}
+        <button type="button"
+                class="link link-hover text-left"
+                data-billpay-edit-trigger
+                hx-get="{{ row.edit_url }}&focus_field=actual_payment_amount"
+                hx-target="#bill-pay-row-{{ row.account_id }}"
+                hx-swap="outerHTML"
+                hx-request="queue:last"
+                hx-disabled-elt="this">
+            {{ row.actual_payment_amount_display }}
+        </button>
+    </td>
+    <td>
+        <button type="button"
+                class="text-left"
+                data-billpay-edit-trigger
+                hx-get="{{ row.edit_url }}&focus_field=paid"
+                hx-target="#bill-pay-row-{{ row.account_id }}"
+                hx-swap="outerHTML"
+                hx-request="queue:last"
+                hx-disabled-elt="this">
+            {% if row.paid %}
+                <span class="badge badge-success">{{ row.paid_label }}</span>
+            {% else %}
+                <span class="badge badge-ghost">{{ row.paid_label }}</span>
+            {% endif %}
+        </button>
     </td>
     <td class="text-right">
         <button type="button"

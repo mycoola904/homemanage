@@ -21,11 +21,17 @@ from financial.services.accounts import (
 	serialize_account_rows,
 )
 from financial.services.bill_pay import (
+	BILL_PAY_DEFAULT_FOCUS_FIELD,
+	BILL_PAY_FOCUS_ACTUAL_PAYMENT,
+	BILL_PAY_FOCUS_PAID,
+	BILL_PAY_KEYBOARD_INTENT_CANCEL,
 	build_bill_pay_row,
 	build_bill_pay_rows,
 	get_or_initialize_monthly_payment,
 	liability_accounts_for_household,
 	month_to_query_value,
+	normalize_bill_pay_focus_field,
+	normalize_bill_pay_keyboard_intent,
 	parse_month_param,
 	upsert_monthly_payment,
 )
@@ -189,7 +195,25 @@ def _render_bill_pay_row_display(request, *, account: Account, month_param: str)
 	return render(request, "financial/bill_pay/_row.html", {"row": row})
 
 
-def _render_bill_pay_row_edit(request, *, account: Account, month_param: str, status: int = 200) -> HttpResponse:
+def _bill_pay_focus_field_from_request(request, *, default: str | None = None) -> str:
+	requested = request.POST.get("focus_field") or request.GET.get("focus_field")
+	return normalize_bill_pay_focus_field(requested, default=default)
+
+
+def _bill_pay_keyboard_intent_from_request(request) -> str | None:
+	requested = request.POST.get("keyboard_intent")
+	return normalize_bill_pay_keyboard_intent(requested)
+
+
+def _first_bill_pay_error_focus_field(form: BillPayRowForm) -> str:
+	if form.errors.get("actual_payment_amount"):
+		return BILL_PAY_FOCUS_ACTUAL_PAYMENT
+	if form.errors.get("paid"):
+		return BILL_PAY_FOCUS_PAID
+	return BILL_PAY_DEFAULT_FOCUS_FIELD
+
+
+def _render_bill_pay_row_edit(request, *, account: Account, month_param: str, focus_field: str, status: int = 200) -> HttpResponse:
 	month = parse_month_param(month_param)
 	row = build_bill_pay_row(account=account, month=month)
 	instance = get_or_initialize_monthly_payment(account=account, month=month)
@@ -197,10 +221,20 @@ def _render_bill_pay_row_edit(request, *, account: Account, month_param: str, st
 	form_id = f"bill-pay-form-{account.id}"
 	form.fields["actual_payment_amount"].widget.attrs["form"] = form_id
 	form.fields["paid"].widget.attrs["form"] = form_id
+	form.fields["actual_payment_amount"].widget.attrs["data-focus-field"] = BILL_PAY_FOCUS_ACTUAL_PAYMENT
+	form.fields["paid"].widget.attrs["data-focus-field"] = BILL_PAY_FOCUS_PAID
+	form.fields["actual_payment_amount"].widget.attrs["data-tab-order"] = "2"
+	form.fields["paid"].widget.attrs["data-tab-order"] = "3"
 	return render(
 		request,
 		"financial/bill_pay/_row_edit.html",
-		{"row": row, "form": form, "post_hx_url": row.save_url, "form_id": form_id},
+		{
+			"row": row,
+			"form": form,
+			"post_hx_url": row.save_url,
+			"form_id": form_id,
+			"focus_field": focus_field,
+		},
 		status=status,
 	)
 
@@ -430,8 +464,14 @@ def bill_pay_row(request, account_id):
 	if account.account_type not in {"credit_card", "loan", "other"}:
 		return _render_bill_pay_row_missing(request, account_id, status=404)
 
+	focus_field = _bill_pay_focus_field_from_request(request)
+
 	if request.method == "GET":
-		return _render_bill_pay_row_edit(request, account=account, month_param=month_param)
+		return _render_bill_pay_row_edit(request, account=account, month_param=month_param, focus_field=focus_field)
+
+	keyboard_intent = _bill_pay_keyboard_intent_from_request(request)
+	if keyboard_intent == BILL_PAY_KEYBOARD_INTENT_CANCEL:
+		return _render_bill_pay_row_display(request, account=account, month_param=month_param)
 
 	instance = get_or_initialize_monthly_payment(account=account, month=month)
 	form = BillPayRowForm(request.POST, instance=instance, account=account, month=month)
@@ -439,6 +479,10 @@ def bill_pay_row(request, account_id):
 	form_id = f"bill-pay-form-{account.id}"
 	form.fields["actual_payment_amount"].widget.attrs["form"] = form_id
 	form.fields["paid"].widget.attrs["form"] = form_id
+	form.fields["actual_payment_amount"].widget.attrs["data-focus-field"] = BILL_PAY_FOCUS_ACTUAL_PAYMENT
+	form.fields["paid"].widget.attrs["data-focus-field"] = BILL_PAY_FOCUS_PAID
+	form.fields["actual_payment_amount"].widget.attrs["data-tab-order"] = "2"
+	form.fields["paid"].widget.attrs["data-tab-order"] = "3"
 	if form.is_valid():
 		saved = form.save(commit=False)
 		payment = upsert_monthly_payment(
@@ -458,6 +502,7 @@ def bill_pay_row(request, account_id):
 			"form": form,
 			"post_hx_url": row.save_url,
 			"form_id": form_id,
+			"focus_field": _first_bill_pay_error_focus_field(form),
 		},
 		status=422,
 	)
