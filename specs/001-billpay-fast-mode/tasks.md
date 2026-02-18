@@ -86,7 +86,7 @@
 
 **Goal**: Handle terminal and open-next failure states cleanly without breaking saved-row state.
 
-**Independent Test**: Save final unpaid row with Fast Mode ON and verify no invalid auto-open; simulate next-row open failure and verify subtle feedback with manual continuation.
+**Independent Test**: Save final unpaid row with Fast Mode ON and verify no invalid auto-open; simulate next-row open failure and verify an inline status message in the Bill Pay header area with manual continuation.
 
 ### Tests for User Story 3
 
@@ -107,10 +107,12 @@
 
 **Purpose**: Final validation, documentation, and accountability updates across stories.
 
-- [ ] T027 [P] Document finalized HTMX trigger contract examples in `specs/001-billpay-fast-mode/contracts/bill-pay-fast-mode.openapi.yaml`
-- [ ] T028 [P] Update execution notes and manual validation steps in `specs/001-billpay-fast-mode/quickstart.md`
+- [ ] T027 [P] [REQ:UI-001] Document finalized HTMX trigger contract examples in `specs/001-billpay-fast-mode/contracts/bill-pay-fast-mode.openapi.yaml`
+- [ ] T028 [P] [REQ:UI-003] Update execution notes and manual validation steps in `specs/001-billpay-fast-mode/quickstart.md`
 - [ ] T029 Run focused regression suite for bill pay fast mode in `financial/tests/test_bill_pay_save.py`, `financial/tests/test_bill_pay_row_keyboard.py`, `financial/tests/test_bill_pay_validation.py`, and `financial/tests/test_bill_pay_index.py`
-- [ ] T030 Add AI prompt/response traceability note for implementation in `docs/ai/006-bill-pay-fast-mode-log.md`
+- [ ] T030 [REQ:Principle-V] Add AI prompt/response traceability note for implementation in `docs/ai/006-bill-pay-fast-mode-log.md`
+- [ ] T031 [REQ:UI-002] Verify template safety constraints (single-line `{% %}` and `{# #}` tags/comments, server-computed conditional state) in `financial/templates/financial/bill_pay/index.html` and `financial/templates/financial/bill_pay/_row_edit.html`
+- [ ] T032 [REQ:Deterministic-Data] Verify no schema/fixture drift and record deterministic evidence (no new migrations, no fixture changes required) in `specs/001-billpay-fast-mode/quickstart.md`
 
 ---
 
@@ -146,7 +148,7 @@
 - **US1**: T008/T009/T010 parallel; then T011 and T013 can proceed in parallel, followed by T014/T015.
 - **US2**: T016/T017/T018 parallel; then T019 and T021 parallel.
 - **US3**: T022/T023 parallel; then T024 and T026 parallel before T025 finalize client behavior.
-- **Polish**: T027 and T028 parallel before T029/T030 final sign-off.
+- **Polish**: T027, T028, T031, and T032 parallel before T029/T030 final sign-off.
 
 ---
 

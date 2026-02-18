@@ -17,7 +17,7 @@ Add an optional Fast Mode workflow to bill pay row saves: when enabled, a succes
 **Testing**: Django test runner (`manage.py test`) with feature/unit integration tests in `financial/tests/`  
 **Target Platform**: Server-rendered web app in modern desktop browsers
 **Project Type**: Django monolith (server-rendered templates + HTMX partial updates)  
-**Performance Goals**: Preserve existing row-save latency profile; add at most one follow-up row-edit GET request when Fast Mode is enabled  
+**Performance Goals**: Add at most one follow-up row-edit GET request per successful Fast Mode save, avoid full-table refreshes on row save, and complete save+auto-open in no more than two HTMX round trips during acceptance testing  
 **Constraints**: No schema migration; no new dependency; maintain deterministic row ordering; preserve existing keyboard save/cancel behavior; respect Django single-line template tag/comment constraints  
 **Scale/Scope**: One feature slice in bill pay flow (`bill_pay_row` save/edit UX), plus targeted tests and docs artifacts
 
@@ -27,7 +27,7 @@ Add an optional Fast Mode workflow to bill pay row saves: when enabled, a succes
 - [x] **Deterministic Data Plan**: No migrations/fixtures required. Data updates occur via existing `MonthlyBillPayment` upsert path. Rollback is code-only revert of Fast Mode signals/handler with unchanged schema.
 - [x] **Dependency Discipline**: No new runtime/dev dependencies. Uses existing Django + HTMX + current static JS pipeline.
 - [x] **Template & Watcher Safety**: CSS pipeline validated with `npm run build:css` (Tailwind + DaisyUI successful). For active styling/debug work, run `npm run dev:css` and confirm rebuild output. HTMX containers remain stable: row target `#bill-pay-row-<account_id>` with `outerHTML`; table target `#bill-pay-table-body` with `innerHTML`.
-- [x] **HTMX Failure Handling**: Save validation errors return `_row_edit.html` with `422` to same row target; save success returns `_row.html` and optional trigger for next-row open; open-next failure leaves saved row intact and shows subtle feedback with manual continuation.
+- [x] **HTMX Failure Handling**: Save validation errors return `_row_edit.html` with `422` to same row target; save success returns `_row.html` and optional trigger for next-row open; open-next failure leaves saved row intact, displays a subtle inline status message in the Bill Pay header area, and requires manual continuation.
 - [x] **AI Accountability**: Planning/clarification decisions are recorded in `spec.md` and `research.md`; PR will reference this plan/spec and include prompt file `.github/prompts/speckit.specify.prompt.md` plus chat/session link.
 
 Document evidence for every checkbox. If any item is unresolved, stop and revise the spec/plan before coding.

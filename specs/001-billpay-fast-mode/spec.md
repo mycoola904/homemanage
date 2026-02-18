@@ -12,7 +12,7 @@
 ### Session 2026-02-17
 
 - Q: Which ordering should define "next unpaid row" for Fast Mode after a save? → A: Next unpaid row in the current on-screen table order (top-to-bottom).
-- Q: When Fast Mode save succeeds but opening the next row fails (network/server error), what should the UX do? → A: Keep the saved row in view state, show a subtle inline error/toast, and require manual open of the next row.
+- Q: When Fast Mode save succeeds but opening the next row fails (network/server error), what should the UX do? → A: Keep the saved row in view state, show a subtle inline status message in the Bill Pay header area, and require manual open of the next row.
 - Q: What should the default Fast Mode toggle state be when the Bill Pay page first loads? → A: Default OFF on every initial page load.
 - Q: How long should a user’s Fast Mode toggle choice persist after they change it from the default OFF state? → A: Current page only (resets to OFF on full page reload/new visit).
 
@@ -65,14 +65,14 @@ As a user finishing a payment run, I receive a clear outcome when no unpaid rows
 
 - User enables Fast Mode after the page has loaded and immediately saves a row.
 - A previously selected “next” row becomes paid or unavailable before it opens.
-- The next unpaid row exists but cannot be opened due to a transient request failure; keep saved row in view state, show subtle failure feedback, and require manual open for continuation.
+- The next unpaid row exists but cannot be opened due to a transient request failure; keep saved row in view state, show subtle inline status message in the Bill Pay header area, and require manual open for continuation.
 - The current row save returns validation errors while Fast Mode is enabled.
 
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
 
-- **FR-001**: The bill pay screen MUST provide a Fast Mode toggle that users can enable or disable during a session.
+- **FR-001**: The bill pay screen MUST provide a Fast Mode toggle that users can enable or disable during the current page lifecycle.
 - **FR-001a**: On each initial Bill Pay page load, the Fast Mode toggle MUST default to OFF.
 - **FR-001b**: The Fast Mode toggle state MUST persist only for the current page lifecycle and MUST reset to OFF after full page reload or a new visit.
 - **FR-002**: When Fast Mode is enabled, each successful row save MUST include a server-evaluated next unpaid row candidate.
@@ -84,7 +84,7 @@ As a user finishing a payment run, I receive a clear outcome when no unpaid rows
 - **FR-008**: If save fails validation, the system MUST keep the current row in edit mode with validation feedback and MUST NOT auto-advance.
 - **FR-009**: Auto-advance logic MUST only consider rows in unpaid status within the active bill pay context shown to the user, and MUST select the next row using the current on-screen table order (top-to-bottom).
 - **FR-010**: Fast Mode behavior MUST be available through keyboard-driven save actions as well as pointer-driven save actions.
-- **FR-011**: If auto-opening the next row fails after a successful save, the system MUST keep the saved row in view state, display subtle failure feedback, and require manual open of the next row.
+- **FR-011**: If auto-opening the next row fails after a successful save, the system MUST keep the saved row in view state, display a subtle inline status message in the Bill Pay header area, and require manual open of the next row without automatic retry.
 
 ### Key Entities *(include if feature involves data)*
 
@@ -112,6 +112,7 @@ As a user finishing a payment run, I receive a clear outcome when no unpaid rows
 - **SC-002**: At least 95% of successful saves with Fast Mode enabled open the intended next unpaid row on the first attempt in acceptance testing.
 - **SC-003**: With Fast Mode disabled by default and when manually disabled, 100% of regression test scenarios for current row save behavior continue to pass.
 - **SC-004**: For runs where no unpaid rows remain, users reach a stable completed state (no broken edit target) in 100% of tested sessions.
+- **SC-005**: In all tested open-next failure scenarios, the saved row remains in view state and the inline status message is visible in the Bill Pay header area.
 
 ## Assumptions & Open Questions *(mandatory)*
 
