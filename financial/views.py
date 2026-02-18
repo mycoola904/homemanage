@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -25,6 +26,7 @@ from financial.services.bill_pay import (
 	BILL_PAY_FOCUS_ACTUAL_PAYMENT,
 	BILL_PAY_FOCUS_PAID,
 	BILL_PAY_KEYBOARD_INTENT_CANCEL,
+	build_next_unpaid_row_instruction,
 	build_bill_pay_row,
 	build_bill_pay_rows,
 	get_or_initialize_monthly_payment,
@@ -33,6 +35,7 @@ from financial.services.bill_pay import (
 	normalize_bill_pay_focus_field,
 	normalize_bill_pay_keyboard_intent,
 	parse_month_param,
+	serialize_next_row_instruction,
 	upsert_monthly_payment,
 )
 from financial.services.transactions import serialize_transaction_rows
@@ -42,6 +45,9 @@ ACCOUNT_IMPORT_PANEL_ID = "account-import-panel"
 ACCOUNT_IMPORT_HX_TARGET = "#account-import-panel"
 ACCOUNT_IMPORT_HX_SWAP = "innerHTML"
 BILL_PAY_TABLE_BODY_ID = "bill-pay-table-body"
+BILL_PAY_FAST_MODE_INPUT_ID = "bill-pay-fast-mode"
+BILL_PAY_FAST_MODE_STATUS_ID = "bill-pay-fast-mode-status"
+BILL_PAY_OPEN_NEXT_ROW_EVENT = "billpay:openNextRow"
 
 
 def _get_current_household_or_redirect(request):
@@ -158,6 +164,9 @@ def _bill_pay_context(request, household, *, month_param: str | None = None) -> 
 		"has_rows": bool(rows),
 		"selected_month": month_to_query_value(selected_month),
 		"table_body_id": BILL_PAY_TABLE_BODY_ID,
+		"fast_mode_input_id": BILL_PAY_FAST_MODE_INPUT_ID,
+		"fast_mode_status_id": BILL_PAY_FAST_MODE_STATUS_ID,
+		"fast_mode_enabled": False,
 	}
 
 
@@ -205,6 +214,13 @@ def _bill_pay_keyboard_intent_from_request(request) -> str | None:
 	return normalize_bill_pay_keyboard_intent(requested)
 
 
+def _bill_pay_fast_mode_enabled_from_request(request) -> bool:
+	raw = request.POST.get("fast_mode") or request.GET.get("fast_mode")
+	if raw is None:
+		return False
+	return str(raw).strip().lower() in {"1", "true", "on", "yes"}
+
+
 def _first_bill_pay_error_focus_field(form: BillPayRowForm) -> str:
 	if form.errors.get("actual_payment_amount"):
 		return BILL_PAY_FOCUS_ACTUAL_PAYMENT
@@ -213,19 +229,21 @@ def _first_bill_pay_error_focus_field(form: BillPayRowForm) -> str:
 	return BILL_PAY_DEFAULT_FOCUS_FIELD
 
 
-def _bill_pay_row_edit_context(*, row, form: BillPayRowForm, form_id: str, focus_field: str) -> dict:
+def _bill_pay_row_edit_context(*, row, form: BillPayRowForm, form_id: str, focus_field: str, fast_mode_enabled: bool = False) -> dict:
 	return {
 		"row": row,
 		"form": form,
 		"post_hx_url": row.save_url,
 		"form_id": form_id,
 		"focus_field": focus_field,
+		"fast_mode_enabled": fast_mode_enabled,
 		"no_funding_options": not form.fields["funding_account"].queryset.exists(),
 	}
 
 
 def _render_bill_pay_row_edit(request, *, account: Account, month_param: str, focus_field: str, status: int = 200) -> HttpResponse:
 	month = parse_month_param(month_param)
+	fast_mode_enabled = _bill_pay_fast_mode_enabled_from_request(request)
 	row = build_bill_pay_row(account=account, month=month)
 	instance = get_or_initialize_monthly_payment(account=account, month=month)
 	form = BillPayRowForm(instance=instance, account=account, month=month)
@@ -239,7 +257,7 @@ def _render_bill_pay_row_edit(request, *, account: Account, month_param: str, fo
 	form.fields["paid"].widget.attrs["data-focus-field"] = BILL_PAY_FOCUS_PAID
 	form.fields["actual_payment_amount"].widget.attrs["data-tab-order"] = "2"
 	form.fields["paid"].widget.attrs["data-tab-order"] = "3"
-	context = _bill_pay_row_edit_context(row=row, form=form, form_id=form_id, focus_field=focus_field)
+	context = _bill_pay_row_edit_context(row=row, form=form, form_id=form_id, focus_field=focus_field, fast_mode_enabled=fast_mode_enabled)
 	return render(
 		request,
 		"financial/bill_pay/_row_edit.html",
@@ -495,23 +513,32 @@ def bill_pay_row(request, account_id):
 	form.fields["paid"].widget.attrs["data-focus-field"] = BILL_PAY_FOCUS_PAID
 	form.fields["actual_payment_amount"].widget.attrs["data-tab-order"] = "2"
 	form.fields["paid"].widget.attrs["data-tab-order"] = "3"
+	fast_mode_enabled = _bill_pay_fast_mode_enabled_from_request(request)
 	if form.is_valid():
 		saved = form.save(commit=False)
-		payment = upsert_monthly_payment(
+		upsert_monthly_payment(
 			account=account,
 			month=month,
 			funding_account=saved.funding_account,
 			actual_payment_amount=saved.actual_payment_amount,
 			paid=saved.paid,
 		)
-		_ = payment
-		return _render_bill_pay_row_display(request, account=account, month_param=month_param)
+		response = _render_bill_pay_row_display(request, account=account, month_param=month_param)
+		if fast_mode_enabled:
+			rows = build_bill_pay_rows(liability_accounts_for_household(household), month)
+			next_instruction = build_next_unpaid_row_instruction(rows=rows, current_account_id=str(account.id))
+			if next_instruction is not None:
+				response["HX-Trigger"] = json.dumps(
+					{BILL_PAY_OPEN_NEXT_ROW_EVENT: serialize_next_row_instruction(next_instruction)}
+				)
+		return response
 
 	context = _bill_pay_row_edit_context(
 		row=row,
 		form=form,
 		form_id=form_id,
 		focus_field=_first_bill_pay_error_focus_field(form),
+		fast_mode_enabled=fast_mode_enabled,
 	)
 	return render(
 		request,

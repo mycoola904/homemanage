@@ -29,7 +29,7 @@
   - Server-driven immediate edit row HTML return for next row (rejected: multi-row response complexity).
 
 ## Decision 5: Failure policy for open-next step
-- Decision: If next-row open fails after successful save, keep saved row in view state, show subtle feedback, require manual open.
+- Decision: If next-row open fails after successful save, keep saved row in view state, show an inline status message in the Bill Pay header area, and require manual open.
 - Rationale: Matches clarification and avoids unintended resubmission or row state rollback.
 - Alternatives considered:
   - Auto-retry once (rejected: hidden retry can mask state issues and create inconsistent focus timing).

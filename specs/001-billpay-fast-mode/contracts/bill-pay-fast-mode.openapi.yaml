@@ -126,3 +126,5 @@ x-htmx:
       failure:
         status: 422
         behavior: keep edit row rendered with inline errors; do not auto-open next row
+      open-next-failure:
+        behavior: keep saved row in view state, show inline status message in Bill Pay header area, require manual continuation

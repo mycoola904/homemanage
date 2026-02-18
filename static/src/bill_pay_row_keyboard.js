@@ -2,6 +2,52 @@
   var ENTER_CLASS = 'billpay-row-enter';
   var LEAVE_CLASS = 'billpay-row-leave';
   var ENTER_ANIMATION_TIMEOUT_MS = 220;
+  var FAST_MODE_TOGGLE_ID = 'bill-pay-fast-mode';
+  var FAST_MODE_STATUS_ID = 'bill-pay-fast-mode-status';
+  var pendingNextRowId = null;
+
+  function getFastModeToggle() {
+    return document.getElementById(FAST_MODE_TOGGLE_ID);
+  }
+
+  function getFastModeEnabled() {
+    var toggle = getFastModeToggle();
+    return !!(toggle && toggle.checked);
+  }
+
+  function getStatusElement() {
+    return document.getElementById(FAST_MODE_STATUS_ID);
+  }
+
+  function clearStatusMessage() {
+    var status = getStatusElement();
+    if (!status) {
+      return;
+    }
+    status.textContent = '';
+    status.classList.add('hidden');
+  }
+
+  function showStatusMessage(message) {
+    var status = getStatusElement();
+    if (!status) {
+      return;
+    }
+    status.textContent = message;
+    status.classList.remove('hidden');
+  }
+
+  function syncFastModeField(container) {
+    if (!(container instanceof HTMLElement)) {
+      return;
+    }
+    var value = getFastModeEnabled() ? '1' : '0';
+    Array.from(container.querySelectorAll('[data-fast-mode-field]')).forEach(function (input) {
+      if (input instanceof HTMLInputElement) {
+        input.value = value;
+      }
+    });
+  }
 
   function clearEnterTimer(row) {
     if (!isBillPayRow(row)) {
@@ -98,8 +144,67 @@
 
     var row = detailTarget.closest('[data-billpay-edit-row]');
     if (row instanceof HTMLElement) {
+      syncFastModeField(row);
       focusInitial(row);
+      if (pendingNextRowId && row.getAttribute('data-account-id') === pendingNextRowId) {
+        pendingNextRowId = null;
+        clearStatusMessage();
+      }
     }
+  });
+
+  document.body.addEventListener('htmx:configRequest', function (event) {
+    var target = event.target;
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+    var row = target.closest('[data-billpay-edit-row]');
+    if (!(row instanceof HTMLElement)) {
+      return;
+    }
+    if (!event.detail || !event.detail.parameters) {
+      return;
+    }
+    event.detail.parameters.fast_mode = getFastModeEnabled() ? '1' : '0';
+    syncFastModeField(row);
+  });
+
+  document.body.addEventListener('htmx:responseError', function (event) {
+    var detailTarget = event.detail && event.detail.target;
+    if (!(detailTarget instanceof HTMLElement)) {
+      return;
+    }
+    if (pendingNextRowId && detailTarget.id === 'bill-pay-row-' + pendingNextRowId) {
+      pendingNextRowId = null;
+      showStatusMessage('Unable to open the next row. Continue manually.');
+    }
+  });
+
+  document.body.addEventListener('billpay:openNextRow', function (event) {
+    var payload = event.detail || {};
+    var nextRowId = payload.nextRowId;
+    var nextEditUrl = payload.nextEditUrl;
+    if (!nextRowId || !nextEditUrl) {
+      return;
+    }
+
+    var targetRow = document.getElementById('bill-pay-row-' + nextRowId);
+    if (!(targetRow instanceof HTMLElement)) {
+      showStatusMessage('Unable to open the next row. Continue manually.');
+      return;
+    }
+
+    pendingNextRowId = String(nextRowId);
+    clearStatusMessage();
+    if (window.htmx && typeof window.htmx.ajax === 'function') {
+      window.htmx.ajax('GET', nextEditUrl, {
+        target: targetRow,
+        swap: 'outerHTML'
+      });
+      return;
+    }
+
+    showStatusMessage('Unable to open the next row. Continue manually.');
   });
 
   document.body.addEventListener('htmx:beforeSwap', function (event) {
@@ -129,8 +234,10 @@
   document.addEventListener('DOMContentLoaded', function () {
     var row = activeEditRow();
     if (row) {
+      syncFastModeField(row);
       focusInitial(row);
     }
+    clearStatusMessage();
   });
 
   document.body.addEventListener('keydown', function (event) {

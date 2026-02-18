@@ -68,6 +68,13 @@ class BillPayRow:
     month_param: str
 
 
+@dataclass(frozen=True, slots=True)
+class NextRowInstruction:
+    next_row_id: str
+    next_edit_url: str
+    focus_field: str
+
+
 def normalize_month(value: date | None) -> date:
     if value is None:
         today = date.today()
@@ -154,6 +161,40 @@ def build_bill_pay_rows(accounts: QuerySet[Account], month: date) -> list[BillPa
 def build_bill_pay_row(*, account: Account, month: date) -> BillPayRow:
     rows = build_bill_pay_rows(Account.objects.filter(pk=account.pk), month)
     return rows[0]
+
+
+def build_next_unpaid_row_instruction(
+    *,
+    rows: list[BillPayRow],
+    current_account_id: str,
+    focus_field: str = BILL_PAY_FOCUS_ACTUAL_PAYMENT,
+) -> NextRowInstruction | None:
+    current_index = -1
+    for index, row in enumerate(rows):
+        if row.account_id == current_account_id:
+            current_index = index
+            break
+
+    if current_index < 0:
+        return None
+
+    for row in rows[current_index + 1 :]:
+        if not row.paid:
+            return NextRowInstruction(
+                next_row_id=row.account_id,
+                next_edit_url=f"{row.edit_url}&focus_field={focus_field}",
+                focus_field=focus_field,
+            )
+
+    return None
+
+
+def serialize_next_row_instruction(instruction: NextRowInstruction) -> dict[str, str]:
+    return {
+        "nextRowId": instruction.next_row_id,
+        "nextEditUrl": instruction.next_edit_url,
+        "focusField": instruction.focus_field,
+    }
 
 
 def get_or_initialize_monthly_payment(*, account: Account, month: date) -> MonthlyBillPayment:

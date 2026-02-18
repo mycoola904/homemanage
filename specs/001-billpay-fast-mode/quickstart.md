@@ -39,4 +39,12 @@
 1. Save row with Fast Mode enabled.
    - Observe: Response swaps target row (`outerHTML`) and includes trigger metadata only when a next row exists.
 2. Simulate next-open failure (network/server error).
-   - Observe: Saved row remains in view state, subtle feedback appears, and user manually opens next row.
+   - Observe: Saved row remains in view state, an inline status message appears in the Bill Pay header area, and user manually opens next row.
+
+## Deterministic evidence (no schema/fixture drift)
+1. Verify no new migrations are introduced for this feature.
+   - Command: `python manage.py makemigrations --check --dry-run`
+   - Observe: No changes detected.
+2. Verify fixture footprint remains unchanged.
+   - Command: `git status --short`
+   - Observe: No fixture file changes under `financial/fixtures/`.

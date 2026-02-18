@@ -59,6 +59,7 @@
             {% csrf_token %}
             <input type="hidden" name="keyboard_intent" value="save" />
             <input type="hidden" name="focus_field" value="save" />
+                <input type="hidden" name="fast_mode" value="{% if fast_mode_enabled %}1{% else %}0{% endif %}" data-fast-mode-field />
             <button type="submit"
                     class="btn btn-xs btn-primary"
                     data-focus-field="save"

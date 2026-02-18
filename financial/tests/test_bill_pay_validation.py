@@ -65,6 +65,17 @@ class BillPayValidationTests(TestCase):
         self.assertEqual(response.status_code, 422)
         self.assertIn("cannot be negative", response.content.decode())
 
+    def test_validation_error_with_fast_mode_enabled_does_not_emit_trigger(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.row_url + "?month=2026-02",
+            {"funding_account": str(self.funding_account.id), "actual_payment_amount": "-1.00", "paid": "on", "fast_mode": "1"},
+            HTTP_HX_REQUEST="true",
+        )
+
+        self.assertEqual(response.status_code, 422)
+        self.assertNotIn("HX-Trigger", response.headers)
+
     def test_paid_true_with_blank_amount_is_valid(self):
         self.client.force_login(self.user)
         response = self.client.post(

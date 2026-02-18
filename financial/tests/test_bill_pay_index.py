@@ -99,3 +99,19 @@ class BillPayIndexTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Loan No URL")
         self.assertContains(response, "—")
+
+    def test_fast_mode_toggle_defaults_off_on_initial_load(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'id="bill-pay-fast-mode"')
+        self.assertNotContains(response, 'id="bill-pay-fast-mode" type="checkbox" class="checkbox checkbox-sm" checked')
+
+    def test_fast_mode_inline_status_container_is_present(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'id="bill-pay-fast-mode-status"')
+        self.assertContains(response, 'aria-live="polite"')

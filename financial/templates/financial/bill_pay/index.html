@@ -9,27 +9,34 @@
         <div>
             <h1 class="text-3xl font-bold">Bill Pay</h1>
             <p class="text-base-content/70">Track monthly liability payments by account.</p>
+            <p id="{{ fast_mode_status_id }}" class="mt-1 text-sm text-warning hidden" role="status" aria-live="polite"></p>
         </div>
-        <form method="get"
-              action="{{ table_body_url }}"
-              class="flex items-end gap-2"
-              hx-get="{{ table_body_url }}"
-              hx-target="#{{ table_body_id }}"
-              hx-swap="innerHTML"
-              hx-request="queue:last"
-              hx-disabled-elt="button">
-            <div class="form-control">
-                <label class="label" for="bill-pay-month">
-                    <span class="label-text">Month</span>
-                </label>
-                <input id="bill-pay-month"
-                       name="month"
-                       type="month"
-                       value="{{ selected_month }}"
-                       class="input input-bordered input-sm" />
-            </div>
-            <button type="submit" class="btn btn-sm btn-primary">Load</button>
-        </form>
+        <div class="flex items-end gap-4">
+            <label class="label cursor-pointer gap-2 pb-2">
+                <input id="{{ fast_mode_input_id }}" type="checkbox" class="checkbox checkbox-sm" {% if fast_mode_enabled %}checked{% endif %} />
+                <span class="label-text">Fast Mode</span>
+            </label>
+            <form method="get"
+                  action="{{ table_body_url }}"
+                  class="flex items-end gap-2"
+                  hx-get="{{ table_body_url }}"
+                  hx-target="#{{ table_body_id }}"
+                  hx-swap="innerHTML"
+                  hx-request="queue:last"
+                  hx-disabled-elt="button">
+                <div class="form-control">
+                    <label class="label" for="bill-pay-month">
+                        <span class="label-text">Month</span>
+                    </label>
+                    <input id="bill-pay-month"
+                           name="month"
+                           type="month"
+                           value="{{ selected_month }}"
+                           class="input input-bordered input-sm" />
+                </div>
+                <button type="submit" class="btn btn-sm btn-primary">Load</button>
+            </form>
+        </div>
     </div>
 
     <div class="overflow-x-auto rounded-2xl border border-base-200 bg-base-100 shadow-sm">

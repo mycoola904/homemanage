@@ -15,8 +15,8 @@
 
 **Purpose**: Prepare workspace and baseline verification for Fast Mode implementation.
 
-- [ ] T001 Verify baseline Bill Pay behavior in `financial/tests/test_bill_pay_save.py` and `financial/tests/test_bill_pay_row_keyboard.py` before Fast Mode changes
-- [ ] T002 Confirm watcher workflow for UI tasks by documenting `npm run dev:css` usage in `specs/001-billpay-fast-mode/quickstart.md`
+- [x] T001 Verify baseline Bill Pay behavior in `financial/tests/test_bill_pay_save.py` and `financial/tests/test_bill_pay_row_keyboard.py` before Fast Mode changes
+- [x] T002 Confirm watcher workflow for UI tasks by documenting `npm run dev:css` usage in `specs/001-billpay-fast-mode/quickstart.md`
 
 ---
 
@@ -26,11 +26,11 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T003 Add Fast Mode request parsing helper (`fast_mode` flag normalization) in `financial/views.py`
-- [ ] T004 [P] Add next-unpaid-row selection helper using on-screen row order semantics in `financial/services/bill_pay.py`
-- [ ] T005 [P] Add `NextRowInstruction` builder/serializer helper for HTMX trigger payloads in `financial/services/bill_pay.py`
-- [ ] T006 Wire shared constants/event names for Fast Mode trigger handling in `financial/views.py` and `static/src/bill_pay_row_keyboard.js`
-- [ ] T007 Add/adjust focused foundational tests for helper behavior in `financial/tests/test_bill_pay_save.py`
+- [x] T003 Add Fast Mode request parsing helper (`fast_mode` flag normalization) in `financial/views.py`
+- [x] T004 [P] Add next-unpaid-row selection helper using on-screen row order semantics in `financial/services/bill_pay.py`
+- [x] T005 [P] Add `NextRowInstruction` builder/serializer helper for HTMX trigger payloads in `financial/services/bill_pay.py`
+- [x] T006 Wire shared constants/event names for Fast Mode trigger handling in `financial/views.py` and `static/src/bill_pay_row_keyboard.js`
+- [x] T007 Add/adjust focused foundational tests for helper behavior in `financial/tests/test_bill_pay_save.py`
 
 **Checkpoint**: Foundation ready — user story implementation can begin.
 
@@ -44,17 +44,17 @@
 
 ### Tests for User Story 1
 
-- [ ] T008 [P] [US1] Add save-response trigger test for Fast Mode enabled path in `financial/tests/test_bill_pay_save.py`
-- [ ] T009 [P] [US1] Add next-row ordering test (top-to-bottom on-screen order) in `financial/tests/test_bill_pay_save.py`
-- [ ] T010 [P] [US1] Add keyboard save compatibility test with Fast Mode enabled in `financial/tests/test_bill_pay_row_keyboard.py`
+- [x] T008 [P] [US1] Add save-response trigger test for Fast Mode enabled path in `financial/tests/test_bill_pay_save.py`
+- [x] T009 [P] [US1] Add next-row ordering test (top-to-bottom on-screen order) in `financial/tests/test_bill_pay_save.py`
+- [x] T010 [P] [US1] Add keyboard save compatibility test with Fast Mode enabled in `financial/tests/test_bill_pay_row_keyboard.py`
 
 ### Implementation for User Story 1
 
-- [ ] T011 [US1] Add Fast Mode toggle UI (default OFF) to bill pay header in `financial/templates/financial/bill_pay/index.html`
-- [ ] T012 [US1] Include Fast Mode form field propagation in row edit form submits in `financial/templates/financial/bill_pay/_row_edit.html`
-- [ ] T013 [US1] Update row save success path to emit `HX-Trigger` with next-row payload in `financial/views.py`
-- [ ] T014 [US1] Add client event handler for `billpay:openNextRow` that opens target edit row in `static/src/bill_pay_row_keyboard.js`
-- [ ] T015 [US1] Ensure auto-open focus defaults to `actual_payment_amount` in `static/src/bill_pay_row_keyboard.js`
+- [x] T011 [US1] Add Fast Mode toggle UI (default OFF) to bill pay header in `financial/templates/financial/bill_pay/index.html`
+- [x] T012 [US1] Include Fast Mode form field propagation in row edit form submits in `financial/templates/financial/bill_pay/_row_edit.html`
+- [x] T013 [US1] Update row save success path to emit `HX-Trigger` with next-row payload in `financial/views.py`
+- [x] T014 [US1] Add client event handler for `billpay:openNextRow` that opens target edit row in `static/src/bill_pay_row_keyboard.js`
+- [x] T015 [US1] Ensure auto-open focus defaults to `actual_payment_amount` in `static/src/bill_pay_row_keyboard.js`
 
 **Checkpoint**: User Story 1 is fully functional and independently testable.
 
@@ -68,15 +68,15 @@
 
 ### Tests for User Story 2
 
-- [ ] T016 [P] [US2] Add test ensuring no trigger payload is returned when Fast Mode is disabled in `financial/tests/test_bill_pay_save.py`
-- [ ] T017 [P] [US2] Add default-OFF initial page render test in `financial/tests/test_bill_pay_index.py`
-- [ ] T018 [P] [US2] Add validation-error no-auto-advance regression test in `financial/tests/test_bill_pay_validation.py`
+- [x] T016 [P] [US2] Add test ensuring no trigger payload is returned when Fast Mode is disabled in `financial/tests/test_bill_pay_save.py`
+- [x] T017 [P] [US2] Add default-OFF initial page render test in `financial/tests/test_bill_pay_index.py`
+- [x] T018 [P] [US2] Add validation-error no-auto-advance regression test in `financial/tests/test_bill_pay_validation.py`
 
 ### Implementation for User Story 2
 
-- [ ] T019 [US2] Ensure missing/invalid `fast_mode` input is treated as OFF in `financial/views.py`
-- [ ] T020 [US2] Keep Fast Mode state page-scoped only (no session/localStorage persistence) in `static/src/bill_pay_row_keyboard.js`
-- [ ] T021 [US2] Update bill pay template state wiring for disabled-mode parity in `financial/templates/financial/bill_pay/index.html` and `financial/templates/financial/bill_pay/_row_edit.html`
+- [x] T019 [US2] Ensure missing/invalid `fast_mode` input is treated as OFF in `financial/views.py`
+- [x] T020 [US2] Keep Fast Mode state page-scoped only (no session/localStorage persistence) in `static/src/bill_pay_row_keyboard.js`
+- [x] T021 [US2] Update bill pay template state wiring for disabled-mode parity in `financial/templates/financial/bill_pay/index.html` and `financial/templates/financial/bill_pay/_row_edit.html`
 
 **Checkpoint**: User Stories 1 and 2 both work independently.
 
@@ -90,14 +90,14 @@
 
 ### Tests for User Story 3
 
-- [ ] T022 [P] [US3] Add no-next-row terminal save test (no auto-open trigger action) in `financial/tests/test_bill_pay_save.py`
-- [ ] T023 [P] [US3] Add open-next failure feedback behavior test in `financial/tests/test_bill_pay_row_keyboard.py`
+- [x] T022 [P] [US3] Add no-next-row terminal save test (no auto-open trigger action) in `financial/tests/test_bill_pay_save.py`
+- [x] T023 [P] [US3] Add open-next failure feedback behavior test in `financial/tests/test_bill_pay_row_keyboard.py`
 
 ### Implementation for User Story 3
 
-- [ ] T024 [US3] Add subtle Fast Mode feedback container for open-next failures in `financial/templates/financial/bill_pay/index.html`
-- [ ] T025 [US3] Implement open-next failure handling that keeps saved row stable and prompts manual continuation in `static/src/bill_pay_row_keyboard.js`
-- [ ] T026 [US3] Ensure save success with no next unpaid row exits cleanly without extra trigger actions in `financial/views.py`
+- [x] T024 [US3] Add subtle Fast Mode feedback container for open-next failures in `financial/templates/financial/bill_pay/index.html`
+- [x] T025 [US3] Implement open-next failure handling that keeps saved row stable and prompts manual continuation in `static/src/bill_pay_row_keyboard.js`
+- [x] T026 [US3] Ensure save success with no next unpaid row exits cleanly without extra trigger actions in `financial/views.py`
 
 **Checkpoint**: All user stories are independently functional.
 
@@ -107,12 +107,12 @@
 
 **Purpose**: Final validation, documentation, and accountability updates across stories.
 
-- [ ] T027 [P] [REQ:UI-001] Document finalized HTMX trigger contract examples in `specs/001-billpay-fast-mode/contracts/bill-pay-fast-mode.openapi.yaml`
-- [ ] T028 [P] [REQ:UI-003] Update execution notes and manual validation steps in `specs/001-billpay-fast-mode/quickstart.md`
-- [ ] T029 Run focused regression suite for bill pay fast mode in `financial/tests/test_bill_pay_save.py`, `financial/tests/test_bill_pay_row_keyboard.py`, `financial/tests/test_bill_pay_validation.py`, and `financial/tests/test_bill_pay_index.py`
-- [ ] T030 [REQ:Principle-V] Add AI prompt/response traceability note for implementation in `docs/ai/006-bill-pay-fast-mode-log.md`
-- [ ] T031 [REQ:UI-002] Verify template safety constraints (single-line `{% %}` and `{# #}` tags/comments, server-computed conditional state) in `financial/templates/financial/bill_pay/index.html` and `financial/templates/financial/bill_pay/_row_edit.html`
-- [ ] T032 [REQ:Deterministic-Data] Verify no schema/fixture drift and record deterministic evidence (no new migrations, no fixture changes required) in `specs/001-billpay-fast-mode/quickstart.md`
+- [x] T027 [P] [REQ:UI-001] Document finalized HTMX trigger contract examples in `specs/001-billpay-fast-mode/contracts/bill-pay-fast-mode.openapi.yaml`
+- [x] T028 [P] [REQ:UI-003] Update execution notes and manual validation steps in `specs/001-billpay-fast-mode/quickstart.md`
+- [x] T029 Run focused regression suite for bill pay fast mode in `financial/tests/test_bill_pay_save.py`, `financial/tests/test_bill_pay_row_keyboard.py`, `financial/tests/test_bill_pay_validation.py`, and `financial/tests/test_bill_pay_index.py`
+- [x] T030 [REQ:Principle-V] Add AI prompt/response traceability note for implementation in `docs/ai/006-bill-pay-fast-mode-log.md`
+- [x] T031 [REQ:UI-002] Verify template safety constraints (single-line `{% %}` and `{# #}` tags/comments, server-computed conditional state) in `financial/templates/financial/bill_pay/index.html` and `financial/templates/financial/bill_pay/_row_edit.html`
+- [x] T032 [REQ:Deterministic-Data] Verify no schema/fixture drift and record deterministic evidence (no new migrations, no fixture changes required) in `specs/001-billpay-fast-mode/quickstart.md`
 
 ---
 

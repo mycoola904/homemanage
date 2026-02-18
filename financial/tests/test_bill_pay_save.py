@@ -1,3 +1,5 @@
+import json
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
@@ -40,6 +42,12 @@ class BillPaySaveTests(TestCase):
             current_balance=1200,
         )
         self.row_url = reverse("financial:bill-pay-row", args=[self.account.id])
+
+    def _parse_hx_trigger(self, response):
+        raw = response.headers.get("HX-Trigger")
+        if not raw:
+            return None
+        return json.loads(raw)
 
     def test_get_edit_row_binds_existing_instance_values(self):
         MonthlyBillPayment.objects.create(
@@ -153,6 +161,40 @@ class BillPaySaveTests(TestCase):
         self.assertEqual(keyboard_state.actual_payment_amount, button_amount)
         self.assertEqual(keyboard_state.paid, button_paid)
 
+    def test_keyboard_save_with_fast_mode_emits_next_row_trigger(self):
+        next_account = Account.objects.create(
+            user=self.user,
+            household=self.household,
+            name="Credit Card",
+            institution="Issuer",
+            account_type=AccountType.CREDIT_CARD,
+            status=AccountStatus.ACTIVE,
+            current_balance=-125,
+            payment_due_day=20,
+            minimum_amount_due=30,
+        )
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            self.row_url + "?month=2026-02",
+            {
+                "funding_account": str(self.funding_account.id),
+                "actual_payment_amount": "210.00",
+                "paid": "on",
+                "keyboard_intent": "save",
+                "focus_field": "save",
+                "fast_mode": "1",
+            },
+            HTTP_HX_REQUEST="true",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        trigger = self._parse_hx_trigger(response)
+        self.assertIsNotNone(trigger)
+        self.assertIn("billpay:openNextRow", trigger)
+        self.assertEqual(trigger["billpay:openNextRow"]["nextRowId"], str(next_account.id))
+        self.assertIn(f"/bill-pay/{next_account.id}/row/", trigger["billpay:openNextRow"]["nextEditUrl"])
+
     def test_save_and_reload_shows_funding_account_display(self):
         self.client.force_login(self.user)
         post_response = self.client.post(
@@ -194,6 +236,89 @@ class BillPaySaveTests(TestCase):
         self.assertEqual(payment.funding_account_id, second_funding.id)
         self.assertEqual(str(payment.actual_payment_amount), "65.00")
         self.assertFalse(payment.paid)
+
+    def test_fast_mode_enabled_uses_on_screen_order_for_next_unpaid(self):
+        first = Account.objects.create(
+            user=self.user,
+            household=self.household,
+            name="Loan A",
+            institution="Lender",
+            account_type=AccountType.LOAN,
+            status=AccountStatus.ACTIVE,
+            current_balance=2500,
+            payment_due_day=5,
+            minimum_amount_due=80,
+        )
+        second = Account.objects.create(
+            user=self.user,
+            household=self.household,
+            name="Card B",
+            institution="Issuer",
+            account_type=AccountType.CREDIT_CARD,
+            status=AccountStatus.ACTIVE,
+            current_balance=-500,
+            payment_due_day=15,
+            minimum_amount_due=45,
+        )
+        third = Account.objects.create(
+            user=self.user,
+            household=self.household,
+            name="Other C",
+            institution="Utility",
+            account_type=AccountType.OTHER,
+            status=AccountStatus.ACTIVE,
+            current_balance=70,
+            payment_due_day=25,
+            minimum_amount_due=20,
+        )
+        MonthlyBillPayment.objects.create(account=self.account, month="2026-02-01", funding_account=self.funding_account, actual_payment_amount="220.00", paid=True)
+        MonthlyBillPayment.objects.create(account=second, month="2026-02-01", funding_account=self.funding_account, actual_payment_amount="45.00", paid=True)
+        row_url = reverse("financial:bill-pay-row", args=[first.id])
+
+        self.client.force_login(self.user)
+        response = self.client.post(
+            row_url + "?month=2026-02",
+            {"funding_account": str(self.funding_account.id), "actual_payment_amount": "80.00", "paid": "on", "fast_mode": "1"},
+            HTTP_HX_REQUEST="true",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        trigger = self._parse_hx_trigger(response)
+        self.assertEqual(trigger["billpay:openNextRow"]["nextRowId"], str(third.id))
+
+    def test_fast_mode_disabled_does_not_emit_next_row_trigger(self):
+        next_account = Account.objects.create(
+            user=self.user,
+            household=self.household,
+            name="Card Later",
+            institution="Issuer",
+            account_type=AccountType.CREDIT_CARD,
+            status=AccountStatus.ACTIVE,
+            current_balance=-80,
+            payment_due_day=21,
+            minimum_amount_due=22,
+        )
+        _ = next_account
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.row_url + "?month=2026-02",
+            {"funding_account": str(self.funding_account.id), "actual_payment_amount": "220.00", "paid": "on"},
+            HTTP_HX_REQUEST="true",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("HX-Trigger", response.headers)
+
+    def test_fast_mode_enabled_with_no_next_unpaid_row_emits_no_trigger(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.row_url + "?month=2026-02",
+            {"funding_account": str(self.funding_account.id), "actual_payment_amount": "220.00", "paid": "on", "fast_mode": "1"},
+            HTTP_HX_REQUEST="true",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn("HX-Trigger", response.headers)
 
     def test_row_save_does_not_create_transactions(self):
         self.client.force_login(self.user)

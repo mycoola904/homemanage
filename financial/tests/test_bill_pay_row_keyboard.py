@@ -31,6 +31,7 @@ class BillPayRowKeyboardTests(TestCase):
             minimum_amount_due=220,
         )
         self.row_url = reverse("financial:bill-pay-row", args=[self.account.id])
+        self.index_url = reverse("financial:bill-pay-index")
 
     def test_edit_row_contains_required_tab_order_controls(self):
         self.client.force_login(self.user)
@@ -84,3 +85,19 @@ class BillPayRowKeyboardTests(TestCase):
         self.assertLess(actual_index, paid_index)
         self.assertLess(paid_index, save_index)
         self.assertLess(save_index, cancel_index)
+
+    def test_edit_row_includes_fast_mode_hidden_field(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.row_url, {"month": "2026-02"}, HTTP_HX_REQUEST="true")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="fast_mode"')
+        self.assertContains(response, 'data-fast-mode-field')
+
+    def test_index_loads_open_next_row_handler_and_failure_message_copy(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.index_url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "bill_pay_row_keyboard.js")
+        self.assertContains(response, 'id="bill-pay-fast-mode-status"')
