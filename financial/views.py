@@ -231,6 +231,8 @@ def _render_bill_pay_row_edit(request, *, account: Account, month_param: str, fo
 	form = BillPayRowForm(instance=instance, account=account, month=month)
 	form_id = f"bill-pay-form-{account.id}"
 	form.fields["funding_account"].widget.attrs["form"] = form_id
+	form.fields["funding_account"].widget.attrs["data-focus-field"] = "funding_account"
+	form.fields["funding_account"].widget.attrs["data-tab-order"] = "1"
 	form.fields["actual_payment_amount"].widget.attrs["form"] = form_id
 	form.fields["paid"].widget.attrs["form"] = form_id
 	form.fields["actual_payment_amount"].widget.attrs["data-focus-field"] = BILL_PAY_FOCUS_ACTUAL_PAYMENT
@@ -485,6 +487,8 @@ def bill_pay_row(request, account_id):
 	row = build_bill_pay_row(account=account, month=month)
 	form_id = f"bill-pay-form-{account.id}"
 	form.fields["funding_account"].widget.attrs["form"] = form_id
+	form.fields["funding_account"].widget.attrs["data-focus-field"] = "funding_account"
+	form.fields["funding_account"].widget.attrs["data-tab-order"] = "1"
 	form.fields["actual_payment_amount"].widget.attrs["form"] = form_id
 	form.fields["paid"].widget.attrs["form"] = form_id
 	form.fields["actual_payment_amount"].widget.attrs["data-focus-field"] = BILL_PAY_FOCUS_ACTUAL_PAYMENT

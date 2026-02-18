@@ -66,3 +66,21 @@ class BillPayRowKeyboardTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'data-billpay-animate-row')
         self.assertContains(response, 'class="billpay-row-transition"')
+
+    def test_edit_row_tab_sequence_is_funding_actual_paid_save_cancel(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.row_url, {"month": "2026-02"}, HTTP_HX_REQUEST="true")
+
+        self.assertEqual(response.status_code, 200)
+        html = response.content.decode("utf-8")
+
+        funding_index = html.index('data-focus-field="funding_account"')
+        actual_index = html.index('data-focus-field="actual_payment_amount"')
+        paid_index = html.index('data-focus-field="paid"')
+        save_index = html.index('data-focus-field="save"')
+        cancel_index = html.index('data-focus-field="cancel"')
+
+        self.assertLess(funding_index, actual_index)
+        self.assertLess(actual_index, paid_index)
+        self.assertLess(paid_index, save_index)
+        self.assertLess(save_index, cancel_index)
