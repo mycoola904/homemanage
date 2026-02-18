@@ -1,0 +1,128 @@
+openapi: 3.0.3
+info:
+  title: HomeManage Bill Pay Fast Mode HTMX Contract
+  version: 0.1.0
+  description: |
+    Contract for bill pay row edit/save interactions with optional Fast Mode auto-open signaling.
+servers:
+  - url: /financial
+paths:
+  /bill-pay/{account_id}/row/:
+    get:
+      summary: Render a bill pay row in edit mode
+      parameters:
+        - in: path
+          name: account_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: month
+          required: true
+          schema:
+            type: string
+            pattern: '^\\d{4}-\\d{2}$'
+        - in: query
+          name: focus_field
+          required: false
+          schema:
+            type: string
+            enum: [funding_account, actual_payment_amount, paid, save, cancel]
+      responses:
+        '200':
+          description: Row edit partial rendered
+          content:
+            text/html:
+              schema:
+                type: string
+        '404':
+          description: Row/account/month unavailable for active context
+          content:
+            text/html:
+              schema:
+                type: string
+    post:
+      summary: Save or cancel bill pay row edit
+      parameters:
+        - in: path
+          name: account_id
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: month
+          required: true
+          schema:
+            type: string
+            pattern: '^\\d{4}-\\d{2}$'
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                funding_account:
+                  type: string
+                  format: uuid
+                actual_payment_amount:
+                  type: string
+                  description: Decimal string; must be >= 0 when provided
+                paid:
+                  type: string
+                  description: Checkbox value
+                keyboard_intent:
+                  type: string
+                  enum: [save, cancel]
+                focus_field:
+                  type: string
+                  enum: [funding_account, actual_payment_amount, paid, save, cancel]
+                fast_mode:
+                  type: string
+                  description: 'Fast mode enable flag; truthy value means enabled'
+      responses:
+        '200':
+          description: Save success or cancel success, returns display row partial
+          headers:
+            HX-Trigger:
+              description: |
+                Present when fast_mode is enabled and save succeeds. Event payload for opening next unpaid row.
+              schema:
+                type: string
+                example: >-
+                  {"billpay:openNextRow":{"nextRowId":"<uuid>","nextEditUrl":"/financial/bill-pay/<uuid>/row/?month=2026-02&focus_field=actual_payment_amount","focusField":"actual_payment_amount"}}
+          content:
+            text/html:
+              schema:
+                type: string
+        '422':
+          description: Validation failure; row remains in edit mode
+          content:
+            text/html:
+              schema:
+                type: string
+        '404':
+          description: Account/month unavailable
+          content:
+            text/html:
+              schema:
+                type: string
+x-htmx:
+  endpoints:
+    - name: bill_pay_row_get_edit
+      method: GET
+      path: /financial/bill-pay/{account_id}/row/?month={yyyy-mm}&focus_field={field}
+      hx-target: '#bill-pay-row-{account_id}'
+      hx-swap: outerHTML
+      response-root: tr#bill-pay-row-{account_id}[data-billpay-edit-row]
+    - name: bill_pay_row_post_save_or_cancel
+      method: POST
+      path: /financial/bill-pay/{account_id}/row/?month={yyyy-mm}
+      hx-target: '#bill-pay-row-{account_id}'
+      hx-swap: outerHTML
+      response-root: tr#bill-pay-row-{account_id}
+      failure:
+        status: 422
+        behavior: keep edit row rendered with inline errors; do not auto-open next row
