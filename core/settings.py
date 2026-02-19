@@ -18,6 +18,22 @@ from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / '.env')
+# -----------------------------
+# Google Calendar Configuration
+# -----------------------------
+
+GOOGLE_CALENDAR_ENABLED = os.getenv("GOOGLE_CALENDAR_ENABLED", "false").lower() == "true"
+
+GOOGLE_CALENDAR_ID = os.getenv("GOOGLE_CALENDAR_ID", "primary")
+
+GOOGLE_CALENDAR_SYNC_MONTHS_AHEAD = int(
+    os.getenv("GOOGLE_CALENDAR_SYNC_MONTHS_AHEAD", 3)
+)
+
+GOOGLE_OAUTH_CLIENT_ID = os.getenv("GOOGLE_OAUTH_CLIENT_ID")
+GOOGLE_OAUTH_CLIENT_SECRET = os.getenv("GOOGLE_OAUTH_CLIENT_SECRET")
+GOOGLE_OAUTH_REDIRECT_URI = os.getenv("GOOGLE_OAUTH_REDIRECT_URI")
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -152,4 +168,10 @@ COTTON_DIR = "components"
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'household:home'
 LOGOUT_REDIRECT_URL = 'home'
+
+if DEBUG:
+    ALLOWED_HOSTS = ["*"]
+else:
+    ALLOWED_HOSTS = ["yourdomain.com"]
+
 
