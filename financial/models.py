@@ -363,6 +363,17 @@ class MonthlyBillPayment(models.Model):
 		self.month = self.normalize_month(self.month)
 		return super().save(*args, **kwargs)
 
+class MonthlyBillPaymentCalendarLink(models.Model):	
+	monthly_bill_payment = models.OneToOneField(
+		MonthlyBillPayment, 
+		on_delete=models.CASCADE, 
+		related_name="calendar_link")
+	google_calendar_id = models.CharField(max_length=255)
+	google_event_id = models.CharField(max_length=255, db_index=True)
+	etag = models.CharField(max_length=255, blank=True, null=True)
+	last_synced_at = models.DateTimeField(blank=True, null=True)
+	last_payload_hash = models.CharField(max_length=64, blank=True, null=True) # sha256 hash of the last sent payload for change detection
+
 
 class Transaction(models.Model):
 	id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

@@ -16,19 +16,19 @@
 - [X] Add validators to `Account.payment_due_day`:
       - `MinValueValidator(1)`
       - `MaxValueValidator(28)`
-- [ ] Add/adjust form validation (if you have account edit forms) so UI shows clear error messages.
-- [ ] Write a migration (or run makemigrations) and migrate.
+- [X] Add/adjust form validation (if you have account edit forms) so UI shows clear error messages.
+- [X] Write a migration (or run makemigrations) and migrate.
 - [ ] Add a quick unit test for invalid values (optional but nice).
 
 ## Milestone 2 — Mapping model
-- [ ] Create `MonthlyBillPaymentCalendarLink` model (OneToOne to MBP).
-- [ ] Migrate.
-- [ ] Add admin registration (optional).
-- [ ] Add index(es) if desired (OneToOne is indexed, but add `google_event_id` index if you will query by it).
+- [X] Create `MonthlyBillPaymentCalendarLink` model (OneToOne to MBP).
+- [X] Migrate.
+- [X] Add admin registration (optional).
+- [X] Add index(es) if desired (OneToOne is indexed, but add `google_event_id` index if you will query by it).
 
 ## Milestone 3 — EventSpec DTO + payload hash
-- [ ] Create `financial/services/billpay_calendar.py`.
-- [ ] Add `BillPayEventSpec` dataclass (frozen, slots).
+- [X] Create `financial/services/billpay_calendar.py`.
+- [X] Add `BillPayEventSpec` dataclass (frozen, slots).
 - [ ] Implement `build_billpay_event_spec(mbp)`:
       - Build due date from `mbp.month` + `account.payment_due_day`
       - Household label from `account.household` (name or short code)
