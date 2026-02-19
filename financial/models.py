@@ -10,6 +10,7 @@ from django.db import models
 from django.db.models import Case, IntegerField, When
 from django.db.models.functions import Lower
 from households.models import Household, HouseholdMember
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 ROUTING_NUMBER_VALIDATOR = RegexValidator(
@@ -176,7 +177,14 @@ class Account(models.Model):
 		null=True,
 	)
 	statement_close_date = models.DateField(blank=True, null=True)
-	payment_due_day = models.PositiveSmallIntegerField(blank=True, null=True)
+	payment_due_day = models.PositiveSmallIntegerField(
+		blank=True,
+		null=True,
+		validators=[
+			MinValueValidator(1), 
+			MaxValueValidator(28)
+			]
+	)
 	minimum_amount_due = models.DecimalField(
 		max_digits=12,
 		decimal_places=2,

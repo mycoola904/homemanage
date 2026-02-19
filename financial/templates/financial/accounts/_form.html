@@ -1,6 +1,7 @@
 {% url "financial:accounts-index" as default_cancel %}
 {% if post_hx_url %}
 <form method="post" action="{{ post_hx_url }}" class="space-y-4" hx-post="{{ post_hx_url }}" hx-target="#account-preview-panel" hx-swap="innerHTML">
+    
 {% else %}
 <form method="post" class="space-y-4">
 {% endif %}

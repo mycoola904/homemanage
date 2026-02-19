@@ -13,7 +13,7 @@
       - OAuth client id/secret + redirect uri
 
 ## Milestone 1 — Encode due-day rule (1–28)
-- [ ] Add validators to `Account.payment_due_day`:
+- [X] Add validators to `Account.payment_due_day`:
       - `MinValueValidator(1)`
       - `MaxValueValidator(28)`
 - [ ] Add/adjust form validation (if you have account edit forms) so UI shows clear error messages.
