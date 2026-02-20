@@ -7,19 +7,19 @@ Context:
 <tr data-component="financial.account_row"
     data-account-id="{{ row.id }}"
     id="account-row-{{ row.id }}"
+    class="hover"
     {% if swap_oob %}hx-swap-oob="true"{% endif %}>
     <td>
-        <div class="font-semibold">{{ row.name }}</div>
-        <p class="text-sm text-base-content/70">{{ row.account_type_label }}</p>
+        <div class="font-bold">{{ row.name }}</div>
     </td>
     <td>{{ row.institution|default:"—" }}</td>
     <td>
-        <span class="badge badge-outline">{{ row.account_type_label }}</span>
+        <span class="badge badge-ghost badge-sm">{{ row.account_type_label }}</span>
     </td>
     <td>
         {% if row.online_access_url %}
-            <a href="{{ row.online_access_url }}" class="link link-primary" target="_blank" rel="noopener noreferrer">
-                Open
+            <a href="{{ row.online_access_url }}" class="link" target="_blank" rel="noopener noreferrer">
+                Visit Site
             </a>
         {% else %}
             —
@@ -32,10 +32,10 @@ Context:
         {{ row.current_balance_display }}
     </td>
     <td class="text-right">
-        <div class="join join-horizontal justify-end gap-2">
+        <div class="flex items-center justify-end gap-2">
             <button
                 type="button"
-                class="btn btn-xs join-item"
+                class="btn btn-xs btn-ghost"
                 hx-get="{{ row.preview_url }}"
                 hx-target="#account-preview-panel"
                 hx-swap="innerHTML"
@@ -45,33 +45,45 @@ Context:
             >
                 Preview
             </button>
-            <a class="btn btn-xs join-item btn-ghost" href="{{ row.open_url }}" aria-label="Open account detail">
+            <a class="btn btn-xs btn-ghost" href="{{ row.open_url }}" aria-label="Open account detail">
                 Open
             </a>
-            <button
-                type="button"
-                class="btn btn-xs join-item btn-ghost"
-                hx-get="{{ row.edit_url }}"
-                hx-target="#account-preview-panel"
-                hx-swap="innerHTML"
-                hx-request="queue:last"
-                hx-disabled-elt="this"
-                aria-label="Edit account"
-            >
-                Edit
-            </button>
-            <button
-                type="button"
-                class="btn btn-xs join-item btn-error"
-                hx-get="{{ row.delete_url }}"
-                hx-target="#account-preview-panel"
-                hx-swap="innerHTML"
-                hx-request="queue:last"
-                hx-disabled-elt="this"
-                aria-label="Delete account"
-            >
-                Delete
-            </button>
+            <div class="dropdown dropdown-end">
+                <button type="button" tabindex="0" role="button" class="btn btn-xs btn-ghost">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
+                    </svg>
+                </button>
+                <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-32">
+                    <li>
+                        <button
+                            type="button"
+                            hx-get="{{ row.edit_url }}"
+                            hx-target="#account-preview-panel"
+                            hx-swap="innerHTML"
+                            hx-request="queue:last"
+                            hx-disabled-elt="this"
+                            aria-label="Edit account"
+                        >
+                            Edit
+                        </button>
+                    </li>
+                    <li>
+                        <button
+                            type="button"
+                            class="text-error"
+                            hx-get="{{ row.delete_url }}"
+                            hx-target="#account-preview-panel"
+                            hx-swap="innerHTML"
+                            hx-request="queue:last"
+                            hx-disabled-elt="this"
+                            aria-label="Delete account"
+                        >
+                            Delete
+                        </button>
+                    </li>
+                </ul>
+            </div>
         </div>
     </td>
 </tr>

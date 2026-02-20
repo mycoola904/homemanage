@@ -6,36 +6,38 @@ Context:
 - empty_state_title / empty_state_body: copy strings
 {% endcomment %}
 
-<section id="accounts-table"
-         class="space-y-4"
-         data-component="financial.accounts_table"
-         {% if swap_oob %}hx-swap-oob="true"{% endif %}>
-    {% if has_accounts %}
-        <div class="overflow-x-auto rounded-2xl border border-base-200 bg-base-100 shadow-sm">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Institution</th>
-                        <th>Type</th>
-                        <th>Online Access</th>
-                        <th>Status</th>
-                        <th class="text-right">Balance</th>
-                        <th class="text-right">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for row in rows %}
-                        <c-financial.account_row row=row />
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    {% else %}
-        <div class="rounded-2xl border border-dashed border-base-300 bg-base-100 p-8 text-center">
-            <p class="text-xl font-semibold">{{ empty_state_title }}</p>
-            <p class="text-base-content/70">{{ empty_state_body }}</p>
-            <a href="{{ add_account_url }}" class="btn btn-primary mt-4">Add Account</a>
-        </div>
-    {% endif %}
-</section>
+<div id="accounts-table"
+     class="card bg-base-100 shadow-lg"
+     data-component="financial.accounts_table"
+     {% if swap_oob %}hx-swap-oob="true"{% endif %}>
+    <div class="card-body">
+        {% if has_accounts %}
+            <div class="overflow-x-auto">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Institution</th>
+                            <th>Type</th>
+                            <th>Online Access</th>
+                            <th>Status</th>
+                            <th class="text-right">Balance</th>
+                            <th class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in rows %}
+                            <c-financial.account_row row=row />
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="text-center p-8">
+                <h2 class="text-xl font-semibold">{{ empty_state_title }}</h2>
+                <p class="text-base-content/70 mt-2">{{ empty_state_body }}</p>
+                <a href="{{ add_account_url }}" class="btn btn-primary mt-4">Add Account</a>
+            </div>
+        {% endif %}
+    </div>
+</div>

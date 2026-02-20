@@ -5,17 +5,14 @@
     class="billpay-row-transition"
     data-initial-focus-field="{{ focus_field }}">
     <td class="font-semibold">
-        <button type="button"
-                class="btn btn-ghost btn-xs">
-            {{ row.name }}
-        </button>
+        {{ row.name }}
     </td>
     <td>{{ row.institution|default:"—" }}</td>
     <td>{{ row.payment_due_day_display }}</td>
     <td>{{ row.minimum_amount_due_display }}</td>
     <td>
         {% if row.online_access_url %}
-            <a href="{{ row.online_access_url }}" class="link link-primary" target="_blank" rel="noopener noreferrer">Open</a>
+            <a href="{{ row.online_access_url }}" class="link" target="_blank" rel="noopener noreferrer">Visit Site</a>
         {% else %}
             —
         {% endif %}
@@ -68,7 +65,7 @@
                 Save
             </button>
             <button type="button"
-                    class="btn btn-xs"
+                    class="btn btn-xs btn-ghost"
                     data-focus-field="cancel"
                     data-tab-order="5"
                     hx-post="{{ post_hx_url }}"

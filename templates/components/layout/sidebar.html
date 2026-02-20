@@ -1,15 +1,17 @@
-<div class="drawer-side is-drawer-close:overflow-visible">
+<div class="drawer-side">
   <label for="{{ drawer_id }}" aria-label="close sidebar" class="drawer-overlay"></label>
 
-  <div class="flex min-h-full flex-col items-start bg-base-200 is-drawer-close:w-14 is-drawer-open:w-64">
+  <div class="flex min-h-full flex-col items-start bg-base-200 p-4 w-80">
+    <div class="w-full p-4 text-lg font-bold">
+      <a href="{% url 'household:home' %}">Home Management</a>
+    </div>
     <ul class="menu w-full grow">
       {% with ns=request.resolver_match.namespace %}
 
       <!-- List item -->
      <li>
       <a href="{% url 'household:home' %}"
-        class="is-drawer-close:tooltip is-drawer-close:tooltip-right flex items-center gap-2"
-        data-tip="Household Home">
+        class="flex items-center gap-2">
 
             <!-- Home icon -->
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
@@ -17,53 +19,49 @@
             </svg>
 
 
-            <span class="is-drawer-close:hidden">Household Home</span>
+            <span>Household Home</span>
         </a>
     </li>
 
       {% if ns == 'household' and available_households %}
       <li>
         <a href="{% url 'financial:accounts-index' %}"
-           class="is-drawer-close:tooltip is-drawer-close:tooltip-right flex items-center gap-2"
-           data-tip="Finance">
+           class="flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0 1 15.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 0 1 3 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 0 0-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 0 1-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 0 0 3 15h-.75M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm3 0h.008v.008H18V10.5Zm-12 0h.008v.008H6V10.5Z" />
             </svg>
 
-            <span class="is-drawer-close:hidden">Finance</span>
+            <span>Finance</span>
         </a>
       </li>
       {% elif ns == 'financial' and available_households %}
       <li>
         <a href="{% url 'financial:accounts-index' %}"
-           class="is-drawer-close:tooltip is-drawer-close:tooltip-right flex items-center gap-2"
-           data-tip="Accounts">
+           class="flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z" />
             </svg>
 
 
-            <span class="is-drawer-close:hidden">Accounts</span>
+            <span>Accounts</span>
         </a>
       </li>
       <li>
         <a href="{% url 'financial:accounts-import' %}"
-           class="is-drawer-close:tooltip is-drawer-close:tooltip-right flex items-center gap-2"
-           data-tip="Import">
+           class="flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 16.5V3.75m0 12.75 4.5-4.5m-4.5 4.5-4.5-4.5M3 16.5v1.125A2.625 2.625 0 0 0 5.625 20.25h12.75A2.625 2.625 0 0 0 21 17.625V16.5" />
             </svg>
-            <span class="is-drawer-close:hidden">Import</span>
+            <span>Import</span>
         </a>
       </li>
       <li>
         <a href="{% url 'financial:bill-pay-index' %}"
-           class="is-drawer-close:tooltip is-drawer-close:tooltip-right flex items-center gap-2"
-           data-tip="Bill Pay">
+           class="flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5m-19.5 0v7.5a2.25 2.25 0 0 0 2.25 2.25h15a2.25 2.25 0 0 0 2.25-2.25v-7.5m-19.5 0A2.25 2.25 0 0 1 4.5 6h15a2.25 2.25 0 0 1 2.25 2.25M6 12h.008v.008H6V12Zm3 0h.008v.008H9V12Z" />
             </svg>
-            <span class="is-drawer-close:hidden">Bill Pay</span>
+            <span>Bill Pay</span>
         </a>
       </li>
       {% endif %}
@@ -71,14 +69,13 @@
       {% if can_access_settings %}
       <li>
         <a href="{% url 'household:settings-index' %}"
-           class="is-drawer-close:tooltip is-drawer-close:tooltip-right flex items-center gap-2"
-           data-tip="Settings">
+           class="flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
               <path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 0 1 1.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.559.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.894.149c-.424.07-.764.383-.929.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 0 1-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.398.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 0 1-.12-1.45l.527-.737c.25-.35.272-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 0 1 .12-1.45l.773-.773a1.125 1.125 0 0 1 1.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894Z" />
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
             </svg>
 
-            <span class="is-drawer-close:hidden">Settings</span>
+            <span>Settings</span>
         </a>
       </li>
       {% endif %}

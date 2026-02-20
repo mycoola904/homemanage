@@ -4,16 +4,16 @@
 {% block title %}Bill Pay{% endblock title %}
 
 {% block content %}
-<div class="p-6 space-y-6">
+<div class="space-y-4">
     <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-bold">Bill Pay</h1>
+            <h1 class="text-2xl font-bold md:text-3xl">Bill Pay</h1>
             <p class="text-base-content/70">Track monthly liability payments by account.</p>
             <p id="{{ fast_mode_status_id }}" class="mt-1 text-sm text-warning hidden" role="status" aria-live="polite"></p>
         </div>
         <div class="flex items-end gap-4">
             <label class="label cursor-pointer gap-2 pb-2">
-                <input id="{{ fast_mode_input_id }}" type="checkbox" class="checkbox checkbox-sm" {% if fast_mode_enabled %}checked{% endif %} />
+                <input id="{{ fast_mode_input_id }}" type="checkbox" class="toggle toggle-sm" {% if fast_mode_enabled %}checked{% endif %} />
                 <span class="label-text">Fast Mode</span>
             </label>
             <form method="get"
@@ -39,25 +39,29 @@
         </div>
     </div>
 
-    <div class="overflow-x-auto rounded-2xl border border-base-200 bg-base-100 shadow-sm">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Account</th>
-                    <th>Institution</th>
-                    <th>Due Day</th>
-                    <th>Minimum Due</th>
-                    <th>Online Access</th>
-                    <th>Funding Account</th>
-                    <th>Actual Payment</th>
-                    <th>Paid</th>
-                    <th class="text-right">Actions</th>
-                </tr>
-            </thead>
-            <tbody id="{{ table_body_id }}">
-                {% include "financial/bill_pay/_table_body.html" with rows=rows has_rows=has_rows selected_month=selected_month table_body_id=table_body_id only %}
-            </tbody>
-        </table>
+    <div class="card bg-base-100 shadow-lg">
+        <div class="card-body">
+            <div class="overflow-x-auto">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Account</th>
+                            <th>Institution</th>
+                            <th>Due Day</th>
+                            <th>Minimum Due</th>
+                            <th>Online Access</th>
+                            <th>Funding Account</th>
+                            <th>Actual Payment</th>
+                            <th>Paid</th>
+                            <th class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="{{ table_body_id }}">
+                        {% include "financial/bill_pay/_table_body.html" with rows=rows has_rows=has_rows selected_month=selected_month table_body_id=table_body_id only %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock content %}

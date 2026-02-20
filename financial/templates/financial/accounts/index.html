@@ -3,10 +3,10 @@
 {% block title %}Accounts{% endblock title %}
 
 {% block content %}
-<div class="p-6 space-y-6">
+<div class="space-y-4">
     <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-bold">Accounts</h1>
+            <h1 class="text-2xl font-bold md:text-3xl">Accounts</h1>
             <p class="text-base-content/70">Review every household account without leaving this page.</p>
         </div>
         <a href="{{ add_account_url }}" class="btn btn-primary">
@@ -17,21 +17,25 @@
     {% if messages %}
         <div class="space-y-2">
             {% for message in messages %}
-                <div class="alert alert-success">{{ message }}</div>
+                <div role="alert" class="alert alert-success">{{ message }}</div>
             {% endfor %}
         </div>
     {% endif %}
 
-    <div class="grid gap-6 lg:grid-cols-2">
-        <c-financial.accounts_table
-            rows=account_rows
-            has_accounts=has_accounts
-            empty_state_title=empty_state_title
-            empty_state_body=empty_state_body
-            add_account_url=add_account_url
-        />
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+        <div class="lg:col-span-3">
+            <c-financial.accounts_table
+                rows=account_rows
+                has_accounts=has_accounts
+                empty_state_title=empty_state_title
+                empty_state_body=empty_state_body
+                add_account_url=add_account_url
+            />
+        </div>
 
-        <c-financial.account_preview_panel panel_id=preview_panel_id />
+        <div class="lg:col-span-2">
+            <c-financial.account_preview_panel panel_id=preview_panel_id />
+        </div>
     </div>
 </div>
 {% endblock content %}
