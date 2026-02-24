@@ -11,6 +11,7 @@ from django.db.models import Case, IntegerField, When
 from django.db.models.functions import Lower
 from households.models import Household, HouseholdMember
 from django.core.validators import MinValueValidator, MaxValueValidator
+from .integrations.google_calendar.models import GoogleOAuthToken
 
 
 ROUTING_NUMBER_VALIDATOR = RegexValidator(
