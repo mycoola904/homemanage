@@ -195,8 +195,8 @@ class Account(models.Model):
 		constraints = [
 			models.UniqueConstraint(
 				Lower("name"),
-				"user",
-				name="financial_account_user_lower_name_unique",
+				"household",
+				name="financial_account_household_lower_name_unique",
 			)
 		]
 

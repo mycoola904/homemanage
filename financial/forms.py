@@ -34,11 +34,14 @@ class AccountImportForm(forms.Form):
 class AccountForm(forms.ModelForm):
     """Model-backed form used for create/edit flows."""
 
-    def __init__(self, *args, user=None, **kwargs):
+    def __init__(self, *args, user=None, household=None, **kwargs):
         self._user = user
+        self._household = household
         super().__init__(*args, **kwargs)
         if self._user is None and getattr(self.instance, "user_id", None):
             self._user = self.instance.user
+        if self._household is None and getattr(self.instance, "household_id", None):
+            self._household = self.instance.household
 
         account_type = (
             self.data.get("account_type")
@@ -83,15 +86,15 @@ class AccountForm(forms.ModelForm):
 
     def clean_name(self):
         name = self.cleaned_data.get("name")
-        user = self._user or getattr(self.instance, "user", None)
-        if not name or user is None:
+        household = self._household or getattr(self.instance, "household", None)
+        if not name or household is None:
             return name
 
-        conflict_qs = Account.objects.filter(user=user, name__iexact=name)
+        conflict_qs = Account.objects.filter(household=household, name__iexact=name)
         if self.instance.pk:
             conflict_qs = conflict_qs.exclude(pk=self.instance.pk)
         if conflict_qs.exists():
-            raise forms.ValidationError("You already have an account with this name.")
+            raise forms.ValidationError("An account with this name already exists in this household.")
         return name
 
     def clean(self):

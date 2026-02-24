@@ -92,4 +92,4 @@ class AccountEditTests(TestCase):
         }
         response = self.client.post(self.edit_url, payload, HTTP_HX_REQUEST="true")
         self.assertEqual(response.status_code, 422)
-        self.assertIn("already have an account with this name", response.content.decode())
+        self.assertIn("already exists in this household", response.content.decode())

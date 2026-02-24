@@ -330,7 +330,7 @@ def account_import_page(request):
 			"import_errors": ["Upload a CSV file to continue."],
 		}
 		if is_htmx:
-			return render(request, "financial/accounts/_import_panel.html", context, status=422)
+			return render(request, "financial/accounts/_import_panel.html", context)
 		return render(request, "financial/accounts/import.html", context, status=422)
 
 	try:
@@ -364,7 +364,7 @@ def account_import_page(request):
 			"import_errors": exc.errors,
 		}
 		if is_htmx:
-			return render(request, "financial/accounts/_import_panel.html", context, status=422)
+			return render(request, "financial/accounts/_import_panel.html", context)
 		return render(request, "financial/accounts/import.html", context, status=422)
 
 
@@ -559,6 +559,8 @@ class AccountCreateView(LoginRequiredMixin, CreateView):
 	def get_form_kwargs(self):  # pragma: no cover - CBV hook
 		kwargs = super().get_form_kwargs()
 		kwargs["user"] = self.request.user
+		household, _ = _get_current_household_or_redirect(self.request)
+		kwargs["household"] = household
 		return kwargs
 
 	def form_valid(self, form):
