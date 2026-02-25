@@ -328,6 +328,7 @@ class MonthlyBillPayment(models.Model):
 	paid = models.BooleanField(default=False)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
+	google_event_id = models.CharField(max_length=255, blank=True, null=True, help_text="Google Calendar event ID for sync tracking")
 
 	objects = MonthlyBillPaymentManager()
 

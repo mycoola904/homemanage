@@ -1,6 +1,8 @@
 from django.urls import path
 
 from financial import views
+from .integrations.google_calendar import views as google_views
+
 
 app_name = "financial"
 
@@ -38,4 +40,9 @@ urlpatterns = [
         name="account-transactions-category-new",
     ),
     path("<uuid:pk>/", views.AccountDetailView.as_view(), name="accounts-detail"),
+]
+
+urlpatterns += [
+    path("google/oauth/connect/", google_views.google_oauth_connect, name="google-oauth-connect"),
+    path("google/oauth/callback/", google_views.google_oauth_callback, name="google-oauth-callback"),
 ]
