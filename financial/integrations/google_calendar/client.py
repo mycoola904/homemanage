@@ -69,10 +69,20 @@ class GoogleCalendarClient:
         return event["id"], event.get("htmlLink")
         
     def patch_event(self, calendar_id: str, event_id: str, payload: dict) -> tuple[str, str | None]:
-        raise NotImplementedError("GoogleCalendarClient.patch_event is not implemented yet")
+        service = self.build_service()
+        event = (
+            service.events()
+            .patch(calendarId=calendar_id, eventId=event_id, body=payload)
+            .execute()            
+        )
+        return event["id"], event.get("htmlLink")
     
     def delete_event(self, calendar_id: str, event_id: str) -> None:
-        raise NotImplementedError("GoogleCalendarClient.delete_event is not implemented yet")
+        service = self.build_service()
+        service.events().delete(
+            calendarId=calendar_id, 
+            eventId=event_id
+            ).execute()
 
 def build_google_event_payload(spec: BillPayEventSpec) -> dict:
     """

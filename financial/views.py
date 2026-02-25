@@ -14,6 +14,17 @@ from django.views.generic import CreateView, DetailView, ListView
 
 from financial.forms import AccountForm, AccountImportForm, BillPayRowForm, CategoryForm, TransactionForm
 from financial.models import Account, Transaction, UserAccountQuerysetMixin
+from django.conf import settings
+from django.views.decorators.http import require_http_methods
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
+from django.utils.html import escape
+
+from financial.models import MonthlyBillPayment
+from financial.services.billpay_calendar import build_billpay_event_spec
+from financial.integrations.google_calendar.client import GoogleCalendarClient, build_google_event_payload
+
+
 from households.services.households import resolve_current_household
 from financial.services.account_import import AccountImportValidationError, import_accounts_from_csv
 from financial.services.accounts import (
@@ -546,6 +557,61 @@ def bill_pay_row(request, account_id):
 		context,
 		status=422,
 	)
+
+@login_required
+@require_http_methods(["POST"])
+def bill_pay_sync_google(request):
+    household, redirect_response = _get_current_household_or_redirect(request)
+    if redirect_response is not None:
+        return redirect_response
+
+    if not getattr(settings, "GOOGLE_CALENDAR_ENABLED", False):
+        return HttpResponse(
+            '<div class="alert alert-warning">Google Calendar sync is disabled.</div>',
+            status=400,
+        )
+
+    month_param = request.POST.get("month")
+    if not month_param:
+        return HttpResponse(
+            '<div class="alert alert-error">Missing month.</div>',
+            status=400,
+        )
+
+    try:
+        month = parse_month_param(month_param)  # same helper you already use in bill_pay_row :contentReference[oaicite:5]{index=5}
+    except ValueError:
+        return HttpResponse(
+            '<div class="alert alert-error">Invalid month.</div>',
+            status=400,
+        )
+
+    calendar_id = getattr(settings, "GOOGLE_CALENDAR_ID", "primary")
+    client = GoogleCalendarClient()
+
+    accounts = liability_accounts_for_household(household)
+    inserted = 0
+    skipped = 0
+
+    for account in accounts:
+        mbp = get_or_initialize_monthly_payment(account=account, month=month)
+        if mbp.google_event_id:
+            skipped += 1
+            continue
+
+        spec = build_billpay_event_spec(mbp)  # :contentReference[oaicite:6]{index=6}
+        payload = build_google_event_payload(spec)
+
+        event_id, _link = client.insert_event(calendar_id, payload)
+        mbp.google_event_id = event_id
+        mbp.save(update_fields=["google_event_id", "updated_at"])
+        inserted += 1
+
+    return HttpResponse(
+        f'<div class="alert alert-success">'
+        f'Synced {inserted} new event(s). Skipped {skipped} already-synced.</div>'
+    )
+
 
 
 class AccountCreateView(LoginRequiredMixin, CreateView):
