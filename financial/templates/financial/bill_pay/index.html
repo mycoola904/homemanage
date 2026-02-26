@@ -50,12 +50,13 @@
             <form method="post"
                   action="{% url 'financial:bill-pay-sync-google' %}"
                   class="flex items-end"
+                                    onsubmit="document.getElementById('bill-pay-sync-month').value = document.getElementById('bill-pay-month').value"
                   hx-post="{% url 'financial:bill-pay-sync-google' %}"
                   hx-target="#bill-pay-sync-status"
                   hx-swap="innerHTML"
                   hx-disabled-elt="button">
                 {% csrf_token %}
-                <input type="hidden" name="month" value="{{ selected_month }}">
+                                <input id="bill-pay-sync-month" type="hidden" name="month" value="{{ selected_month }}">
                 <button type="submit" class="btn btn-sm btn-outline">
                     Sync to Google
                 </button>
