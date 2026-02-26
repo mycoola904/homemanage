@@ -591,6 +591,7 @@ def bill_pay_sync_google(request):
 
     accounts = liability_accounts_for_household(household)
     inserted = 0
+    updated = 0
     skipped = 0
     deleted = 0
 
@@ -614,12 +615,21 @@ def bill_pay_sync_google(request):
             continue
 
         # 2) Not paid - ensure calendar event exists with correct details
-        if mbp.google_event_id:
-            skipped += 1
-            continue
-
-        spec = build_billpay_event_spec(mbp)  # :contentReference[oaicite:6]{index=6}
+        spec = build_billpay_event_spec(mbp)
         payload = build_google_event_payload(spec)
+
+        if mbp.google_event_id:
+            try:
+                event_id, _link = client.patch_event(calendar_id, mbp.google_event_id, payload)
+                if event_id != mbp.google_event_id:
+                    mbp.google_event_id = event_id
+                    mbp.save(update_fields=["google_event_id", "updated_at"])
+                updated += 1
+                continue
+            except Exception as exc:
+                status_code = getattr(getattr(exc, "resp", None), "status", None)
+                if status_code != 404:
+                    raise
 
         event_id, _link = client.insert_event(calendar_id, payload)
 
@@ -629,7 +639,7 @@ def bill_pay_sync_google(request):
 
     return HttpResponse(
         f'<div class="alert alert-success">'
-        f'Synced {inserted} new. Deleted {deleted} paid. Skipped {skipped}.</div>'
+        f'Synced {inserted} new. Updated {updated}. Deleted {deleted} paid. Skipped {skipped}.</div>'
     )
 
 
