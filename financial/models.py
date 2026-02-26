@@ -10,6 +10,8 @@ from django.db import models
 from django.db.models import Case, IntegerField, When
 from django.db.models.functions import Lower
 from households.models import Household, HouseholdMember
+from django.core.validators import MinValueValidator, MaxValueValidator
+from .integrations.google_calendar.models import GoogleOAuthToken
 
 
 ROUTING_NUMBER_VALIDATOR = RegexValidator(
@@ -176,7 +178,14 @@ class Account(models.Model):
 		null=True,
 	)
 	statement_close_date = models.DateField(blank=True, null=True)
-	payment_due_day = models.PositiveSmallIntegerField(blank=True, null=True)
+	payment_due_day = models.PositiveSmallIntegerField(
+		blank=True,
+		null=True,
+		validators=[
+			MinValueValidator(1), 
+			MaxValueValidator(28)
+			]
+	)
 	minimum_amount_due = models.DecimalField(
 		max_digits=12,
 		decimal_places=2,
@@ -319,6 +328,7 @@ class MonthlyBillPayment(models.Model):
 	paid = models.BooleanField(default=False)
 	created_at = models.DateTimeField(auto_now_add=True)
 	updated_at = models.DateTimeField(auto_now=True)
+	google_event_id = models.CharField(max_length=255, blank=True, null=True, help_text="Google Calendar event ID for sync tracking")
 
 	objects = MonthlyBillPaymentManager()
 
@@ -354,6 +364,17 @@ class MonthlyBillPayment(models.Model):
 	def save(self, *args, **kwargs):
 		self.month = self.normalize_month(self.month)
 		return super().save(*args, **kwargs)
+
+class MonthlyBillPaymentCalendarLink(models.Model):	
+	monthly_bill_payment = models.OneToOneField(
+		MonthlyBillPayment, 
+		on_delete=models.CASCADE, 
+		related_name="calendar_link")
+	google_calendar_id = models.CharField(max_length=255)
+	google_event_id = models.CharField(max_length=255, db_index=True)
+	etag = models.CharField(max_length=255, blank=True, null=True)
+	last_synced_at = models.DateTimeField(blank=True, null=True)
+	last_payload_hash = models.CharField(max_length=64, blank=True, null=True) # sha256 hash of the last sent payload for change detection
 
 
 class Transaction(models.Model):

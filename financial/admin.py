@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Transaction, Account
+from .models import Transaction, Account, MonthlyBillPaymentCalendarLink
 @admin.register(Transaction)
 class TransactionAdmin(admin.ModelAdmin):
     list_display = ('id', 'account', 'amount', 'transaction_type', 'description')
@@ -9,3 +9,7 @@ class TransactionAdmin(admin.ModelAdmin):
 @admin.register(Account)
 class AccountAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'household', 'name', 'institution', 'account_type', 'status', 'current_balance')
+
+@admin.register(MonthlyBillPaymentCalendarLink)
+class MonthlyBillPaymentCalendarLinkAdmin(admin.ModelAdmin):
+    list_display = [field.name for field in MonthlyBillPaymentCalendarLink._meta.fields]

@@ -96,6 +96,17 @@ class AccountForm(forms.ModelForm):
         if conflict_qs.exists():
             raise forms.ValidationError("An account with this name already exists in this household.")
         return name
+    
+    def clean_payment_due_day(self):
+        value = self.cleaned_data.get("payment_due_day")
+        if value is None:
+            return value
+
+        if not (1 <= value <= 28):
+            msg = "Payment due day must be between 1 and 28."
+            self.add_error("payment_due_day", msg)  # field error
+            self.add_error(None, msg)               # banner error
+        return value
 
     def clean(self):
         cleaned_data = super().clean()

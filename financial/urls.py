@@ -1,6 +1,8 @@
 from django.urls import path
 
 from financial import views
+from .integrations.google_calendar import views as google_views
+
 
 app_name = "financial"
 
@@ -9,6 +11,7 @@ urlpatterns = [
     path("bill-pay/", views.bill_pay_index, name="bill-pay-index"),
     path("bill-pay/table-body/", views.bill_pay_table_body, name="bill-pay-table-body"),
     path("bill-pay/<uuid:account_id>/row/", views.bill_pay_row, name="bill-pay-row"),
+    path("bill-pay/sync-google/", views.bill_pay_sync_google, name="bill-pay-sync-google"),
     path("import/", views.account_import_page, name="accounts-import"),
     path("import/panel/", views.account_import_panel, name="accounts-import-panel"),
     path("import/template/", views.account_import_template, name="accounts-import-template"),
@@ -38,4 +41,9 @@ urlpatterns = [
         name="account-transactions-category-new",
     ),
     path("<uuid:pk>/", views.AccountDetailView.as_view(), name="accounts-detail"),
+]
+
+urlpatterns += [
+    path("google/oauth/connect/", google_views.google_oauth_connect, name="google-oauth-connect"),
+    path("google/oauth/callback/", google_views.google_oauth_callback, name="google-oauth-callback"),
 ]
