@@ -9,6 +9,7 @@ app_name = "financial"
 urlpatterns = [
     path("", views.AccountsIndexView.as_view(), name="accounts-index"),
     path("bill-pay/", views.bill_pay_index, name="bill-pay-index"),
+    path("bill-pay/print/", views.bill_pay_print, name="bill-pay-print"),
     path("bill-pay/table-body/", views.bill_pay_table_body, name="bill-pay-table-body"),
     path("bill-pay/<uuid:account_id>/row/", views.bill_pay_row, name="bill-pay-row"),
     path("bill-pay/sync-google/", views.bill_pay_sync_google, name="bill-pay-sync-google"),

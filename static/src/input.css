@@ -36,3 +36,46 @@
     opacity: 0.94;
   }
 }
+
+.bill-pay-print-only {
+  display: none;
+}
+
+@page {
+  size: Letter portrait;
+  margin: 0.5in;
+}
+
+@media print {
+  .bill-pay-screen-only,
+  .bill-pay-screen-inline {
+    display: none !important;
+  }
+
+  .bill-pay-print-only {
+    display: inline !important;
+  }
+
+  #bill-pay-table {
+    width: 100%;
+    table-layout: fixed;
+    font-size: 10.5pt;
+  }
+
+  #bill-pay-table th,
+  #bill-pay-table td {
+    padding: 0.2rem 0.35rem;
+    white-space: normal;
+  }
+
+  #bill-pay-table th:nth-child(2),
+  #bill-pay-table th:nth-child(3),
+  #bill-pay-table th:nth-child(5),
+  #bill-pay-table th:nth-child(9),
+  #bill-pay-table td:nth-child(2),
+  #bill-pay-table td:nth-child(3),
+  #bill-pay-table td:nth-child(5),
+  #bill-pay-table td:nth-child(9) {
+    display: none;
+  }
+}

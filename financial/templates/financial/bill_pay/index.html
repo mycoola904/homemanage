@@ -29,7 +29,7 @@
                   action="{{ table_body_url }}"
                   class="flex items-end gap-2"
                   hx-get="{{ table_body_url }}"
-                  hx-target="#{{ table_body_id }}"
+                hx-target="#bill-pay-month-content"
                   hx-swap="innerHTML"
                   hx-request="queue:last"
                   hx-disabled-elt="button">
@@ -62,31 +62,23 @@
                 </button>
             </form>
 
+            <form method="get"
+                  action="{% url 'financial:bill-pay-print' %}"
+                  target="_blank"
+                  class="flex items-end bill-pay-screen-only"
+                  onsubmit="this.querySelector('[name=month]').value = document.getElementById('bill-pay-month').value">
+                <input type="hidden" name="month" value="{{ selected_month }}" />
+                <button type="submit" class="btn btn-sm btn-outline">Print</button>
+            </form>
+
         </div>
     </div>
 
     <!-- Sync status (HTMX response lands here) -->
     <div id="bill-pay-sync-status"></div>
 
-    <div class="overflow-x-auto rounded-2xl border border-base-200 bg-base-100 shadow-sm">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Account</th>
-                    <th>Institution</th>
-                    <th>Due Day</th>
-                    <th>Minimum Due</th>
-                    <th>Online Access</th>
-                    <th>Funding Account</th>
-                    <th>Actual Payment</th>
-                    <th>Paid</th>
-                    <th class="text-right">Actions</th>
-                </tr>
-            </thead>
-            <tbody id="{{ table_body_id }}">
-                {% include "financial/bill_pay/_table_body.html" with rows=rows has_rows=has_rows selected_month=selected_month table_body_id=table_body_id only %}
-            </tbody>
-        </table>
+    <div id="bill-pay-month-content">
+        {% include "financial/bill_pay/_month_content.html" with rows=rows has_rows=has_rows table_error=table_error table_body_id=table_body_id actual_payment_total_id=actual_payment_total_id actual_payment_total_display=actual_payment_total_display only %}
     </div>
 </div>
 {% endblock content %}

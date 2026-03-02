@@ -330,3 +330,16 @@ class BillPaySaveTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Transaction.objects.filter(account=self.account).count(), 0)
+
+    def test_save_response_includes_oob_total_fragment(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.row_url + "?month=2026-02",
+            {"funding_account": str(self.funding_account.id), "actual_payment_amount": "220.00", "paid": "on"},
+            HTTP_HX_REQUEST="true",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'id="bill-pay-actual-payment-total"')
+        self.assertContains(response, 'hx-swap-oob="outerHTML"')
+        self.assertContains(response, "Total Actual Payment: $220.00")

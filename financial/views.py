@@ -1,5 +1,6 @@
 from pathlib import Path
 import json
+from decimal import Decimal, InvalidOperation
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -50,6 +51,7 @@ from financial.services.bill_pay import (
     upsert_monthly_payment,
 )
 from financial.services.transactions import serialize_transaction_rows
+from financial.services.formatters import format_usd
 
 
 ACCOUNT_IMPORT_PANEL_ID = "account-import-panel"
@@ -58,6 +60,7 @@ ACCOUNT_IMPORT_HX_SWAP = "innerHTML"
 BILL_PAY_TABLE_BODY_ID = "bill-pay-table-body"
 BILL_PAY_FAST_MODE_INPUT_ID = "bill-pay-fast-mode"
 BILL_PAY_FAST_MODE_STATUS_ID = "bill-pay-fast-mode-status"
+BILL_PAY_ACTUAL_PAYMENT_TOTAL_ID = "bill-pay-actual-payment-total"
 BILL_PAY_OPEN_NEXT_ROW_EVENT = "billpay:openNextRow"
 
 
@@ -147,6 +150,18 @@ def _transactions_body_context(account: Account) -> dict:
     }
 
 
+def _actual_payment_total_from_rows(rows) -> Decimal:
+    total_amount = Decimal("0.00")
+    for row in rows:
+        if not row.actual_payment_amount_value:
+            continue
+        try:
+            total_amount += Decimal(row.actual_payment_amount_value)
+        except (InvalidOperation, TypeError):
+            continue
+    return total_amount
+
+
 def _render_transactions_body(request, account: Account, *, status: int = 200) -> HttpResponse:
     context = _transactions_body_context(account)
     return render(
@@ -170,6 +185,7 @@ def _bill_pay_context(request, household, *, month_param: str | None = None) -> 
     selected_month = parse_month_param(month_param)
     accounts = liability_accounts_for_household(household)
     rows = build_bill_pay_rows(accounts, selected_month)
+    total_amount = _actual_payment_total_from_rows(rows)
     return {
         "rows": rows,
         "has_rows": bool(rows),
@@ -178,6 +194,8 @@ def _bill_pay_context(request, household, *, month_param: str | None = None) -> 
         "fast_mode_input_id": BILL_PAY_FAST_MODE_INPUT_ID,
         "fast_mode_status_id": BILL_PAY_FAST_MODE_STATUS_ID,
         "fast_mode_enabled": False,
+        "actual_payment_total_id": BILL_PAY_ACTUAL_PAYMENT_TOTAL_ID,
+        "actual_payment_total_display": format_usd(total_amount),
     }
 
 
@@ -185,19 +203,17 @@ def _render_bill_pay_table_body(request, household, *, month_param: str | None =
     try:
         context = _bill_pay_context(request, household, month_param=month_param)
     except ValueError:
-        return render(
-            request,
-            "financial/bill_pay/_table_body.html",
-            {
-                "rows": [],
-                "has_rows": False,
-                "selected_month": timezone.localdate().strftime("%Y-%m"),
-                "table_body_id": BILL_PAY_TABLE_BODY_ID,
-                "table_error": "Invalid month format.",
-            },
-            status=400,
-        )
-    return render(request, "financial/bill_pay/_table_body.html", context, status=status)
+        context = {
+            "rows": [],
+            "has_rows": False,
+            "selected_month": timezone.localdate().strftime("%Y-%m"),
+            "table_body_id": BILL_PAY_TABLE_BODY_ID,
+            "table_error": "Invalid month format.",
+            "actual_payment_total_id": BILL_PAY_ACTUAL_PAYMENT_TOTAL_ID,
+            "actual_payment_total_display": format_usd(Decimal("0.00")),
+        }
+        status = 400
+    return render(request, "financial/bill_pay/_month_content.html", context, status=status)
 
 
 def _render_bill_pay_row_missing(request, account_id, *, status: int = 404) -> HttpResponse:
@@ -213,6 +229,21 @@ def _render_bill_pay_row_display(request, *, account: Account, month_param: str)
     month = parse_month_param(month_param)
     row = build_bill_pay_row(account=account, month=month)
     return render(request, "financial/bill_pay/_row.html", {"row": row})
+
+
+def _append_bill_pay_total_oob(*, response: HttpResponse, request, household, month) -> None:
+    rows = build_bill_pay_rows(liability_accounts_for_household(household), month)
+    total_amount = _actual_payment_total_from_rows(rows)
+    total_html = render_to_string(
+        "financial/bill_pay/_actual_payment_total.html",
+        {
+            "actual_payment_total_id": BILL_PAY_ACTUAL_PAYMENT_TOTAL_ID,
+            "actual_payment_total_display": format_usd(total_amount),
+            "swap_oob": True,
+        },
+        request=request,
+    )
+    response.content = response.content + total_html.encode(response.charset or "utf-8")
 
 
 def _bill_pay_focus_field_from_request(request, *, default: str | None = None) -> str:
@@ -481,6 +512,19 @@ def bill_pay_table_body(request):
 
 
 @login_required
+@require_http_methods(["GET"])
+def bill_pay_print(request):
+    household, redirect_response = _get_current_household_or_redirect(request)
+    if redirect_response is not None:
+        return redirect_response
+    try:
+        context = _bill_pay_context(request, household, month_param=request.GET.get("month"))
+    except ValueError:
+        return HttpResponse("Invalid month format.", status=400)
+    return render(request, "financial/bill_pay/print.html", context)
+
+
+@login_required
 @require_http_methods(["GET", "POST"])
 def bill_pay_row(request, account_id):
     household, redirect_response = _get_current_household_or_redirect(request)
@@ -509,7 +553,9 @@ def bill_pay_row(request, account_id):
 
     keyboard_intent = _bill_pay_keyboard_intent_from_request(request)
     if keyboard_intent == BILL_PAY_KEYBOARD_INTENT_CANCEL:
-        return _render_bill_pay_row_display(request, account=account, month_param=month_param)
+        response = _render_bill_pay_row_display(request, account=account, month_param=month_param)
+        _append_bill_pay_total_oob(response=response, request=request, household=household, month=month)
+        return response
 
     instance = get_or_initialize_monthly_payment(account=account, month=month)
     form = BillPayRowForm(request.POST, instance=instance, account=account, month=month)
@@ -535,6 +581,7 @@ def bill_pay_row(request, account_id):
             paid=saved.paid,
         )
         response = _render_bill_pay_row_display(request, account=account, month_param=month_param)
+        _append_bill_pay_total_oob(response=response, request=request, household=household, month=month)
         if fast_mode_enabled:
             rows = build_bill_pay_rows(liability_accounts_for_household(household), month)
             next_instruction = build_next_unpaid_row_instruction(rows=rows, current_account_id=str(account.id))

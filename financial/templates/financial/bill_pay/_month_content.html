@@ -1,0 +1,22 @@
+{% include "financial/bill_pay/_actual_payment_total.html" with actual_payment_total_id=actual_payment_total_id actual_payment_total_display=actual_payment_total_display only %}
+
+<div class="overflow-x-auto rounded-2xl border border-base-200 bg-base-100 shadow-sm" id="bill-pay-print-area">
+    <table class="table bill-pay-print-table" id="bill-pay-table">
+        <thead>
+            <tr>
+                <th>Account</th>
+                <th>Institution</th>
+                <th>Due Day</th>
+                <th>Minimum Due</th>
+                <th>Online Access</th>
+                <th>Funding Account</th>
+                <th>Actual Payment</th>
+                <th>Paid</th>
+                <th class="text-right">Actions</th>
+            </tr>
+        </thead>
+        <tbody id="{{ table_body_id }}">
+            {% include "financial/bill_pay/_table_body.html" with rows=rows has_rows=has_rows selected_month=selected_month table_error=table_error table_body_id=table_body_id only %}
+        </tbody>
+    </table>
+</div>

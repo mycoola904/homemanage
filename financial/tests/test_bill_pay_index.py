@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from financial.models import Account, AccountStatus, AccountType
+from financial.models import Account, AccountStatus, AccountType, MonthlyBillPayment
 from households.models import Household, HouseholdMember
 
 
@@ -20,6 +20,7 @@ class BillPayIndexTests(TestCase):
             is_primary=True,
         )
         self.url = reverse("financial:bill-pay-index")
+        self.print_url = reverse("financial:bill-pay-print")
 
     def test_requires_authentication(self):
         response = self.client.get(self.url)
@@ -115,3 +116,89 @@ class BillPayIndexTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'id="bill-pay-fast-mode-status"')
         self.assertContains(response, 'aria-live="polite"')
+
+    def test_actual_payment_total_is_computed_for_selected_month(self):
+        first = Account.objects.create(
+            user=self.user,
+            household=self.household,
+            name="Loan One",
+            institution="Lender",
+            account_type=AccountType.LOAN,
+            status=AccountStatus.ACTIVE,
+            current_balance=1400,
+            payment_due_day=10,
+            minimum_amount_due=60,
+        )
+        second = Account.objects.create(
+            user=self.user,
+            household=self.household,
+            name="Card Two",
+            institution="Issuer",
+            account_type=AccountType.CREDIT_CARD,
+            status=AccountStatus.ACTIVE,
+            current_balance=-300,
+            payment_due_day=18,
+            minimum_amount_due=25,
+        )
+        MonthlyBillPayment.objects.create(
+            account=first,
+            month="2026-02-01",
+            actual_payment_amount="120.50",
+            paid=False,
+        )
+        MonthlyBillPayment.objects.create(
+            account=second,
+            month="2026-02-01",
+            actual_payment_amount="79.50",
+            paid=True,
+        )
+
+        self.client.force_login(self.user)
+        response = self.client.get(self.url, {"month": "2026-02"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["actual_payment_total_display"], "$200.00")
+        self.assertContains(response, "Total Actual Payment: $200.00")
+
+    def test_print_button_and_table_id_are_present(self):
+        self.client.force_login(self.user)
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, self.print_url)
+        self.assertContains(response, 'id="bill-pay-table"')
+
+    def test_print_view_uses_selected_month_records_with_total_and_columns(self):
+        account = Account.objects.create(
+            user=self.user,
+            household=self.household,
+            name="Print Loan",
+            institution="Lender",
+            account_type=AccountType.LOAN,
+            status=AccountStatus.ACTIVE,
+            current_balance=2200,
+            payment_due_day=11,
+            minimum_amount_due=100,
+        )
+        MonthlyBillPayment.objects.create(
+            account=account,
+            month="2026-02-01",
+            actual_payment_amount="175.00",
+            paid=True,
+        )
+
+        self.client.force_login(self.user)
+        response = self.client.get(self.print_url, {"month": "2026-02"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Month: 2026-02")
+        self.assertContains(response, "Total Actual Payment: $175.00")
+        self.assertContains(response, "Account")
+        self.assertContains(response, "Minimum Due")
+        self.assertContains(response, "Funding Account")
+        self.assertContains(response, "Actual Payment")
+        self.assertContains(response, "Paid")
+        self.assertNotContains(response, "Institution")
+        self.assertNotContains(response, "Due Day")
+        self.assertNotContains(response, "Online Access")
+        self.assertNotContains(response, "Actions")

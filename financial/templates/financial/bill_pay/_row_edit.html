@@ -40,10 +40,11 @@
         </div>
     </td>
     <td>
-        <label class="inline-flex items-center gap-2">
+        <label class="inline-flex items-center gap-2 bill-pay-screen-inline">
             {{ form.paid }}
             <span class="text-sm">Paid</span>
         </label>
+        <span class="bill-pay-print-only">{{ row.paid_label }}</span>
         {% for error in form.paid.errors %}
             <p class="text-xs text-error">{{ error }}</p>
         {% endfor %}

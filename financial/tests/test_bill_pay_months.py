@@ -78,6 +78,8 @@ class BillPayMonthTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Monthly Loan")
         self.assertContains(response, "$140.00")
+        self.assertContains(response, 'id="bill-pay-actual-payment-total"')
+        self.assertContains(response, "Total Actual Payment: $140.00")
 
     def test_invalid_month_returns_400(self):
         self.client.force_login(self.user)

@@ -54,11 +54,14 @@
                 hx-swap="outerHTML"
                 hx-request="queue:last"
                 hx-disabled-elt="this">
-            {% if row.paid %}
-                <span class="badge badge-success">{{ row.paid_label }}</span>
-            {% else %}
-                <span class="badge badge-ghost">{{ row.paid_label }}</span>
-            {% endif %}
+            <span class="bill-pay-screen-inline">
+                {% if row.paid %}
+                    <span class="badge badge-success">{{ row.paid_label }}</span>
+                {% else %}
+                    <span class="badge badge-ghost">{{ row.paid_label }}</span>
+                {% endif %}
+            </span>
+            <span class="bill-pay-print-only">{{ row.paid_label }}</span>
         </button>
     </td>
     <td class="text-right">
