@@ -75,6 +75,9 @@ class BillPaySaveTests(TestCase):
         self.assertContains(response, f'name="funding_account"')
         self.assertContains(response, f'form="{expected_form_id}"')
         self.assertContains(response, f'form="{expected_form_id}"')
+        self.assertContains(response, f"hx-include=\"[form='{expected_form_id}']\"")
+        self.assertContains(response, 'hx-post="', count=1)
+        self.assertContains(response, 'name="keyboard_intent"', count=2)
 
     def test_post_creates_account_month_record(self):
         self.client.force_login(self.user)
@@ -331,7 +334,7 @@ class BillPaySaveTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(Transaction.objects.filter(account=self.account).count(), 0)
 
-    def test_save_response_includes_oob_total_fragment(self):
+    def test_save_response_includes_oob_month_content_refresh(self):
         self.client.force_login(self.user)
         response = self.client.post(
             self.row_url + "?month=2026-02",
@@ -340,6 +343,30 @@ class BillPaySaveTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'id="bill-pay-actual-payment-total"')
-        self.assertContains(response, 'hx-swap-oob="outerHTML"')
+        self.assertContains(response, 'id="bill-pay-month-content"')
+        self.assertContains(response, 'hx-swap-oob="innerHTML"')
         self.assertContains(response, "Total Actual Payment: $220.00")
+
+    def test_cancel_response_includes_oob_month_content_refresh(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.row_url + "?month=2026-02",
+            {"keyboard_intent": "cancel", "focus_field": "cancel"},
+            HTTP_HX_REQUEST="true",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'id="bill-pay-month-content"')
+        self.assertContains(response, 'hx-swap-oob="innerHTML"')
+
+    def test_save_response_paid_cell_renders_single_badge_without_print_text_span(self):
+        self.client.force_login(self.user)
+        response = self.client.post(
+            self.row_url + "?month=2026-02",
+            {"funding_account": str(self.funding_account.id), "actual_payment_amount": "220.00", "paid": "on"},
+            HTTP_HX_REQUEST="true",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<span class="badge badge-success">Paid</span>', html=True)
+        self.assertNotContains(response, 'bill-pay-print-only')

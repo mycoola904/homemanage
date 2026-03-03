@@ -44,7 +44,6 @@
             {{ form.paid }}
             <span class="text-sm">Paid</span>
         </label>
-        <span class="bill-pay-print-only">{{ row.paid_label }}</span>
         {% for error in form.paid.errors %}
             <p class="text-xs text-error">{{ error }}</p>
         {% endfor %}
@@ -54,6 +53,7 @@
               id="{{ form_id }}"
               action="{{ post_hx_url }}"
               hx-post="{{ post_hx_url }}"
+              hx-include="[form='{{ form_id }}']"
               hx-target="#bill-pay-row-{{ row.account_id }}"
               hx-swap="outerHTML"
               class="inline-flex items-center gap-2">
@@ -68,14 +68,13 @@
                     hx-disabled-elt="this">
                 Save
             </button>
-            <button type="button"
+                <button type="submit"
                     class="btn btn-xs"
                     data-focus-field="cancel"
                     data-tab-order="5"
-                    hx-post="{{ post_hx_url }}"
+                    name="keyboard_intent"
+                    value="cancel"
                     hx-vals='{"keyboard_intent":"cancel","focus_field":"cancel"}'
-                    hx-target="#bill-pay-row-{{ row.account_id }}"
-                    hx-swap="outerHTML"
                     hx-disabled-elt="this">
                 Cancel
             </button>

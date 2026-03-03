@@ -246,6 +246,21 @@ def _append_bill_pay_total_oob(*, response: HttpResponse, request, household, mo
     response.content = response.content + total_html.encode(response.charset or "utf-8")
 
 
+def _bill_pay_month_content_oob_html(*, request, household, month) -> str:
+    month_param = month_to_query_value(month)
+    context = _bill_pay_context(request, household, month_param=month_param)
+    month_content_html = render_to_string(
+        "financial/bill_pay/_month_content.html",
+        context,
+        request=request,
+    )
+    return (
+        '<div id="bill-pay-month-content" hx-swap-oob="innerHTML">'
+        f"{month_content_html}"
+        "</div>"
+    )
+
+
 def _bill_pay_focus_field_from_request(request, *, default: str | None = None) -> str:
     requested = request.POST.get("focus_field") or request.GET.get("focus_field")
     return normalize_bill_pay_focus_field(requested, default=default)
@@ -553,8 +568,7 @@ def bill_pay_row(request, account_id):
 
     keyboard_intent = _bill_pay_keyboard_intent_from_request(request)
     if keyboard_intent == BILL_PAY_KEYBOARD_INTENT_CANCEL:
-        response = _render_bill_pay_row_display(request, account=account, month_param=month_param)
-        _append_bill_pay_total_oob(response=response, request=request, household=household, month=month)
+        response = HttpResponse(_bill_pay_month_content_oob_html(request=request, household=household, month=month))
         return response
 
     instance = get_or_initialize_monthly_payment(account=account, month=month)
@@ -580,8 +594,7 @@ def bill_pay_row(request, account_id):
             actual_payment_amount=saved.actual_payment_amount,
             paid=saved.paid,
         )
-        response = _render_bill_pay_row_display(request, account=account, month_param=month_param)
-        _append_bill_pay_total_oob(response=response, request=request, household=household, month=month)
+        response = HttpResponse(_bill_pay_month_content_oob_html(request=request, household=household, month=month))
         if fast_mode_enabled:
             rows = build_bill_pay_rows(liability_accounts_for_household(household), month)
             next_instruction = build_next_unpaid_row_instruction(rows=rows, current_account_id=str(account.id))
