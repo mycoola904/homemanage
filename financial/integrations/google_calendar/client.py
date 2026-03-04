@@ -42,11 +42,13 @@ class GoogleCalendarClient:
             client_id=settings.GOOGLE_OAUTH_CLIENT_ID,
             client_secret=settings.GOOGLE_OAUTH_CLIENT_SECRET,
             scopes=scopes,
+            expiry=token_row.token_expiry,
         )
 
         # Refresh if expired (or missing access token)
-        needs_refresh = (not creds.token) or creds.expired
+        needs_refresh = (not creds.token) or (creds.expired and bool(creds.refresh_token))
         if needs_refresh:
+            print("GOOGLE TOKEN REFRESH HAPPENING")
             creds.refresh(Request())
 
             # Persist new access token + expiry
